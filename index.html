@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Great Goals Lifestyle — Build Your Legacy</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  /* Extra page-specific styles */
+  .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; }
+  .about-text h2 { font-size:clamp(1.5rem,3vw,2.2rem); font-weight:700; color:var(--dark); margin-bottom:1rem; }
+  .about-text h2 span { color:var(--primary); }
+  .about-text p { color:var(--gray); line-height:1.8; margin-bottom:1rem; }
+  .about-img { background:linear-gradient(135deg,#1e3a5f,#0f172a); border-radius:var(--radius-lg); height:320px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:3rem; }
+  .value-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1.25rem; }
+  .value-card { background:#fff; border-radius:var(--radius); padding:1.75rem; text-align:center; box-shadow:var(--shadow); transition:var(--transition); border-top:4px solid var(--primary); }
+  .value-card:hover { transform:translateY(-6px); }
+  .value-icon { font-size:2rem; margin-bottom:.75rem; }
+  .value-card h3 { font-size:1rem; font-weight:700; color:var(--dark); }
+  .value-card p  { font-size:.83rem; color:var(--gray); margin-top:.4rem; }
+
+  .testimonial-card { background:#fff; border-radius:var(--radius); padding:1.75rem; box-shadow:var(--shadow); position:relative; }
+  .testimonial-card::before { content:'"'; font-size:4rem; color:var(--primary); opacity:.2; position:absolute; top:.5rem; left:1rem; font-family:serif; line-height:1; }
+  .testimonial-text { font-size:.9rem; color:var(--gray); line-height:1.7; margin-bottom:1rem; }
+  .testimonial-name { font-weight:700; color:var(--dark); font-size:.9rem; }
+  .testimonial-id   { font-size:.78rem; color:var(--primary); }
+  .stars { color:#f59e0b; font-size:.85rem; margin-bottom:.5rem; }
+
+  .plan-table { width:100%; border-collapse:collapse; background:#fff; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+  .plan-table th { background:var(--dark); color:#fff; padding:.85rem 1rem; text-align:left; font-size:.8rem; }
+  .plan-table td { padding:.8rem 1rem; font-size:.875rem; border-bottom:1px solid #f1f5f9; }
+  .plan-table tr:last-child td { border-bottom:none; }
+  .plan-table tr:hover td { background:#fafbff; }
+
+  .income-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1.5rem; }
+  .income-card { background:#fff; border-radius:var(--radius); padding:1.75rem; box-shadow:var(--shadow); border-left:4px solid var(--primary); }
+  .income-card.green { border-left-color:var(--green); }
+  .income-card h3 { font-size:1rem; font-weight:700; color:var(--dark); display:flex; align-items:center; gap:.5rem; }
+  .income-card p { font-size:.875rem; color:var(--gray); margin-top:.5rem; line-height:1.6; }
+  .income-card .formula { background:#f1f5f9; border-radius:6px; padding:.75rem; margin-top:.75rem; font-family:monospace; font-size:.83rem; color:var(--dark); }
+
+  /* Scroll reveal */
+  .reveal { opacity:0; transform:translateY(30px); transition:opacity .6s ease, transform .6s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  .bv-banner { background:linear-gradient(135deg,var(--purple),var(--blue)); color:#fff; border-radius:var(--radius-lg); padding:2rem; text-align:center; margin-bottom:2rem; }
+  .bv-banner h2 { font-size:1.8rem; font-weight:800; }
+  .bv-banner p  { opacity:.85; margin-top:.5rem; }
+  .bv-formula   { display:inline-flex; align-items:center; gap:1rem; background:rgba(255,255,255,.15); border-radius:8px; padding:.75rem 1.5rem; margin-top:1rem; font-size:1.1rem; font-weight:700; }
+</style>
+</head>
+<body>
+<div class="toast-container" id="toast-container"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="nav-logo">
+    <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1e293b,#0f172a);border:3px solid #f97316;display:flex;align-items:center;justify-content:center;color:#f97316;font-weight:900;font-size:1.1rem;flex-shrink:0;">GG</div>
+    <div class="nav-logo-text">Great Goals<br><span>Lifestyle Pvt. Ltd.</span></div>
+  </a>
+  <div class="hamburger" id="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="active">HOME</a>
+    <a href="plan.html">PLAN</a>
+    <a href="about.html">ABOUT</a>
+    <a href="support.html">SUPPORT</a>
+    <a href="login.html" class="btn-nav">LOGIN</a>
+    <a href="register.html" class="btn-nav">REGISTRATION</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <canvas id="particles-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-badge">🚀 India's Fastest Growing MLM Network</div>
+    <h1>Build Your Legacy With<br><span>Great Goals Lifestyle</span></h1>
+    <p>Join thousands of entrepreneurs earning passive income through our proven binary network marketing system. Your success story starts here.</p>
+    <div class="hero-btns">
+      <a href="register.html" class="btn btn-primary"><i class="fas fa-rocket"></i> Join Now — Free</a>
+      <a href="plan.html" class="btn btn-outline"><i class="fas fa-chart-line"></i> View Business Plan</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-pill"><i class="fas fa-users"></i><span><strong id="cnt1">0</strong> Leaders</span></div>
+      <div class="stat-pill animate-delay-1"><i class="fas fa-rupee-sign"></i><span>Earn up to <strong>₹1.56 Cr</strong><small style="display:block;font-size:0.72rem;opacity:0.85;">(₹1.20 Cr Comm + ₹36L Reward)</small></span></div>
+      <div class="stat-pill animate-delay-2"><i class="fas fa-calendar"></i><span>Goal: <strong>2028</strong></span></div>
+      <div class="stat-pill animate-delay-3"><i class="fas fa-trophy"></i><span><strong>10</strong> Achievement Ranks</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item reveal"><div class="stat-number" data-target="2026">0</div><div class="stat-label">Members & Growing</div></div>
+  <div class="stat-item reveal"><div class="stat-number" data-target="50">₹0L+</div><div class="stat-label">Commission Distributed</div></div>
+  <div class="stat-item reveal"><div class="stat-number" data-target="10">0</div><div class="stat-label">Achievement Ranks</div></div>
+  <div class="stat-item reveal"><div class="stat-number" data-target="100">0%</div><div class="stat-label">Transparency Guaranteed</div></div>
+</div>
+
+<!-- ABOUT -->
+<section class="section">
+  <div class="container">
+    <div class="about-grid reveal">
+      <div class="about-text">
+        <h2>Know About <span>Great Goals Lifestyle</span> Pvt. Ltd.</h2>
+        <p>We Are Going To Create <strong>1 Lakh Great Goal Leaders</strong> In India Before 2028. Our mission is to empower every Indian household with financial freedom through ethical network marketing.</p>
+        <p>Our binary plan ensures fair income distribution — when both your team legs grow, you earn. The more you help others succeed, the more you earn through referral and binary matching income.</p>
+        <a href="about.html" class="btn btn-primary btn-sm">Learn More <i class="fas fa-arrow-right"></i></a>
+      </div>
+      <div class="about-img"><i class="fas fa-globe-asia"></i></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>Our <span>Product Packages</span></h2>
+      <p>Choose a package that suits you. Each package comes with premium products and a business opportunity.</p>
+      <div class="section-line"></div>
+    </div>
+    <div class="cards-grid" id="productsGrid">
+      <!-- ₹10,000 Premium Package Card -->
+      <div class="product-card p1 reveal">
+        <div class="product-img-wrap">
+          <img src="assets/images/p1_10000.jpg" alt="Premium Package ₹10,000" loading="lazy">
+          <span class="product-badge-float">MOST POPULAR</span>
+        </div>
+        <div class="product-card-header">
+          <div class="product-price"><sup>₹</sup>10,000</div>
+          <div class="product-name">Premium Package ₹10,000</div>
+          <div class="product-bv">BV: 1200 | RP: 1</div>
+          <div style="font-size:0.85rem;margin-top:0.35rem;background:rgba(0,0,0,0.2);padding:4px 8px;border-radius:6px;">
+            Net Referral: <strong>₹1,020</strong> <small style="opacity:0.85;">(₹180 tax/service charge deducted)</small>
+          </div>
+        </div>
+        <div class="product-card-body">
+          <ul class="product-items">
+            <li><i class="fas fa-check-circle"></i> 1× Kanchipuram Wedding Saree</li>
+            <li><i class="fas fa-check-circle"></i> 1× Premier Pant & Shirt Piece</li>
+            <li><i class="fas fa-check-circle"></i> 5× Compact Tour Discount Voucher (CTDV) @ ₹2,000 each</li>
+            <li><i class="fas fa-check-circle"></i> 1× Business ID & Business Password</li>
+          </ul>
+          <a href="register.html" class="btn btn-primary w-100"><i class="fas fa-shopping-cart"></i> Get This Package</a>
+        </div>
+      </div>
+
+      <!-- ₹5,000 Standard Package Card -->
+      <div class="product-card p2 reveal animate-delay-1">
+        <div class="product-img-wrap">
+          <img src="assets/images/p2_5000.jpg" alt="Standard Package ₹5,000" loading="lazy">
+          <span class="product-badge-float">BEST VALUE</span>
+        </div>
+        <div class="product-card-header">
+          <div class="product-price"><sup>₹</sup>5,000</div>
+          <div class="product-name">Standard Package ₹5,000</div>
+          <div class="product-bv">BV: 600 | RP: 1</div>
+          <div style="font-size:0.85rem;margin-top:0.35rem;background:rgba(0,0,0,0.2);padding:4px 8px;border-radius:6px;">
+            Net Referral: <strong>₹510</strong> <small style="opacity:0.85;">(₹90 tax/service charge deducted)</small>
+          </div>
+        </div>
+        <div class="product-card-body">
+          <ul class="product-items">
+            <li><i class="fas fa-check-circle"></i> 1× Banarasi Saree OR 1× Suite Length</li>
+            <li><i class="fas fa-check-circle"></i> 3× Compact Tour Discount Voucher (CTDV) @ ₹6,000 printed value</li>
+            <li><i class="fas fa-check-circle"></i> 1× Business ID & Business Password</li>
+          </ul>
+          <a href="register.html" class="btn btn-primary w-100"><i class="fas fa-shopping-cart"></i> Get This Package</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INCOME TYPES -->
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>Income <span>Types</span></h2>
+      <p>Multiple income streams to maximize your earnings</p>
+      <div class="section-line"></div>
+    </div>
+    <div class="income-grid">
+      <div class="income-card reveal">
+        <h3><i class="fas fa-user-plus text-primary"></i> Direct Referral Income</h3>
+        <p>Instant commission credited straight to your wallet on every sponsored package:</p>
+        <div class="formula">
+          ₹10,000 package (1,200 BV) → <strong>₹1,020</strong> net (₹1,200 − ₹180 tax & charge)<br>
+          ₹5,000 package (600 BV) → <strong>₹510</strong> net (₹600 − ₹90 tax & charge)
+        </div>
+      </div>
+      <div class="income-card green reveal animate-delay-1">
+        <h3><i class="fas fa-exchange-alt text-green"></i> Binary Matching Income</h3>
+        <p>Earn ₹600 for every matched RP pair from your left and right legs. The weaker leg determines matching.</p>
+        <div class="formula">1 RP (Left) + 1 RP (Right) = ₹600 income<br>1 RP = 600 BV</div>
+      </div>
+      <div class="income-card reveal animate-delay-2" style="border-left-color:var(--purple)">
+        <h3><i class="fas fa-trophy" style="color:var(--purple)"></i> Achievement Rewards</h3>
+        <p>Unlock milestone cash bonuses plus binary commissions — entering Chairman brings <strong>₹1.20 Cr Commission</strong> + <strong>₹36 Lakh Reward</strong> = <strong>₹1.56 Crore Total Earning</strong>!</p>
+        <div class="formula">10 Ranks: Silver → Chairman<br>Chairman: ₹1.20 Cr Comm + ₹36L Reward = <strong>₹1.56 Cr Total</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACHIEVEMENTS -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>10 Achievement <span>Milestones</span></h2>
+      <p>Unlock incredible rewards as your team grows. Every milestone brings a cash bonus!</p>
+      <div class="section-line"></div>
+    </div>
+    <div class="ach-grid" id="achGrid"></div>
+  </div>
+</section>
+
+<!-- BINARY PLAN -->
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>How The <span>Binary Plan</span> Works</h2>
+      <p>Simple, powerful, and transparent</p>
+      <div class="section-line"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;" class="reveal">
+      <div>
+        <h3 style="font-size:1.3rem;font-weight:700;color:var(--dark);margin-bottom:1rem;">You are at the center</h3>
+        <p style="color:var(--gray);line-height:1.8;margin-bottom:1rem;">Place members on your LEFT or RIGHT leg. When both legs match in RP, you earn Binary Matching income of <strong>₹600 per matched pair</strong>.</p>
+        <ul style="color:var(--gray);font-size:.9rem;line-height:2;">
+          <li><i class="fas fa-check-circle text-primary" style="margin-right:.5rem;"></i>1 RP = 600 BV (Business Value)</li>
+          <li><i class="fas fa-check-circle text-primary" style="margin-right:.5rem;"></i>Unmatched BV carries forward</li>
+          <li><i class="fas fa-check-circle text-primary" style="margin-right:.5rem;"></i>Unlimited depth — earn from entire team</li>
+          <li><i class="fas fa-check-circle text-primary" style="margin-right:.5rem;"></i>Both legs grow together for maximum income</li>
+        </ul>
+      </div>
+      <div style="background:var(--dark);border-radius:var(--radius-lg);padding:2rem;text-align:center;color:#fff;">
+        <div style="display:flex;justify-content:center;margin-bottom:1.5rem;">
+          <div style="background:var(--primary);padding:.75rem 1.5rem;border-radius:8px;font-weight:700;">YOU (Root)</div>
+        </div>
+        <div style="display:flex;justify-content:space-around;position:relative;">
+          <div style="position:absolute;top:-1rem;left:25%;right:25%;height:2px;background:rgba(255,255,255,.3);"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem;">
+            <div style="width:2px;height:30px;background:rgba(255,255,255,.3);"></div>
+            <div style="background:var(--purple);padding:.6rem 1rem;border-radius:8px;font-size:.85rem;font-weight:600;">LEFT LEG</div>
+            <div style="font-size:.75rem;color:#94a3b8;">Place members here</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem;">
+            <div style="width:2px;height:30px;background:rgba(255,255,255,.3);"></div>
+            <div style="background:var(--blue);padding:.6rem 1rem;border-radius:8px;font-size:.85rem;font-weight:600;">RIGHT LEG</div>
+            <div style="font-size:.75rem;color:#94a3b8;">Place members here</div>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;background:rgba(255,255,255,.1);border-radius:8px;padding:.75rem;font-size:.83rem;color:#94a3b8;">
+          Left RP ≥ 1 + Right RP ≥ 1 = <span style="color:var(--primary);font-weight:700;">₹600 Income!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>What Our <span>Members Say</span></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="cards-grid">
+      <div class="testimonial-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">I joined 8 months ago and already reached Silver rank. My binary matching income is now ₹6,000 per month consistently. The support team is excellent!</p>
+        <div class="testimonial-name">Priya Sharma</div>
+        <div class="testimonial-id">Member ID: GG00023 | Rank: Silver</div>
+      </div>
+      <div class="testimonial-card reveal animate-delay-1">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">The Kanchipuram saree in the ₹10,000 package alone is worth the investment. On top of that, the earning system is transparent and pays on time!</p>
+        <div class="testimonial-name">Rajan Pillai</div>
+        <div class="testimonial-id">Member ID: GG00041 | Rank: Gold</div>
+      </div>
+      <div class="testimonial-card reveal animate-delay-2">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">Great Goals Lifestyle changed my life. In just 2 years I have built a team of 200+ members. The binary plan really works if you put in the effort!</p>
+        <div class="testimonial-name">Mohammed Asif</div>
+        <div class="testimonial-id">Member ID: GG00008 | Rank: Diamond</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);text-align:center;color:#fff;">
+  <div class="container reveal">
+    <h2 style="font-size:2rem;font-weight:800;margin-bottom:1rem;">Ready to Start Your Journey?</h2>
+    <p style="color:#94a3b8;max-width:500px;margin:0 auto 2rem;">Join Great Goals Lifestyle today and start building your financial freedom through our proven binary network marketing system.</p>
+    <a href="register.html" class="btn btn-primary" style="font-size:1rem;padding:1rem 2.5rem;"><i class="fas fa-rocket"></i> Register Now — It's Free</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:1.3rem;">GG</div>
+      <h3>Great Goals Lifestyle Pvt. Ltd.</h3>
+      <p>We Are Going To Create 1lakh Great Goal Leaders In India Before 2028</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="plan.html">Business Plan</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="support.html">Support</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="register.html">Register</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="#">Municipal Corp Main Road</a></li>
+        <li><a href="#">Naragund Dt; Gadag 582207</a></li>
+        <li><a href="#">Karnataka, India</a></li>
+        <li><a href="mailto:greatgoalslifestyle@gmail.com">greatgoalslifestyle@gmail.com</a></li>
+        <li><a href="tel:9110871460">9110871460</a></li>
+        <li><a href="tel:9663639659">9663639659</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Achievements</h4>
+      <ul id="footerAch"></ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 <span>Great Goals Lifestyle Pvt. Ltd.</span> All rights reserved. | Designed with ❤️ for Indian Entrepreneurs</p>
+  </div>
+</footer>
+
+<script src="assets/js/app.js"></script>
+<script>
+// Particle Canvas
+(function(){
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  function resize(){ canvas.width=innerWidth; canvas.height=canvas.parentElement.clientHeight||window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  for(let i=0;i<80;i++) particles.push({
+    x: Math.random()*innerWidth, y: Math.random()*innerHeight,
+    vx: (Math.random()-.5)*.4, vy: (Math.random()-.5)*.4,
+    r: Math.random()*2+1, opacity: Math.random()*.5+.1
+  });
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>canvas.width) p.vx*=-1;
+      if(p.y<0||p.y>canvas.height) p.vy*=-1;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(249,115,22,${p.opacity})`;
+      ctx.fill();
+    });
+    // Lines
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<100){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle=`rgba(249,115,22,${.15*(1-dist/100)})`;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// Counter animation
+function countUp(el, target, prefix='', suffix='') {
+  let start=0, duration=2000, step=target/60;
+  const timer=setInterval(()=>{
+    start+=step;
+    if(start>=target){ start=target; clearInterval(timer); }
+    el.textContent=prefix+Math.round(start).toLocaleString('en-IN')+suffix;
+  },duration/60);
+}
+
+// Scroll reveal
+const reveals=document.querySelectorAll('.reveal');
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:.1});
+reveals.forEach(r=>observer.observe(r));
+
+// Stats counter on scroll
+const statNums=document.querySelectorAll('.stat-number[data-target]');
+const statObs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const t=parseInt(e.target.getAttribute('data-target'));
+      const txt=e.target.textContent;
+      const prefix=txt.startsWith('₹')?'₹':'';
+      const suffix=txt.endsWith('L+')?'L+':txt.endsWith('%')?'%':'';
+      countUp(e.target,t,prefix,suffix);
+      statObs.unobserve(e.target);
+    }
+  });
+},{threshold:.5});
+statNums.forEach(n=>statObs.observe(n));
+// Hero counter
+countUp(document.getElementById('cnt1'),10000+APP.getMembers().length,'','+ Leaders');
+
+// Render products
+function renderProducts(){
+  const grid=document.getElementById('productsGrid');
+  grid.innerHTML='';
+  APP.getProducts().filter(p=>p.active).forEach((p,i)=>{
+    const cls=i===0?'p1':'p2';
+        const refInc = p.referralIncome || (p.price >= 10000 ? 1020 : 510);
+        const imgSrc = p.image || (p.price >= 10000 ? 'assets/images/p1_10000.jpg' : 'assets/images/p2_5000.jpg');
+        const badgeTxt = p.badge || (p.price >= 10000 ? 'MOST POPULAR' : 'BEST VALUE');
+        grid.innerHTML+=`
+    <div class="product-card ${cls} reveal animate-delay-${i+1}">
+      <div class="product-img-wrap">
+        <img src="${imgSrc}" alt="${p.name}" loading="lazy">
+        <span class="product-badge-float">${badgeTxt}</span>
+      </div>
+      <div class="product-card-header">
+        <div class="product-price"><sup>₹</sup>${(p.price).toLocaleString('en-IN')}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-bv">BV: ${p.bv} | RP: ${p.rp}</div>
+        <div style="font-size:0.85rem;margin-top:0.35rem;background:rgba(0,0,0,0.2);padding:4px 8px;border-radius:6px;">Net Referral: <strong>${APP.fmtINR(refInc)}</strong> <small style="opacity:0.8;">(${p.price>=10000?'₹180':'₹90'} tax/charge deducted)</small></div>
+      </div>
+      <div class="product-card-body">
+        <ul class="product-items">
+          ${p.items.map(it=>`<li><i class="fas fa-check-circle"></i>${it}</li>`).join('')}
+        </ul>
+        <a href="register.html" class="btn btn-primary w-100"><i class="fas fa-shopping-cart"></i> Get This Package</a>
+      </div>
+    </div>`;
+  });
+  // Observe dynamically rendered product cards
+  document.querySelectorAll('#productsGrid .reveal').forEach(r => observer.observe(r));
+}
+renderProducts();
+
+// Render achievements
+function renderAchievements(){
+  const grid=document.getElementById('achGrid');
+  grid.innerHTML='';
+  APP.ACHIEVEMENTS.forEach((a,i)=>{
+    grid.innerHTML+=`
+    <div class="ach-card reveal animate-delay-${(i%5)+1}" style="background:${a.color};animation-delay:${i*.1}s">
+      <div class="ach-icon">${a.icon}</div>
+      <div class="ach-name">${a.name}</div>
+      <div class="ach-bv">Target: ${a.bv.toLocaleString('en-IN')} BV (${a.rp.toLocaleString()} RP)</div>
+      <div style="font-size:0.8rem;margin-top:4px;opacity:0.95;">Commission: <strong>${APP.fmtINR(a.commission)}</strong></div>
+      <div class="ach-reward">Reward: ${APP.fmtINR(a.reward)}</div>
+      <div style="font-size:0.85rem;font-weight:800;background:rgba(0,0,0,0.25);padding:3px 8px;border-radius:6px;margin-top:5px;">
+        Total: ${APP.fmtINR(a.totalEarnings)}
+      </div>
+      ${a.rewardTitle ? `<div style="font-size:0.75rem;opacity:0.92;margin-top:3px;background:rgba(255,255,255,0.18);padding:2px 8px;border-radius:4px;">${a.rewardTitle}</div>` : ''}
+    </div>`;
+  });
+  // Footer
+  const fl=document.getElementById('footerAch');
+  APP.ACHIEVEMENTS.forEach(a=>{ fl.innerHTML+=`<li><a href="plan.html">${a.icon} ${a.name}</a></li>`; });
+}
+renderAchievements();
+</script>
+</body>
+</html>

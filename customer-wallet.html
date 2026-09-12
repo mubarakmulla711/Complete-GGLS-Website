@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallet & Withdraw - Great Goals Lifestyle</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+<div class="toast-container" id="toast-container"></div>
+<div class="dash-layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem;">GG</div>
+      <div class="sidebar-logo-text">Great Goals<br><span>Lifestyle</span></div>
+    </div>
+    <div class="sidebar-user" id="sidebarUser"></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-label">Main</div>
+      <a href="dashboard.html" class="sidebar-nav-item"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="customer-tree.html" class="sidebar-nav-item"><i class="fas fa-sitemap"></i> My Tree</a>
+      <a href="customer-orders.html" class="sidebar-nav-item"><i class="fas fa-shopping-cart"></i> Order Product</a>
+      <a href="customer-wallet.html" class="sidebar-nav-item active"><i class="fas fa-wallet"></i> Wallet & Withdraw</a>
+      <a href="customer-achievements.html" class="sidebar-nav-item"><i class="fas fa-trophy"></i> Achievements</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="APP.logout();window.location.href='login.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </nav>
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <h1>Wallet & Commission Withdrawal</h1>
+      <div class="topbar-user">
+        <div class="topbar-avatar" id="topAvatar">?</div>
+        <span class="topbar-name" id="topName">User</span>
+      </div>
+    </div>
+    <div class="dash-content">
+      <div class="wallet-grid">
+        <div class="wallet-card">
+          <div class="wallet-card-label">Available Income Wallet</div>
+          <div class="wallet-card-amount">₹<span id="walletBal">0.00</span></div>
+          <small class="text-gray">Ready for bank withdrawal</small>
+        </div>
+        <div class="wallet-card" style="border-top-color:var(--green);">
+          <div class="wallet-card-label">Success Withdrawals</div>
+          <div class="wallet-card-amount">₹<span id="successWd">0.00</span></div>
+          <small class="text-gray">Total paid to bank</small>
+        </div>
+        <div class="wallet-card" style="border-top-color:var(--yellow);">
+          <div class="wallet-card-label">Pending Approvals</div>
+          <div class="wallet-card-amount">₹<span id="pendingWd">0.00</span></div>
+          <small class="text-gray">Awaiting Admin Confirmation</small>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;">
+        <div class="card">
+          <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem;"><i class="fas fa-university text-primary"></i> Request Withdrawal</h3>
+          <div class="alert alert-info" style="font-size:0.8rem;">
+            <i class="fas fa-info-circle"></i> Withdrawals require admin approval. Once approved by admin, funds will be disbursed to your account. Minimum: ₹100.
+          </div>
+          <div class="form-group">
+            <label>Withdrawal Amount (₹) *</label>
+            <input type="number" class="form-control" id="wdAmount" placeholder="Min ₹100">
+          </div>
+          <div class="form-group">
+            <label>Bank Name *</label>
+            <input type="text" class="form-control" id="bankName" placeholder="e.g. State Bank of India">
+          </div>
+          <div class="form-group">
+            <label>Account Number *</label>
+            <input type="text" class="form-control" id="accNo" placeholder="Bank Account Number">
+          </div>
+          <div class="form-group">
+            <label>IFSC Code *</label>
+            <input type="text" class="form-control" id="ifsc" placeholder="e.g. SBIN0001234">
+          </div>
+          <div class="form-group">
+            <label>Account Holder Name *</label>
+            <input type="text" class="form-control" id="accHolder" placeholder="Full name as per bank passbook">
+          </div>
+          <button class="btn btn-primary w-100" onclick="submitWithdrawal()"><i class="fas fa-paper-plane"></i> Submit Withdrawal Request</button>
+        </div>
+
+        <div class="table-card">
+          <div class="table-card-header">
+            <h3><i class="fas fa-list-alt text-primary"></i> Withdrawal History</h3>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr><th>Amount</th><th>Bank</th><th>Date</th><th>Status</th></tr>
+              </thead>
+              <tbody id="wdHistory"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+<script>
+function showToast(msg, type='success'){
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;
+  tc.appendChild(t); setTimeout(()=>t.remove(),3500);
+}
+
+if(!APP.requireMember('login.html')) throw new Error('redirect');
+const session = APP.getCurrentSession();
+const user = APP.getMemberById(session.id);
+document.getElementById('topAvatar').textContent = user.name.charAt(0).toUpperCase();
+document.getElementById('topName').textContent = user.name;
+document.getElementById('sidebarUser').innerHTML = `<div class="sidebar-user-id">${user.id}</div><div class="sidebar-user-name">${user.name}</div><span class="sidebar-status">${user.status}</span>`;
+
+function updateWalletView() {
+  const currentU = APP.getMemberById(user.id);
+  document.getElementById('walletBal').textContent = Number(currentU.incomeWallet || 0).toLocaleString('en-IN', {minimumFractionDigits:2});
+  document.getElementById('successWd').textContent = Number(currentU.successWithdrawals || 0).toLocaleString('en-IN', {minimumFractionDigits:2});
+  
+  const wds = APP.getWithdrawals().filter(w => w.memberId === user.id);
+  const pending = wds.filter(w => w.status === 'pending').reduce((sum, w) => sum + w.amount, 0);
+  document.getElementById('pendingWd').textContent = pending.toLocaleString('en-IN', {minimumFractionDigits:2});
+
+  const tbody = document.getElementById('wdHistory');
+  if(!wds.length) {
+    tbody.innerHTML = `<tr><td colspan="4" class="no-data">No requests yet.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = wds.reverse().map(w => {
+    let badgeClass = 'badge-pending';
+    if(w.status === 'approved') badgeClass = 'badge-approved';
+    if(w.status === 'rejected') badgeClass = 'badge-rejected';
+    return `<tr>
+      <td><strong>₹${w.amount.toLocaleString('en-IN')}</strong></td>
+      <td>${w.bankDetails ? w.bankDetails.bankName : 'Bank'}</td>
+      <td>${new Date(w.requestedAt).toLocaleDateString('en-IN')}</td>
+      <td><span class="badge-status ${badgeClass}">${w.status.toUpperCase()}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function submitWithdrawal() {
+  const amount = Number(document.getElementById('wdAmount').value);
+  const bankName = document.getElementById('bankName').value.trim();
+  const accNo = document.getElementById('accNo').value.trim();
+  const ifsc = document.getElementById('ifsc').value.trim();
+  const accHolder = document.getElementById('accHolder').value.trim();
+
+  if(!amount || amount < 100) return showToast('Minimum withdrawal is ₹100', 'error');
+  if(!bankName || !accNo || !ifsc || !accHolder) return showToast('Please enter all bank details', 'error');
+
+  const res = APP.requestWithdrawal(user.id, amount, { bankName, accNo, ifsc, accHolder });
+  if(res.success) {
+    showToast('Withdrawal submitted! Awaiting Admin approval.');
+    document.getElementById('wdAmount').value = '';
+    updateWalletView();
+  } else {
+    showToast(res.msg || 'Withdrawal failed', 'error');
+  }
+}
+
+updateWalletView();
+</script>
+</body>
+</html>

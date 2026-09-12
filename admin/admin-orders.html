@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orders Management – Admin | Great Goals Lifestyle</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    .dash-topbar{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.75rem;background:#fff;border-bottom:1px solid #f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+    .dash-topbar h1{font-size:1.3rem;font-weight:800;color:#1e293b;margin:0;}
+    .dash-content{padding:1.75rem;overflow-y:auto;}
+    .stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.25rem;margin-bottom:1.5rem;}
+    .sbar-card{background:#fff;border-radius:14px;padding:1.25rem 1.5rem;box-shadow:0 2px 10px rgba(0,0,0,.07);border-left:4px solid;}
+    .sbar-card.blue{border-color:#3b82f6;}.sbar-card.yellow{border-color:#eab308;}.sbar-card.green{border-color:#22c55e;}.sbar-card.orange{border-color:#f97316;}
+    .sbar-val{font-size:1.6rem;font-weight:800;color:#1e293b;}
+    .sbar-lbl{font-size:.75rem;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:.15rem;}
+    
+    .tabs-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1.25rem;border-bottom:2px solid #e2e8f0;padding-bottom:.5rem;overflow-x:auto;}
+    .tab-btn{background:none;border:none;padding:.6rem 1.1rem;font-size:.88rem;font-weight:700;color:#64748b;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:all .18s;white-space:nowrap;}
+    .tab-btn:hover{color:#1e293b;background:#f1f5f9;}
+    .tab-btn.active{color:#f97316;background:#fff7ed;}
+    .tab-badge{font-size:.7rem;padding:.15rem .5rem;border-radius:50px;background:#e2e8f0;color:#475569;}
+    .tab-btn.active .tab-badge{background:#f97316;color:#fff;}
+    .tab-badge.urgent{background:#ef4444;color:#fff;}
+
+    .toolbar{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap;}
+    .search-box{display:flex;align-items:center;gap:.5rem;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:.55rem .9rem;flex:1;min-width:200px;}
+    .search-box input{border:none;outline:none;font-size:.88rem;width:100%;color:#1e293b;}
+    .search-box i{color:#94a3b8;}
+    .filter-sel{padding:.55rem .9rem;border:1.5px solid #e2e8f0;border-radius:10px;font-size:.88rem;color:#1e293b;background:#fff;outline:none;}
+    .btn-export{background:#1e293b;color:#fff;border:none;padding:.6rem 1.1rem;border-radius:10px;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:all .2s;}
+    .btn-export:hover{background:#0f172a;}
+    
+    .table-card{background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.07);overflow:hidden;margin-bottom:1.5rem;}
+    table{width:100%;border-collapse:collapse;}
+    th{background:#f8fafc;color:#64748b;font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:.85rem 1rem;text-align:left;white-space:nowrap;}
+    td{padding:.85rem 1rem;font-size:.845rem;color:#1e293b;border-top:1px solid #f1f5f9;white-space:nowrap;}
+    tr:hover td{background:#fefce8;}
+    .badge{display:inline-block;font-size:.68rem;font-weight:700;border-radius:50px;padding:.2rem .6rem;}
+    .badge-completed{background:#dcfce7;color:#166534;border:1px solid #86efac;}
+    .badge-pending{background:#fef3c7;color:#92400e;border:1px solid #fde047;}
+    .badge-rejected{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
+    
+    .btn-xs{font-size:.72rem;padding:.3rem .65rem;border-radius:6px;border:none;cursor:pointer;font-weight:700;transition:all .18s;display:inline-flex;align-items:center;gap:.3rem;}
+    .btn-approve{background:#22c55e;color:#fff;}
+    .btn-approve:hover{background:#16a34a;}
+    .btn-reject{background:#ef4444;color:#fff;}
+    .btn-reject:hover{background:#dc2626;}
+
+    .pagination{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:1rem;flex-wrap:wrap;}
+    .page-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;font-size:.82rem;cursor:pointer;font-weight:600;color:#475569;transition:all .18s;}
+    .page-btn.active{background:#f97316;color:#fff;border-color:#f97316;}
+    .page-btn:hover:not(.active){background:#f8fafc;}
+    .mobile-toggle{display:none;background:none;border:none;font-size:1.4rem;color:#1e293b;cursor:pointer;}
+    @media(max-width:768px){.mobile-toggle{display:block;}.toolbar{flex-direction:column;align-items:stretch;}th,td{padding:.6rem .65rem;font-size:.75rem;}}
+  </style>
+</head>
+<body>
+<div class="dash-layout">
+  <nav class="sidebar admin-sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem">GG</div>
+      <div class="sidebar-logo-text">Admin Panel<br><span>Great Goals</span></div>
+    </div>
+    <div style="padding:.75rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.1);">
+      <div style="font-size:.7rem;color:#94a3b8;">Logged in as</div>
+      <div style="font-size:.95rem;font-weight:700;color:#fff;">Administrator</div>
+      <span style="font-size:.7rem;background:#f97316;color:#fff;padding:.1rem .5rem;border-radius:50px;">Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-label">Management</div>
+      <a href="admin-dashboard.html" class="sidebar-nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="admin-members.html" class="sidebar-nav-item"><i class="fas fa-users"></i> Members</a>
+      <a href="admin-products.html" class="sidebar-nav-item"><i class="fas fa-box"></i> Products</a>
+      <a href="admin-orders.html" class="sidebar-nav-item active">
+        <i class="fas fa-shopping-bag"></i> Orders
+        <span id="navPendingBadge" style="display:none;background:#ef4444;color:#fff;font-size:.65rem;font-weight:700;padding:.1rem .45rem;border-radius:50px;margin-left:auto;">0</span>
+      </a>
+      <a href="admin-withdrawals.html" class="sidebar-nav-item"><i class="fas fa-money-bill-wave"></i> Withdrawals</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="APP.logout();window.location.href='../login.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </nav>
+
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <div style="display:flex;align-items:center;gap:.75rem;">
+        <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></button>
+        <div>
+          <h1><i class="fas fa-shopping-bag" style="color:#f97316;margin-right:.4rem;"></i>Product Orders Verification</h1>
+          <div style="font-size:.78rem;color:#94a3b8;margin-top:.1rem;">Review pending orders, approve packages, and propagate BV & commissions</div>
+        </div>
+      </div>
+      <button class="btn-export" onclick="exportCSV()"><i class="fas fa-download"></i> Export CSV</button>
+    </div>
+
+    <div class="dash-content">
+      <!-- Top KPI Stats -->
+      <div class="stats-bar">
+        <div class="sbar-card blue"><div class="sbar-val" id="statTotal">0</div><div class="sbar-lbl">Total Orders</div></div>
+        <div class="sbar-card yellow"><div class="sbar-val" id="statPending" style="color:#ca8a04;">0</div><div class="sbar-lbl">Pending Verification</div></div>
+        <div class="sbar-card green"><div class="sbar-val" id="statCompleted" style="color:#16a34a;">0</div><div class="sbar-lbl">Completed / Activated</div></div>
+        <div class="sbar-card orange"><div class="sbar-val" id="statRevenue">0</div><div class="sbar-lbl">Total Verified Revenue</div></div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="tabs-bar">
+        <button class="tab-btn active" id="tabAll" onclick="setTab('all')">
+          <i class="fas fa-list"></i> All Orders <span class="tab-badge" id="tabBadgeAll">0</span>
+        </button>
+        <button class="tab-btn" id="tabPending" onclick="setTab('pending')">
+          <i class="fas fa-clock text-warning"></i> Pending Verification <span class="tab-badge urgent" id="tabBadgePending">0</span>
+        </button>
+        <button class="tab-btn" id="tabCompleted" onclick="setTab('completed')">
+          <i class="fas fa-check-circle text-success"></i> Completed <span class="tab-badge" id="tabBadgeCompleted">0</span>
+        </button>
+        <button class="tab-btn" id="tabRejected" onclick="setTab('rejected')">
+          <i class="fas fa-times-circle text-danger"></i> Rejected <span class="tab-badge" id="tabBadgeRejected">0</span>
+        </button>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Search by Member ID, Member Name, or Order ID…" oninput="filterOrders()" />
+        </div>
+        <select class="filter-sel" id="productFilter" onchange="filterOrders()">
+          <option value="">All Products</option>
+        </select>
+      </div>
+
+      <div class="table-card">
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Member ID</th>
+                <th>Member Name</th>
+                <th>Product</th>
+                <th>Price</th>
+                <th>BV</th>
+                <th>RP</th>
+                <th>Order Date</th>
+                <th>Status</th>
+                <th>Admin Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTbody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="../assets/js/app.js"></script>
+<script>
+  APP.requireAdmin('../login.html');
+  function showToast(msg,type='success'){
+    const tc=document.getElementById('toast-container');
+    const t=document.createElement('div');
+    t.className=`toast ${type}`;
+    t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':type==='warning'?'exclamation-triangle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;
+    tc.appendChild(t);
+    setTimeout(()=>t.remove(),3500);
+  }
+
+  const PAGE_SIZE=15;
+  let currentPage=1;
+  let currentStatusTab='all';
+  let filteredOrders=[];
+
+  let allOrders=APP.getOrders();
+  const products=APP.getProducts();
+  const prodMap={}; products.forEach(p=>prodMap[p.id]=p);
+  const memberMap={}; APP.getMembers().forEach(m=>memberMap[m.id]=m);
+
+  // Populate product filter
+  const pf=document.getElementById('productFilter');
+  products.forEach(p=>{
+    const opt=document.createElement('option');
+    opt.value=p.id;
+    opt.textContent=`${p.name} (₹${p.price.toLocaleString('en-IN')})`;
+    pf.appendChild(opt);
+  });
+
+  function updateStats(){
+    allOrders=APP.getOrders();
+    const totalRev=allOrders.filter(o=>o.status==='completed').reduce((s,o)=>s+(o.price||0),0);
+    const completedCount=allOrders.filter(o=>o.status==='completed').length;
+    const pendingCount=allOrders.filter(o=>o.status==='pending').length;
+    const rejectedCount=allOrders.filter(o=>o.status==='rejected').length;
+
+    document.getElementById('statTotal').textContent=allOrders.length;
+    document.getElementById('statPending').textContent=pendingCount;
+    document.getElementById('statCompleted').textContent=completedCount;
+    document.getElementById('statRevenue').textContent=APP.fmtINR(totalRev);
+
+    document.getElementById('tabBadgeAll').textContent=allOrders.length;
+    document.getElementById('tabBadgePending').textContent=pendingCount;
+    document.getElementById('tabBadgeCompleted').textContent=completedCount;
+    document.getElementById('tabBadgeRejected').textContent=rejectedCount;
+
+    const navBadge=document.getElementById('navPendingBadge');
+    if(pendingCount>0){
+      navBadge.textContent=pendingCount;
+      navBadge.style.display='inline-block';
+    } else {
+      navBadge.style.display='none';
+    }
+  }
+
+  function setTab(tab){
+    currentStatusTab=tab;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    if(tab==='all') document.getElementById('tabAll').classList.add('active');
+    if(tab==='pending') document.getElementById('tabPending').classList.add('active');
+    if(tab==='completed') document.getElementById('tabCompleted').classList.add('active');
+    if(tab==='rejected') document.getElementById('tabRejected').classList.add('active');
+    filterOrders();
+  }
+
+  function filterOrders(){
+    const q=document.getElementById('searchInput').value.toLowerCase();
+    const pid=document.getElementById('productFilter').value;
+    
+    filteredOrders=allOrders.filter(o=>{
+      const mem=memberMap[o.memberId] || APP.getMemberById(o.memberId);
+      const matchQ=!q || o.id.toLowerCase().includes(q) || o.memberId.toLowerCase().includes(q) || (mem&&mem.name.toLowerCase().includes(q));
+      const matchP=!pid || o.productId===pid;
+      
+      const st = o.status || 'completed';
+      const matchTab = currentStatusTab==='all' || st===currentStatusTab;
+
+      return matchQ && matchP && matchTab;
+    }).sort((a,b)=>new Date(b.date||b.createdAt||0)-new Date(a.date||a.createdAt||0));
+
+    currentPage=1;
+    renderTable();
+    renderPagination();
+  }
+
+  function renderTable(){
+    const tbody=document.getElementById('ordersTbody');
+    tbody.innerHTML='';
+    const start=(currentPage-1)*PAGE_SIZE;
+    const pageItems=filteredOrders.slice(start,start+PAGE_SIZE);
+
+    if(!pageItems.length){
+      tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:2.5rem;color:#94a3b8;"><i class="fas fa-shopping-bag" style="font-size:2rem;display:block;margin-bottom:.5rem;"></i>No orders found</td></tr>';
+      return;
+    }
+
+    pageItems.forEach(o=>{
+      const mem=memberMap[o.memberId] || APP.getMemberById(o.memberId);
+      const prod=prodMap[o.productId] || APP.getProductById(o.productId);
+      const status=o.status||'completed';
+      
+      let badgeHtml='';
+      let actionsHtml='';
+
+      if(status==='completed'){
+        badgeHtml=`<span class="badge badge-completed"><i class="fas fa-check-circle"></i> Completed</span>`;
+        actionsHtml=`<span style="color:#16a34a;font-size:0.75rem;font-weight:700;"><i class="fas fa-shield-alt"></i> Verified & Activated</span>`;
+      } else if(status==='pending'){
+        badgeHtml=`<span class="badge badge-pending"><i class="fas fa-clock"></i> Pending Approval</span>`;
+        actionsHtml=`
+          <button class="btn-xs btn-approve" onclick="approveOrder('${o.id}')" title="Approve order, activate package & credit BV/RP">
+            <i class="fas fa-check"></i> Approve & Complete
+          </button>
+          <button class="btn-xs btn-reject" onclick="rejectOrder('${o.id}')" title="Reject Order">
+            <i class="fas fa-times"></i> Reject
+          </button>
+        `;
+      } else if(status==='rejected'){
+        badgeHtml=`<span class="badge badge-rejected"><i class="fas fa-times-circle"></i> Rejected</span>`;
+        actionsHtml=`<span style="color:#dc2626;font-size:0.75rem;">${o.rejectedReason||'Declined'}</span>`;
+      }
+
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td><span style="font-family:monospace;font-size:.78rem;font-weight:700;">${o.id||'—'}</span></td>
+        <td><span style="font-family:monospace;font-size:.78rem;font-weight:700;color:#f97316;">${o.memberId}</span></td>
+        <td><strong>${mem?mem.name:'Unknown'}</strong></td>
+        <td>${prod?prod.name:(o.productName||'—')}</td>
+        <td><strong style="color:#16a34a;">${APP.fmtINR(o.price || (prod?prod.price:0))}</strong></td>
+        <td>${o.bv || (prod?prod.bv:0)}</td>
+        <td>${o.rp || (prod?prod.rp:0)}</td>
+        <td>${o.createdAt?new Date(o.createdAt).toLocaleDateString('en-IN'):'—'}</td>
+        <td>${badgeHtml}</td>
+        <td>${actionsHtml}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function approveOrder(orderId){
+    const o = APP.getOrders().find(item=>item.id===orderId);
+    if(!o) return;
+    if(!confirm(`Approve Order "${orderId}" for ${o.memberName} (${o.memberId})?\n\nThis will mark the order as COMPLETED, activate the product package, credit referral income to sponsor, and propagate BV/RP up the tree.`)) return;
+
+    const res=APP.completeOrder(orderId);
+    if(res && res.success){
+      showToast(`Order ${orderId} approved and completed! Package activated.`);
+      updateStats();
+      filterOrders();
+    } else {
+      showToast((res&&res.msg)?res.msg:'Failed to approve order','error');
+    }
+  }
+
+  function rejectOrder(orderId){
+    const reason = prompt('Please enter a reason for rejecting this order:', 'Payment verification unconfirmed');
+    if(reason === null) return;
+
+    const res=APP.rejectOrder(orderId, reason || 'Rejected by Admin');
+    if(res && res.success){
+      showToast(`Order ${orderId} has been rejected.`, 'warning');
+      updateStats();
+      filterOrders();
+    } else {
+      showToast('Failed to reject order', 'error');
+    }
+  }
+
+  function renderPagination(){
+    const totalPages=Math.ceil(filteredOrders.length/PAGE_SIZE);
+    const pg=document.getElementById('pagination');pg.innerHTML='';
+    if(totalPages<=1)return;
+    const mk=(label,page,isA)=>{const b=document.createElement('button');b.className=`page-btn${isA?' active':''}`;b.innerHTML=label;b.onclick=()=>{currentPage=page;renderTable();renderPagination();};pg.appendChild(b);};
+    if(currentPage>1)mk('<i class="fas fa-chevron-left"></i>',currentPage-1,false);
+    for(let i=1;i<=totalPages;i++){if(i===1||i===totalPages||Math.abs(i-currentPage)<=1)mk(i,i,i===currentPage);else if(Math.abs(i-currentPage)===2){const sp=document.createElement('span');sp.textContent='…';sp.style.cssText='padding:.4rem .2rem;color:#94a3b8;font-size:.85rem;';pg.appendChild(sp);}}
+    if(currentPage<totalPages)mk('<i class="fas fa-chevron-right"></i>',currentPage+1,false);
+  }
+
+  function exportCSV(){
+    const rows=[['Order ID','Member ID','Member Name','Product','Price','BV','RP','Date','Status']];
+    filteredOrders.forEach(o=>{
+      const mem=memberMap[o.memberId] || APP.getMemberById(o.memberId);
+      const prod=prodMap[o.productId] || APP.getProductById(o.productId);
+      rows.push([o.id||'',o.memberId,mem?mem.name:'Unknown',prod?prod.name:'',prod?prod.price:'',prod?prod.bv||0:'',prod?prod.rp||0:'',(o.createdAt)?new Date(o.createdAt).toLocaleDateString('en-IN'):'',o.status||'completed']);
+    });
+    const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=`orders_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+    URL.revokeObjectURL(url);
+    showToast('CSV exported successfully!');
+  }
+
+  updateStats();
+  filterOrders();
+</script>
+</body>
+</html>

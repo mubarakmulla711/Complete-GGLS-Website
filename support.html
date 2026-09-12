@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Support — Great Goals Lifestyle</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+.reveal{opacity:0;transform:translateY(24px);transition:.6s ease;}
+.reveal.visible{opacity:1;transform:none;}
+</style>
+</head>
+<body>
+<div class="toast-container" id="toast-container"></div>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">
+    <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1e293b,#0f172a);border:3px solid #f97316;display:flex;align-items:center;justify-content:center;color:#f97316;font-weight:900;font-size:1.1rem;">GG</div>
+    <div class="nav-logo-text">Great Goals<br><span>Lifestyle Pvt. Ltd.</span></div>
+  </a>
+  <div class="hamburger" onclick="document.getElementById('nL').classList.toggle('open')"><span></span><span></span><span></span></div>
+  <div class="nav-links" id="nL">
+    <a href="index.html">HOME</a><a href="plan.html">PLAN</a><a href="about.html">ABOUT</a>
+    <a href="support.html" class="active">SUPPORT</a><a href="login.html" class="btn-nav">LOGIN</a><a href="register.html" class="btn-nav">REGISTRATION</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <h1>Contact Us</h1>
+    <div class="breadcrumb"><a href="index.html">Home</a> ▶ Contact Us</div>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="contact-grid reveal">
+      <!-- Left: Form -->
+      <div>
+        <h2 style="font-size:1.5rem;font-weight:700;color:var(--dark);margin-bottom:.25rem;">Send Message Us</h2>
+        <div style="width:50px;height:3px;background:var(--primary);border-radius:2px;margin-bottom:2rem;"></div>
+        <div class="form-row">
+          <div class="form-group"><input type="text" class="form-control" id="subject" placeholder="Subject"></div>
+          <div class="form-group"><input type="text" class="form-control" id="yourName" placeholder="Your Name *"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><input type="email" class="form-control" id="yourMail" placeholder="Your Mail *"></div>
+          <div class="form-group"><input type="tel" class="form-control" id="phoneNum" placeholder="Phone Number"></div>
+        </div>
+        <div class="form-group"><textarea class="form-control" id="message" rows="5" placeholder="Message *"></textarea></div>
+        <button class="btn btn-primary" style="padding:.8rem 2rem;" onclick="sendMessage()"><i class="fas fa-paper-plane"></i> Send Message</button>
+      </div>
+
+      <!-- Right: Contact Details -->
+      <div>
+        <h2 style="font-size:1.5rem;font-weight:700;color:var(--dark);margin-bottom:.25rem;">Contact Details</h2>
+        <div style="width:50px;height:3px;background:var(--primary);border-radius:2px;margin-bottom:2rem;"></div>
+        <div class="contact-detail">
+          <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <div>
+            <h4>Address :</h4>
+            <p>GREATGOALS LIFESTYLE<br>Municipal Corp Main Road Naragund Dt; Gadag 582207 KARNATAKA INDIA</p>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+          <div>
+            <h4>Mail To Fernando :</h4>
+            <p><a href="mailto:greatgoalslifestyle@gmail.com" style="color:var(--primary);">greatgoalslifestyle@gmail.com</a><br><a href="mailto:greatgoalslifestyle@gmail.com" style="color:var(--primary);">greatgoalslifestyle@gmail.com</a></p>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-icon"><i class="fas fa-phone"></i></div>
+          <div>
+            <h4>Call Him:</h4>
+            <p><a href="tel:9110871460" style="color:var(--primary);">9110871460</a>, <a href="tel:9663639659" style="color:var(--primary);">9663639659</a></p>
+          </div>
+        </div>
+
+        <div style="background:#f8fafc;border-radius:var(--radius);padding:1.25rem;margin-top:1rem;">
+          <h4 style="font-size:.9rem;font-weight:700;color:var(--dark);margin-bottom:.75rem;"><i class="fas fa-clock text-primary" style="margin-right:.4rem;"></i>Support Hours</h4>
+          <p style="font-size:.83rem;color:var(--gray);line-height:1.7;">Monday – Saturday: 9:00 AM – 7:00 PM<br>Sunday: 10:00 AM – 2:00 PM<br><em>We typically respond within 4 hours.</em></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div style="margin-top:4rem;" class="reveal">
+      <div class="section-header">
+        <h2>Frequently Asked <span>Questions</span></h2>
+        <div class="section-line"></div>
+      </div>
+      <div id="faqList" style="max-width:800px;margin:0 auto;"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand"><div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:1.3rem;">GG</div><h3>Great Goals Lifestyle Pvt. Ltd.</h3><p>1 Lakh Great Goal Leaders in India before 2028</p></div>
+    <div class="footer-col"><h4>Quick Links</h4><ul><li><a href="index.html">Home</a></li><li><a href="plan.html">Business Plan</a></li><li><a href="about.html">About Us</a></li><li><a href="support.html">Support</a></li><li><a href="login.html">Login</a></li></ul></div>
+    <div class="footer-col"><h4>Contact</h4><ul><li><a href="#">Naragund Dt; Gadag 582207</a></li><li><a href="#">Karnataka, India</a></li><li><a href="mailto:greatgoalslifestyle@gmail.com">greatgoalslifestyle@gmail.com</a></li><li><a href="tel:9110871460">9110871460</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><p>© 2026 <span>Great Goals Lifestyle Pvt. Ltd.</span> All rights reserved.</p></div>
+</footer>
+
+<script src="assets/js/app.js"></script>
+<script>
+function showToast(msg,type='success'){
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;
+  tc.appendChild(t); setTimeout(()=>t.remove(),3500);
+}
+
+function sendMessage(){
+  const n=document.getElementById('yourName').value.trim();
+  const m=document.getElementById('yourMail').value.trim();
+  const msg=document.getElementById('message').value.trim();
+  if(!n||!m||!msg){ showToast('Please fill Name, Email and Message.','error'); return; }
+  showToast('Thank you! Your message has been sent. We will get back to you within 4 hours.');
+  document.getElementById('yourName').value='';
+  document.getElementById('yourMail').value='';
+  document.getElementById('subject').value='';
+  document.getElementById('phoneNum').value='';
+  document.getElementById('message').value='';
+}
+
+const faqs=[
+  {q:'How do I register?', a:'Click on REGISTRATION in the navbar, enter your Sponsor ID, select your position (Left/Right), fill personal details and choose a package.'},
+  {q:'What is BV and RP?', a:'BV (Business Value) represents the value of products sold. RP (Reward Point) = 600 BV. Your binary matching income is calculated based on matched RP pairs between left and right legs.'},
+  {q:'How is Binary Matching income calculated?', a:'When you have 1 RP on both your left and right legs, you earn ₹600. The weaker leg determines how many pairs are matched. Unmatched BV carries forward.'},
+  {q:'How do I withdraw my income?', a:'Login to your dashboard, go to Wallet & Withdraw, enter the withdrawal amount (minimum ₹100) and bank details. Admin will process within 24-48 hours.'},
+  {q:'What products do I receive?', a:'₹10,000 package: Kanchipuram Saree + Premier Pant & Shirt + 5 CTDV vouchers + Business ID. ₹5,000 package: Banarasi Saree or Suite Length + 3 CTDV vouchers + Business ID.'},
+  {q:'How do I achieve ranks?', a:'Ranks are achieved when the BV of your weaker leg (min of left/right BV) reaches the milestone threshold. Each rank unlocks a one-time cash reward.'},
+];
+const fl=document.getElementById('faqList');
+faqs.forEach((f,i)=>{
+  fl.innerHTML+=`<div style="background:#fff;border-radius:var(--radius);margin-bottom:1rem;box-shadow:var(--shadow);overflow:hidden;">
+    <button onclick="toggleFaq(${i})" style="width:100%;text-align:left;padding:1.1rem 1.5rem;background:none;border:none;font-size:.95rem;font-weight:600;color:var(--dark);cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+      <span>${f.q}</span><i class="fas fa-chevron-down" id="faq-icon-${i}" style="color:var(--primary);transition:.3s;"></i>
+    </button>
+    <div id="faq-ans-${i}" style="display:none;padding:0 1.5rem 1.1rem;font-size:.875rem;color:var(--gray);line-height:1.7;">${f.a}</div>
+  </div>`;
+});
+function toggleFaq(i){
+  const ans=document.getElementById('faq-ans-'+i);
+  const icon=document.getElementById('faq-icon-'+i);
+  const open=ans.style.display==='block';
+  ans.style.display=open?'none':'block';
+  icon.style.transform=open?'':'rotate(180deg)';
+}
+
+const reveals=document.querySelectorAll('.reveal');
+const obs=new IntersectionObserver(e=>e.forEach(r=>{if(r.isIntersecting)r.target.classList.add('visible');}),{threshold:.1});
+reveals.forEach(r=>obs.observe(r));
+</script>
+</body>
+</html>

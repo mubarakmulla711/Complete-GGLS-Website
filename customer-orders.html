@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Products - Great Goals Lifestyle</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+<div class="toast-container" id="toast-container"></div>
+<div class="dash-layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem;">GG</div>
+      <div class="sidebar-logo-text">Great Goals<br><span>Lifestyle</span></div>
+    </div>
+    <div class="sidebar-user" id="sidebarUser"></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-label">Main</div>
+      <a href="dashboard.html" class="sidebar-nav-item"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="customer-tree.html" class="sidebar-nav-item"><i class="fas fa-sitemap"></i> My Tree</a>
+      <a href="customer-orders.html" class="sidebar-nav-item active"><i class="fas fa-shopping-cart"></i> Order Product</a>
+      <a href="customer-wallet.html" class="sidebar-nav-item"><i class="fas fa-wallet"></i> Wallet & Withdraw</a>
+      <a href="customer-achievements.html" class="sidebar-nav-item"><i class="fas fa-trophy"></i> Achievements</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="APP.logout();window.location.href='login.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </nav>
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <h1>Order Product Packages</h1>
+      <div class="topbar-user">
+        <div class="topbar-avatar" id="topAvatar">?</div>
+        <span class="topbar-name" id="topName">User</span>
+      </div>
+    </div>
+    <div class="dash-content">
+      <div id="pendingOrderNotice" style="display:none;background:#fef3c7;border:1.5px solid #fde047;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;color:#854d0e;box-shadow:var(--shadow);">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#eab308;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div>
+            <div style="font-weight:700;font-size:0.95rem;">Order Pending Admin Verification & Approval</div>
+            <div style="font-size:0.83rem;margin-top:2px;">Your recent package order has been placed with <strong>Pending</strong> status and sent to the administrator. Once approved, your BV, RP, and business package will be fully activated.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cards-grid" id="productsContainer" style="margin-bottom: 2rem;"></div>
+      
+      <div class="table-card">
+        <div class="table-card-header">
+          <h3><i class="fas fa-history text-primary"></i> Order History</h3>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr><th>Order ID</th><th>Product</th><th>Price</th><th>BV</th><th>RP</th><th>Date</th><th>Status</th><th>Notes</th></tr>
+            </thead>
+            <tbody id="ordersList"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+<script>
+function showToast(msg, type='success'){
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':type==='warning'?'exclamation-triangle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;
+  tc.appendChild(t); setTimeout(()=>t.remove(),4000);
+}
+
+if(!APP.requireMember('login.html')) throw new Error('redirect');
+const session = APP.getCurrentSession();
+const user = APP.getMemberById(session.id);
+document.getElementById('topAvatar').textContent = user.name.charAt(0).toUpperCase();
+document.getElementById('topName').textContent = user.name;
+document.getElementById('sidebarUser').innerHTML = `<div class="sidebar-user-id">${user.id}</div><div class="sidebar-user-name">${user.name}</div><span class="sidebar-status">${user.status}</span>`;
+
+function renderProducts() {
+  const container = document.getElementById('productsContainer');
+  const prods = APP.getProducts().filter(p => p.active);
+  container.innerHTML = prods.map(p => {
+    const imgSrc = p.image || (p.price >= 10000 ? 'assets/images/p1_10000.jpg' : 'assets/images/p2_5000.jpg');
+    const badgeTxt = p.badge || (p.price >= 10000 ? 'MOST POPULAR' : 'BEST VALUE');
+    const isP2 = p.price < 10000;
+    const hasPkg = user.packageId === p.id;
+    return `
+    <div class="product-card ${isP2 ? 'p2' : 'p1'}">
+      <div class="product-img-wrap">
+        <img src="${imgSrc}" alt="${p.name}" loading="lazy">
+        <span class="product-badge-float">${badgeTxt}</span>
+      </div>
+      <div class="product-card-header">
+        <div class="product-price"><sup>₹</sup>${p.price.toLocaleString('en-IN')}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-bv">BV: ${p.bv} | RP: ${p.rp}</div>
+        <div style="font-size:0.85rem;margin-top:0.35rem;background:rgba(0,0,0,0.2);padding:4px 8px;border-radius:6px;">Net Referral: <strong>${APP.fmtINR(p.referralIncome || (p.price>=10000?1020:510))}</strong> <small style="opacity:0.8;">(${p.price>=10000?'₹180':'₹90'} tax/charge deducted)</small></div>
+      </div>
+      <div class="product-card-body">
+        <ul class="product-items">
+          ${p.items.map(it => `<li><i class="fas fa-check-circle"></i> ${it}</li>`).join('')}
+        </ul>
+        <button class="btn btn-primary w-100" onclick="buyProduct('${p.id}')">
+          <i class="fas fa-cart-plus"></i> ${hasPkg ? 'Re-order Package' : 'Order Now'}
+        </button>
+      </div>
+    </div>
+  `}).join('');
+}
+
+function buyProduct(pId) {
+  const p = APP.getProductById(pId);
+  if(!confirm(`Confirm order for ${p.name} at ₹${p.price.toLocaleString('en-IN')}?\n\nNOTE: The order will be submitted with "Pending" status and sent to Admin for verification and activation.`)) return;
+  
+  // Customer placement sets status 'pending' and adds message to Admin
+  const res = APP.placeOrder(user.id, pId, false);
+  if(res.success) {
+    showToast('Order submitted successfully! Status is "Pending". Admin notified for verification.', 'warning');
+    setTimeout(() => location.reload(), 1600);
+  } else {
+    showToast(res.msg || 'Failed to place order', 'error');
+  }
+}
+
+function renderOrderHistory() {
+  const list = APP.getOrders().filter(o => o.memberId === user.id).reverse();
+  const tbody = document.getElementById('ordersList');
+  const noticeEl = document.getElementById('pendingOrderNotice');
+  
+  const hasPending = list.some(o => o.status === 'pending');
+  if (noticeEl) noticeEl.style.display = hasPending ? 'block' : 'none';
+
+  if(!list.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="no-data">No previous orders found.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(o => {
+    const status = o.status || 'completed';
+    let badgeHtml = '';
+    let notes = '—';
+    if (status === 'completed') {
+      badgeHtml = '<span class="badge-status badge-completed"><i class="fas fa-check-circle"></i> Completed</span>';
+      notes = '<span style="color:#15803d;font-size:0.8rem;">Package & BV Activated</span>';
+    } else if (status === 'pending') {
+      badgeHtml = '<span class="badge-status badge-pending" style="background:#fef3c7;color:#92400e;border:1px solid #fde047;"><i class="fas fa-clock"></i> Pending Approval</span>';
+      notes = '<span style="color:#b45309;font-size:0.8rem;"><i class="fas fa-hourglass-half"></i> Awaiting Admin Verification</span>';
+    } else if (status === 'rejected') {
+      badgeHtml = '<span class="badge-status badge-rejected"><i class="fas fa-times-circle"></i> Rejected</span>';
+      notes = `<span style="color:#dc2626;font-size:0.8rem;">${o.rejectedReason || 'Order rejected'}</span>`;
+    }
+
+    return `
+    <tr>
+      <td><span style="font-family:monospace;font-weight:700;">${o.id}</span></td>
+      <td><strong>${o.productName}</strong></td>
+      <td>₹${o.price.toLocaleString('en-IN')}</td>
+      <td>${o.bv}</td>
+      <td>${o.rp}</td>
+      <td>${new Date(o.createdAt).toLocaleDateString('en-IN')}</td>
+      <td>${badgeHtml}</td>
+      <td>${notes}</td>
+    </tr>
+    `;
+  }).join('');
+}
+
+renderProducts();
+renderOrderHistory();
+</script>
+</body>
+</html>

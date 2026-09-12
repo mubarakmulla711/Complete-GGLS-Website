@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binary Tree Genealogy — Great Goals Lifestyle</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+/* Clean, Responsive Binary Tree Styling */
+.tree-outer-container {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-height: 520px;
+  position: relative;
+}
+.tree-controls-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.tree-search {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.tree-search input {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  width: 180px;
+}
+.legend-box {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #475569;
+}
+.legend-badge {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+/* Binary Tree Canvas & Nodes */
+.binary-tree-canvas {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 100%;
+  padding: 1rem 2rem 3rem 2rem;
+  user-select: none;
+}
+.tree-branch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 0 8px;
+}
+.tree-children-row {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  padding-top: 36px;
+  width: 100%;
+}
+/* Connecting Lines */
+.tree-children-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 25%;
+  right: 25%;
+  height: 2px;
+  background: #94a3b8;
+}
+.tree-branch::before {
+  content: '';
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  width: 2px;
+  height: 18px;
+  background: #94a3b8;
+}
+/* Root branch doesn't need top connector */
+.binary-tree-canvas > .tree-branch::before {
+  display: none;
+}
+/* Downward vertical branch line to children */
+.tree-branch > .tree-node-card + .tree-children-row::after {
+  content: '';
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  width: 2px;
+  height: 18px;
+  background: #94a3b8;
+}
+
+/* Node Cards */
+.tree-node-card {
+  width: 140px;
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: #fff;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  transition: all 0.25s ease;
+  z-index: 2;
+  text-align: center;
+}
+.tree-node-card:hover {
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.2);
+}
+.tree-node-card.pkg-p1 {
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  border: 2px solid #6d28d9;
+}
+.tree-node-card.pkg-p2 {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  border: 2px solid #1d4ed8;
+}
+.tree-node-card.pkg-default {
+  background: linear-gradient(135deg, #0284c7, #0ea5e9);
+  border: 2px solid #0369a1;
+}
+
+/* Empty Node */
+.tree-node-card.empty-node {
+  background: #f8fafc;
+  border: 2px dashed #94a3b8;
+  color: #64748b;
+  box-shadow: none;
+  cursor: pointer;
+}
+.tree-node-card.empty-node:hover {
+  background: #fff7ed;
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+.empty-icon {
+  font-size: 1.3rem;
+  margin-bottom: 0.2rem;
+}
+.empty-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.empty-pos {
+  font-size: 0.68rem;
+  background: #e2e8f0;
+  border-radius: 4px;
+  padding: 1px 6px;
+  display: inline-block;
+  margin-top: 4px;
+}
+.tree-node-card.empty-node:hover .empty-pos {
+  background: #ffedd5;
+}
+
+/* Card Content Details */
+.node-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-bottom: 0.25rem;
+}
+.node-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+.node-id {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+.node-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0.2rem;
+}
+.node-rank {
+  font-size: 0.68rem;
+  opacity: 0.9;
+  background: rgba(0,0,0,0.18);
+  padding: 1px 6px;
+  border-radius: 50px;
+  display: inline-block;
+  margin-bottom: 0.35rem;
+}
+.node-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: rgba(0,0,0,0.15);
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 0.68rem;
+}
+.node-stats-grid .lbl {
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+/* Quick summary header */
+.tree-summary-pills {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.summary-pill {
+  background: #fff;
+  border-radius: 10px;
+  padding: 0.8rem 1.25rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 180px;
+}
+.summary-pill i {
+  font-size: 1.4rem;
+}
+.summary-pill .sp-lbl {
+  font-size: 0.72rem;
+  color: var(--gray);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.summary-pill .sp-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--dark);
+}
+</style>
+</head>
+<body>
+<div class="toast-container" id="toast-container"></div>
+
+<div class="dash-layout">
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem;">GG</div>
+      <div class="sidebar-logo-text">Great Goals<br><span>Lifestyle</span></div>
+    </div>
+    <div class="sidebar-user" id="sidebarUser"></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-label">Main</div>
+      <a href="dashboard.html" class="sidebar-nav-item"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="customer-tree.html" class="sidebar-nav-item active"><i class="fas fa-sitemap"></i> My Tree</a>
+      <a href="customer-orders.html" class="sidebar-nav-item"><i class="fas fa-shopping-cart"></i> Order Product</a>
+      <a href="customer-wallet.html" class="sidebar-nav-item"><i class="fas fa-wallet"></i> Wallet & Withdraw</a>
+      <a href="customer-achievements.html" class="sidebar-nav-item"><i class="fas fa-trophy"></i> Achievements</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="APP.logout();window.location.href='login.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--dark);" id="menuBtn"><i class="fas fa-bars"></i></button>
+        <h1>Binary Genealogy Tree</h1>
+      </div>
+      <div class="topbar-user">
+        <div class="topbar-avatar" id="topAvatar">?</div>
+        <span class="topbar-name" id="topName">User</span>
+      </div>
+    </div>
+
+    <div class="dash-content">
+      <!-- Top Leg Summary Pills -->
+      <div class="tree-summary-pills">
+        <div class="summary-pill">
+          <i class="fas fa-arrow-left" style="color:var(--purple);"></i>
+          <div>
+            <div class="sp-lbl">Left Leg BV / RP</div>
+            <div class="sp-val"><span id="lblLeftBV">0</span> BV | <span id="lblLeftRP">0</span> RP</div>
+          </div>
+        </div>
+        <div class="summary-pill">
+          <i class="fas fa-arrow-right" style="color:var(--blue);"></i>
+          <div>
+            <div class="sp-lbl">Right Leg BV / RP</div>
+            <div class="sp-val"><span id="lblRightBV">0</span> BV | <span id="lblRightRP">0</span> RP</div>
+          </div>
+        </div>
+        <div class="summary-pill">
+          <i class="fas fa-users" style="color:var(--green);"></i>
+          <div>
+            <div class="sp-lbl">Total Team Downline</div>
+            <div class="sp-val"><span id="lblTeamCount">0</span> Members</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tree Canvas Container -->
+      <div class="tree-outer-container">
+        <div class="tree-controls-bar">
+          <div class="legend-box">
+            <div class="legend-item"><div class="legend-badge" style="background:linear-gradient(135deg,#7c3aed,#9333ea);"></div> ₹10,000 Package</div>
+            <div class="legend-item"><div class="legend-badge" style="background:linear-gradient(135deg,#2563eb,#3b82f6);"></div> ₹5,000 Package</div>
+            <div class="legend-item"><div class="legend-badge" style="background:#f8fafc;border:1px dashed #94a3b8;"></div> Empty (+ Add Slot)</div>
+          </div>
+
+          <div class="tree-search">
+            <input type="text" id="treeSearchInput" placeholder="Search Member ID...">
+            <button class="btn btn-sm btn-primary" onclick="searchTreeNode()"><i class="fas fa-search"></i> View</button>
+            <button class="btn btn-sm btn-outline" style="color:var(--dark);border-color:#cbd5e1;" onclick="resetTree()"><i class="fas fa-redo"></i> Reset</button>
+          </div>
+        </div>
+
+        <div id="treeViewport">
+          <!-- Tree renders here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tree Member Details Modal -->
+<div class="modal-overlay" id="treeModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3><i class="fas fa-user-circle text-primary"></i> Member Tree Details</h3>
+      <button class="modal-close" onclick="document.getElementById('treeModal').classList.remove('active')">&times;</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;font-size:0.9rem;">
+      <div><strong>Member ID:</strong> <div id="modal-id" style="color:var(--primary);font-weight:700;"></div></div>
+      <div><strong>Full Name:</strong> <div id="modal-name"></div></div>
+      <div><strong>Sponsor:</strong> <div id="modal-sponsor"></div></div>
+      <div><strong>Rank:</strong> <div id="modal-rank"></div></div>
+      <div style="grid-column:1/-1;"><strong>Package:</strong> <div id="modal-pkg" style="color:var(--green);font-weight:700;"></div></div>
+      <div><strong>Left BV:</strong> <div id="modal-lbv"></div></div>
+      <div><strong>Right BV:</strong> <div id="modal-rbv"></div></div>
+      <div><strong>Left RP:</strong> <div id="modal-lrp"></div></div>
+      <div><strong>Right RP:</strong> <div id="modal-rrp"></div></div>
+    </div>
+    <div style="margin-top:1.5rem;text-align:right;">
+      <button class="btn btn-primary btn-sm" onclick="viewDownlineAsRoot()"><i class="fas fa-sitemap"></i> View Downline Tree</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+<script src="assets/js/tree.js"></script>
+<script>
+function showToast(msg, type='success'){
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;
+  tc.appendChild(t); setTimeout(()=>t.remove(),3500);
+}
+
+if(!APP.requireMember('login.html')) throw new Error('redirect');
+const session = APP.getCurrentSession();
+const user = APP.getMemberById(session.id);
+let currentRootId = user.id;
+
+document.getElementById('topAvatar').textContent = user.name.charAt(0).toUpperCase();
+document.getElementById('topName').textContent = user.name;
+document.getElementById('sidebarUser').innerHTML = `
+  <div class="sidebar-user-id">${user.id}</div>
+  <div class="sidebar-user-name">${user.name}</div>
+  <span class="sidebar-status">${user.status}</span>
+`;
+
+function refreshTree() {
+  document.getElementById('lblLeftBV').textContent = (user.leftBV || 0).toLocaleString('en-IN');
+  document.getElementById('lblLeftRP').textContent = Number(user.leftRP || 0).toFixed(2);
+  document.getElementById('lblRightBV').textContent = (user.rightBV || 0).toLocaleString('en-IN');
+  document.getElementById('lblRightRP').textContent = Number(user.rightRP || 0).toFixed(2);
+  document.getElementById('lblTeamCount').textContent = (user.leftMemberCount || 0) + (user.rightMemberCount || 0);
+
+  const container = document.getElementById('treeViewport');
+  TREE.render(currentRootId, container, 4);
+}
+
+function searchTreeNode() {
+  const query = document.getElementById('treeSearchInput').value.trim();
+  if(!query) return;
+  const target = APP.getMemberById(query);
+  if(!target) {
+    showToast('Member not found: ' + query, 'error');
+    return;
+  }
+  currentRootId = target.id;
+  refreshTree();
+}
+
+function resetTree() {
+  currentRootId = user.id;
+  document.getElementById('treeSearchInput').value = '';
+  refreshTree();
+}
+
+let selectedModalId = null;
+const originalShowNodeDetail = TREE.showNodeDetail;
+TREE.showNodeDetail = function(memberId) {
+  selectedModalId = memberId;
+  originalShowNodeDetail.call(TREE, memberId);
+};
+
+function viewDownlineAsRoot() {
+  if(!selectedModalId) return;
+  currentRootId = selectedModalId;
+  document.getElementById('treeModal').classList.remove('active');
+  refreshTree();
+}
+
+refreshTree();
+</script>
+</body>
+</html>

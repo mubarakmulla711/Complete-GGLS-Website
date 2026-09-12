@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us — Great Goals Lifestyle</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;}
+.why-item{background:#fff;border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);display:flex;gap:1rem;align-items:flex-start;transition:var(--transition);}
+.why-item:hover{transform:translateY(-4px);}
+.why-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.2rem;flex-shrink:0;}
+.why-item h4{font-size:.95rem;font-weight:700;color:var(--dark);}
+.why-item p{font-size:.82rem;color:var(--gray);margin-top:.25rem;line-height:1.6;}
+.team-card{background:#fff;border-radius:var(--radius-lg);padding:2rem;text-align:center;box-shadow:var(--shadow);transition:var(--transition);}
+.team-card:hover{transform:translateY(-6px);}
+.team-avatar{width:80px;height:80px;border-radius:50%;margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;color:#fff;}
+.team-name{font-size:1rem;font-weight:700;color:var(--dark);}
+.team-role{font-size:.82rem;color:var(--primary);}
+.team-desc{font-size:.83rem;color:var(--gray);margin-top:.5rem;line-height:1.6;}
+.mission-vision{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3rem;}
+.mv-card{padding:2rem;border-radius:var(--radius);text-align:center;}
+.mv-card.mission{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;}
+.mv-card.vision{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;}
+.mv-card h3{font-size:1.2rem;font-weight:700;margin-bottom:.75rem;}
+.mv-card p{font-size:.9rem;opacity:.9;line-height:1.7;}
+@media(max-width:640px){.mission-vision,.about-hero-grid{grid-template-columns:1fr!important;}}
+</style>
+</head>
+<body>
+<div class="toast-container" id="toast-container"></div>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">
+    <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1e293b,#0f172a);border:3px solid #f97316;display:flex;align-items:center;justify-content:center;color:#f97316;font-weight:900;font-size:1.1rem;">GG</div>
+    <div class="nav-logo-text">Great Goals<br><span>Lifestyle Pvt. Ltd.</span></div>
+  </a>
+  <div class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')"><span></span><span></span><span></span></div>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html">HOME</a><a href="plan.html">PLAN</a><a href="about.html" class="active">ABOUT</a>
+    <a href="support.html">SUPPORT</a><a href="login.html" class="btn-nav">LOGIN</a><a href="register.html" class="btn-nav">REGISTRATION</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <h1>Know About Us</h1>
+    <div class="breadcrumb"><a href="index.html">Home</a> ▶ About Us</div>
+  </div>
+</div>
+
+<!-- About main -->
+<section class="section">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;" class="about-hero-grid reveal">
+      <div>
+        <div style="display:inline-block;background:#fff7ed;border:1px solid #fed7aa;color:#ea580c;border-radius:50px;padding:.3rem 1rem;font-size:.8rem;font-weight:600;margin-bottom:1rem;">Est. 2024 | Karnataka, India</div>
+        <h2 style="font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;color:var(--dark);margin-bottom:1rem;">Know About <span style="color:var(--primary);">Great Goals Lifestyle</span> Pvt. Ltd.</h2>
+        <p style="color:var(--gray);line-height:1.9;margin-bottom:1rem;">We Are Going To Create <strong>1 Lakh Great Goal Leaders</strong> In India Before 2028. Great Goals Lifestyle Pvt. Ltd. is a network marketing company registered in Karnataka, India, dedicated to empowering every household with financial freedom.</p>
+        <p style="color:var(--gray);line-height:1.9;margin-bottom:1.5rem;">Our binary plan is simple, transparent, and designed for everyone. Whether you're a student, homemaker, or business professional — you can build a sustainable income stream with us.</p>
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+          <div style="text-align:center;"><div style="font-size:1.8rem;font-weight:800;color:var(--primary);">1L+</div><div style="font-size:.8rem;color:var(--gray);">Target Leaders</div></div>
+          <div style="text-align:center;"><div style="font-size:1.8rem;font-weight:800;color:var(--green);">10</div><div style="font-size:.8rem;color:var(--gray);">Achievement Ranks</div></div>
+          <div style="text-align:center;"><div style="font-size:1.8rem;font-weight:800;color:var(--purple);">2</div><div style="font-size:.8rem;color:var(--gray);">Premium Packages</div></div>
+          <div style="text-align:center;"><div style="font-size:1.8rem;font-weight:800;color:var(--blue);">2028</div><div style="font-size:.8rem;color:var(--gray);">Mission Year</div></div>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:var(--radius-lg);height:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:1.5rem;padding:2rem;text-align:center;">
+        <div style="font-size:4rem;">🌟</div>
+        <h3 style="font-size:1.3rem;font-weight:700;">Building India's Largest<br>MLM Network</h3>
+        <p style="color:#94a3b8;font-size:.9rem;line-height:1.7;">Empowering families across Karnataka and beyond with ethical, transparent income opportunities.</p>
+      </div>
+    </div>
+
+    <div class="mission-vision">
+      <div class="mv-card mission reveal">
+        <div style="font-size:2rem;margin-bottom:.75rem;">🎯</div>
+        <h3>Our Mission</h3>
+        <p>To create 1 Lakh financially independent Great Goal Leaders across India before 2028 through a transparent binary network marketing system.</p>
+      </div>
+      <div class="mv-card vision reveal animate-delay-1">
+        <div style="font-size:2rem;margin-bottom:.75rem;">🔭</div>
+        <h3>Our Vision</h3>
+        <p>To be India's most trusted network marketing company, known for integrity, transparency, and life-changing income opportunities for every Indian.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Values -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>Our Core <span>Values</span></h2>
+      <p>The principles that guide everything we do</p>
+      <div class="section-line"></div>
+    </div>
+    <div class="value-grid">
+      <div class="card reveal" style="text-align:center;border-top:4px solid #f97316;">
+        <div style="font-size:2.5rem;margin-bottom:.75rem;">🤝</div>
+        <h3 style="font-size:1rem;font-weight:700;color:var(--dark);">Trust & Integrity</h3>
+        <p style="font-size:.85rem;color:var(--gray);margin-top:.4rem;">We operate with complete transparency. Every rupee of income is trackable and verifiable in your dashboard.</p>
+      </div>
+      <div class="card reveal animate-delay-1" style="text-align:center;border-top:4px solid #16a34a;">
+        <div style="font-size:2.5rem;margin-bottom:.75rem;">📈</div>
+        <h3 style="font-size:1rem;font-weight:700;color:var(--dark);">Continuous Growth</h3>
+        <p style="font-size:.85rem;color:var(--gray);margin-top:.4rem;">With 10 achievement milestones, there's always a next goal. Growth is built into our DNA.</p>
+      </div>
+      <div class="card reveal animate-delay-2" style="text-align:center;border-top:4px solid #7c3aed;">
+        <div style="font-size:2.5rem;margin-bottom:.75rem;">👨‍👩‍👧‍👦</div>
+        <h3 style="font-size:1rem;font-weight:700;color:var(--dark);">Community</h3>
+        <p style="font-size:.85rem;color:var(--gray);margin-top:.4rem;">We rise together. Your success directly helps your team, and their success helps you.</p>
+      </div>
+      <div class="card reveal animate-delay-3" style="text-align:center;border-top:4px solid #2563eb;">
+        <div style="font-size:2.5rem;margin-bottom:.75rem;">⭐</div>
+        <h3 style="font-size:1rem;font-weight:700;color:var(--dark);">Excellence</h3>
+        <p style="font-size:.85rem;color:var(--gray);margin-top:.4rem;">Premium products, professional support, and world-class earning potential for every member.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>Why Choose <span>Great Goals?</span></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="why-grid">
+      <div class="why-item reveal"><div class="why-icon"><i class="fas fa-shield-alt"></i></div><div><h4>Fully Transparent</h4><p>Real-time dashboard shows every rupee of income, BV, and RP. No hidden deductions.</p></div></div>
+      <div class="why-item reveal animate-delay-1"><div class="why-icon"><i class="fas fa-bolt"></i></div><div><h4>Fast Withdrawals</h4><p>Request withdrawals any time. Admin processes within 24-48 hours.</p></div></div>
+      <div class="why-item reveal animate-delay-2"><div class="why-icon"><i class="fas fa-sitemap"></i></div><div><h4>Binary System</h4><p>Simple left-right binary plan. Help 2 people join and earn from their entire downline.</p></div></div>
+      <div class="why-item reveal animate-delay-3"><div class="why-icon"><i class="fas fa-gift"></i></div><div><h4>Real Products</h4><p>Every package contains genuine premium textile products worth the investment price.</p></div></div>
+      <div class="why-item reveal animate-delay-4"><div class="why-icon"><i class="fas fa-headset"></i></div><div><h4>24/7 Support</h4><p>Our support team is always available. Call, email, or visit our office in Naragund.</p></div></div>
+      <div class="why-item reveal animate-delay-5"><div class="why-icon"><i class="fas fa-trophy"></i></div><div><h4>10 Achievement Ranks</h4><p>Earn up to ₹1.56 Crore total income (₹1.20 Cr matching commission + ₹36 Lakh milestone rewards).</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Team -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>Our <span>Leadership Team</span></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="cards-grid">
+      <div class="team-card reveal">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#f97316,#ea580c);">F</div>
+        <div class="team-name">Fernando (Founder)</div>
+        <div class="team-role">CEO & Managing Director</div>
+        <div class="team-desc">Visionary leader with 15+ years in network marketing. Founded Great Goals Lifestyle with the dream of creating 1 lakh financially free Indians.</div>
+      </div>
+      <div class="team-card reveal animate-delay-1">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">R</div>
+        <div class="team-name">Rajesh Kumar</div>
+        <div class="team-role">Director of Operations</div>
+        <div class="team-desc">Operations expert ensuring smooth payouts, product delivery, and member satisfaction across Karnataka and beyond.</div>
+      </div>
+      <div class="team-card reveal animate-delay-2">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#0891b2,#06b6d4);">P</div>
+        <div class="team-name">Priya Nayak</div>
+        <div class="team-role">Head of Member Relations</div>
+        <div class="team-desc">Dedicated to member success with training programs, support systems, and growth coaching for all achievement levels.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);text-align:center;color:#fff;">
+  <div class="container reveal">
+    <h2 style="font-size:2rem;font-weight:800;margin-bottom:1rem;">Join the Great Goals Family</h2>
+    <p style="color:#94a3b8;max-width:500px;margin:0 auto 2rem;">Be part of India's fastest-growing network. Register today and start your journey to financial freedom.</p>
+    <a href="register.html" class="btn btn-primary" style="font-size:1rem;padding:1rem 2.5rem;"><i class="fas fa-rocket"></i> Register Now</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:1.3rem;">GG</div>
+      <h3>Great Goals Lifestyle Pvt. Ltd.</h3>
+      <p>We Are Going To Create 1lakh Great Goal Leaders In India Before 2028</p>
+    </div>
+    <div class="footer-col"><h4>Quick Links</h4><ul><li><a href="index.html">Home</a></li><li><a href="plan.html">Business Plan</a></li><li><a href="about.html">About Us</a></li><li><a href="support.html">Support</a></li><li><a href="login.html">Login</a></li><li><a href="register.html">Register</a></li></ul></div>
+    <div class="footer-col"><h4>Contact</h4><ul><li><a href="#">Municipal Corp Main Road</a></li><li><a href="#">Naragund Dt; Gadag 582207</a></li><li><a href="#">Karnataka, India</a></li><li><a href="mailto:greatgoalslifestyle@gmail.com">greatgoalslifestyle@gmail.com</a></li><li><a href="tel:9110871460">9110871460</a></li><li><a href="tel:9663639659">9663639659</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><p>© 2026 <span>Great Goals Lifestyle Pvt. Ltd.</span> All rights reserved.</p></div>
+</footer>
+
+<script src="assets/js/app.js"></script>
+<script>
+const reveals=document.querySelectorAll('.reveal');
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.1});
+reveals.forEach(r=>obs.observe(r));
+</script>
+</body>
+</html>

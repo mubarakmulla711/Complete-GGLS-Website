@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Great Goals Lifestyle</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+.quick-btn{flex:1;min-width:150px;background:#fff;border:1.5px solid #e2e8f0;border-radius:var(--radius);padding:1rem;text-align:center;cursor:pointer;transition:var(--transition);text-decoration:none;color:var(--dark);}
+.quick-btn:hover{border-color:var(--primary);background:#fff7ed;transform:translateY(-3px);}
+.quick-btn i{display:block;font-size:1.5rem;margin-bottom:.4rem;color:var(--primary);}
+.quick-btn span{font-size:.83rem;font-weight:600;}
+.pb-wrap{flex:1;height:12px;background:#e2e8f0;border-radius:6px;overflow:hidden;}
+.pb-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--primary),#fbbf24);transition:width 1.2s ease;}
+</style>
+</head>
+<body>
+<div class="toast-container" id="toast-container"></div>
+<div class="dash-layout">
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem;">GG</div>
+    <div class="sidebar-logo-text">Great Goals<br><span>Lifestyle</span></div>
+  </div>
+  <div class="sidebar-user" id="sidebarUser"></div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-nav-label">Main</div>
+    <a href="dashboard.html" class="sidebar-nav-item active"><i class="fas fa-home"></i> Dashboard</a>
+    <a href="customer-tree.html" class="sidebar-nav-item"><i class="fas fa-sitemap"></i> My Tree</a>
+    <a href="customer-orders.html" class="sidebar-nav-item"><i class="fas fa-shopping-cart"></i> Order Product</a>
+    <a href="customer-wallet.html" class="sidebar-nav-item"><i class="fas fa-wallet"></i> Wallet and Withdraw</a>
+    <a href="customer-achievements.html" class="sidebar-nav-item"><i class="fas fa-trophy"></i> Achievements</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-logout" onclick="APP.logout();window.location.href='login.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</nav>
+<div class="dash-main">
+  <div class="dash-topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--dark);" id="menuBtn"><i class="fas fa-bars"></i></button>
+      <h1>Dashboard</h1>
+    </div>
+    <div class="topbar-user">
+      <div class="topbar-avatar" id="topAvatar">?</div>
+      <span class="topbar-name" id="topName">Loading...</span>
+    </div>
+  </div>
+  <div class="dash-content">
+    <div class="stat-cards" id="statCards"></div>
+    <div style="background:#fff;border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);margin-bottom:1.75rem;" id="rankProg"></div>
+    <h3 style="font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:1rem;">Quick Actions</h3>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.75rem;">
+      <a href="customer-tree.html" class="quick-btn"><i class="fas fa-sitemap"></i><span>View My Tree</span></a>
+      <a href="customer-orders.html" class="quick-btn"><i class="fas fa-shopping-cart"></i><span>Order Product</span></a>
+      <a href="customer-wallet.html" class="quick-btn"><i class="fas fa-money-bill-wave"></i><span>Withdraw Income</span></a>
+      <a href="customer-achievements.html" class="quick-btn"><i class="fas fa-trophy"></i><span>My Achievements</span></a>
+      <a href="register.html" class="quick-btn"><i class="fas fa-user-plus"></i><span>Add Member</span></a>
+    </div>
+    <div class="table-card">
+      <div class="table-card-header">
+        <h3><i class="fas fa-shopping-bag text-primary" style="margin-right:.4rem;"></i>Recent Orders</h3>
+        <a href="customer-orders.html" class="btn btn-sm btn-primary">View All</a>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead><tr><th>Order ID</th><th>Product</th><th>Price</th><th>BV</th><th>RP</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody id="recentOrders"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<script src="assets/js/app.js"></script>
+<script>
+function showToast(msg,type){
+  type=type||'success';
+  var tc=document.getElementById('toast-container');
+  var t=document.createElement('div');
+  t.className='toast '+type;
+  t.innerHTML='<i class="fas fa-'+(type==='success'?'check-circle':'exclamation-circle')+' toast-icon"></i><span class="toast-msg">'+msg+'</span>';
+  tc.appendChild(t); setTimeout(function(){t.remove();},3500);
+}
+if(!APP.requireMember('login.html')){throw new Error('redirect');}
+var session=APP.getCurrentSession();
+var user=APP.getMemberById(session.id);
+var initials=user.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
+document.getElementById('topAvatar').textContent=initials;
+document.getElementById('topName').textContent=user.name;
+document.getElementById('sidebarUser').innerHTML='<div class="sidebar-user-id">'+user.id+'</div><div class="sidebar-user-name">'+user.name+'</div><span class="sidebar-status">'+user.status+'</span>';
+
+var cards=[
+  {label:'User ID',value:user.id,sub:'<span style="background:#16a34a;color:#fff;padding:.1rem .5rem;border-radius:50px;font-size:.65rem;">'+user.status+'</span>',icon:'fas fa-id-card',bg:'bg-purple'},
+  {label:'Sponsor ID',value:user.sponsorId||'Root',sub:'Your upline',icon:'fas fa-user-tie',bg:'bg-darkpurple'},
+  {label:'Referral Income',value:'Rs.'+Number(user.referralIncome||0).toFixed(2),sub:'Total earned',icon:'fas fa-hand-holding-usd',bg:'bg-blue'},
+  {label:'Binary Matching',value:'Rs.'+Number(user.binaryIncome||0).toFixed(2),sub:'Total matched',icon:'fas fa-exchange-alt',bg:'bg-green'},
+  {label:'Success Withdrawals',value:'Rs.'+Number(user.successWithdrawals||0).toFixed(2),sub:'Total withdrawn',icon:'fas fa-check-circle',bg:'bg-yellow'},
+  {label:'Income Wallet',value:'Rs.'+Number(user.incomeWallet||0).toFixed(2),sub:'Available balance',icon:'fas fa-wallet',bg:'bg-orange'},
+  {label:'Activation Wallet',value:'Rs.'+Number(user.activationWallet||0).toFixed(2),sub:'Activation balance',icon:'fas fa-coins',bg:'bg-red'},
+  {label:'Left Member',value:user.leftMemberCount||0,sub:'Total left team',icon:'fas fa-user-friends',bg:'bg-purple'},
+  {label:'Right Member',value:user.rightMemberCount||0,sub:'Total right team',icon:'fas fa-users',bg:'bg-darkpurple'},
+  {label:'Rank',value:user.rank||'Nill',sub:'Current achievement',icon:'fas fa-award',bg:'bg-blue'},
+  {label:'Left RP',value:Number(user.leftRP||0).toFixed(2),sub:'Left reward points',icon:'fas fa-arrow-left',bg:'bg-green'},
+  {label:'Right RP',value:Number(user.rightRP||0).toFixed(2),sub:'Right reward points',icon:'fas fa-arrow-right',bg:'bg-yellow'},
+  {label:'Left Carry Forward',value:Number(user.leftCarryForward||0).toFixed(2),sub:'Left carry BV',icon:'fas fa-redo',bg:'bg-orange'},
+  {label:'Right Carry Forward',value:Number(user.rightCarryForward||0).toFixed(2),sub:'Right carry BV',icon:'fas fa-undo',bg:'bg-red'},
+  {label:'Left BV',value:Number(user.leftBV||0).toLocaleString('en-IN'),sub:'Left business value',icon:'fas fa-chart-bar',bg:'bg-cyan'},
+  {label:'Right BV',value:Number(user.rightBV||0).toLocaleString('en-IN'),sub:'Right business value',icon:'fas fa-chart-pie',bg:'bg-teal'},
+];
+var sc=document.getElementById('statCards');
+cards.forEach(function(c,i){
+  sc.innerHTML+='<div class="stat-card '+c.bg+'" style="animation-delay:'+(i*0.05)+'s"><div class="stat-card-icon"><i class="'+c.icon+'"></i></div><div class="stat-card-info"><div class="stat-card-label">'+c.label+'</div><div class="stat-card-value">'+c.value+'</div><div class="stat-card-sub">'+c.sub+'</div></div></div>';
+});
+
+var weakBV=Math.min(user.leftBV||0,user.rightBV||0);
+var nextIdx=APP.ACHIEVEMENTS.findIndex(function(a){return a.bv>weakBV;});
+var nextAch=nextIdx>=0?APP.ACHIEVEMENTS[nextIdx]:null;
+var prevAch=nextIdx>0?APP.ACHIEVEMENTS[nextIdx-1]:null;
+var pct=nextAch?Math.min(100,(weakBV/nextAch.bv)*100):100;
+var rp=document.getElementById('rankProg');
+rp.innerHTML='<h3 style="font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:1rem;">Rank Progress '+(user.rank?'<span style="color:var(--primary)">'+user.rank+'</span>':'<span>No rank yet</span>')+'</h3>';
+if(nextAch){
+  rp.innerHTML+='<div style="display:flex;align-items:center;gap:1rem;"><span style="font-size:.82rem;color:var(--gray);min-width:80px;">'+(prevAch?prevAch.name:'Start')+'</span><div class="pb-wrap"><div class="pb-fill" style="width:'+pct+'%"></div></div><span style="font-size:.82rem;color:var(--gray);min-width:100px;text-align:right;">'+nextAch.icon+' '+nextAch.name+'</span></div><div style="font-size:.78rem;color:var(--gray);margin-top:.5rem;">Weaker Leg BV: <strong>'+weakBV.toLocaleString('en-IN')+'</strong> / '+nextAch.bv.toLocaleString('en-IN')+' BV needed ('+pct.toFixed(1)+'%)</div>';
+} else {
+  rp.innerHTML+='<div style="color:var(--green);font-weight:700;">Maximum rank achieved!</div>';
+}
+
+var orders=APP.getOrders().filter(function(o){return o.memberId===user.id;}).slice(-5).reverse();
+var tb=document.getElementById('recentOrders');
+if(!orders.length){
+  tb.innerHTML='<tr><td colspan="7" class="no-data">No orders yet. <a href="customer-orders.html" style="color:var(--primary)">Order now</a></td></tr>';
+} else {
+  orders.forEach(function(o){
+    var d=new Date(o.createdAt).toLocaleDateString('en-IN');
+    var st = o.status || 'completed';
+    var badgeCls = st === 'completed' ? 'badge-completed' : (st === 'pending' ? 'badge-pending' : 'badge-rejected');
+    var stLabel = st === 'pending' ? '<i class="fas fa-clock"></i> Pending' : (st === 'completed' ? '<i class="fas fa-check-circle"></i> Completed' : '<i class="fas fa-times-circle"></i> Rejected');
+    tb.innerHTML+='<tr><td style="font-size:.78rem;font-family:monospace;font-weight:700;color:var(--gray);">'+o.id+'</td><td><strong>'+o.productName+'</strong></td><td>Rs.'+o.price.toLocaleString('en-IN')+'</td><td>'+o.bv+'</td><td>'+o.rp+'</td><td>'+d+'</td><td><span class="badge-status '+badgeCls+'">'+stLabel+'</span></td></tr>';
+  });
+}
+</script>
+</body>
+</html>

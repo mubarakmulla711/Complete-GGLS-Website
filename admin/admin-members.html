@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Members – Admin | Great Goals Lifestyle</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    .dash-topbar{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.75rem;background:#fff;border-bottom:1px solid #f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+    .dash-topbar h1{font-size:1.3rem;font-weight:800;color:#1e293b;margin:0;}
+    .dash-content{padding:1.75rem;overflow-y:auto;}
+    .toolbar{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap;}
+    .search-box{display:flex;align-items:center;gap:.5rem;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:.55rem .9rem;flex:1;min-width:200px;}
+    .search-box input{border:none;outline:none;font-size:.88rem;width:100%;color:#1e293b;}
+    .search-box i{color:#94a3b8;}
+    .filter-sel{padding:.55rem .9rem;border:1.5px solid #e2e8f0;border-radius:10px;font-size:.88rem;color:#1e293b;background:#fff;outline:none;}
+    .btn-add{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border:none;padding:.6rem 1.2rem;border-radius:10px;font-weight:700;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:all .2s;}
+    .btn-add:hover{opacity:.9;transform:translateY(-1px);}
+    .count-badge{background:#f97316;color:#fff;border-radius:50px;padding:.1rem .55rem;font-size:.72rem;font-weight:800;margin-left:.5rem;}
+    .table-card{background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.07);overflow:hidden;margin-bottom:1.5rem;}
+    table{width:100%;border-collapse:collapse;}
+    th{background:#f8fafc;color:#64748b;font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:.85rem 1rem;text-align:left;white-space:nowrap;}
+    td{padding:.8rem 1rem;font-size:.845rem;color:#1e293b;border-top:1px solid #f1f5f9;white-space:nowrap;}
+    tr:hover td{background:#fefce8;}
+    .badge{display:inline-block;font-size:.68rem;font-weight:700;border-radius:50px;padding:.18rem .55rem;}
+    .badge-active{background:#dcfce7;color:#166534;}
+    .badge-inactive{background:#fee2e2;color:#991b1b;}
+    .action-btns{display:flex;gap:.35rem;flex-wrap:wrap;}
+    .btn-xs{font-size:.7rem;padding:.25rem .6rem;border-radius:6px;border:none;cursor:pointer;font-weight:600;transition:all .18s;}
+    .btn-view{background:#dbeafe;color:#1d4ed8;}
+    .btn-view:hover{background:#bfdbfe;}
+    .btn-toggle-active{background:#dcfce7;color:#166534;}
+    .btn-toggle-inactive{background:#fee2e2;color:#991b1b;}
+    .btn-del{background:#fee2e2;color:#991b1b;}
+    .btn-del:hover{background:#fecaca;}
+    .pagination{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:1rem;flex-wrap:wrap;}
+    .page-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;font-size:.82rem;cursor:pointer;font-weight:600;color:#475569;transition:all .18s;}
+    .page-btn.active{background:#f97316;color:#fff;border-color:#f97316;}
+    .page-btn:hover:not(.active){background:#f8fafc;}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;}
+    .modal-overlay.open{display:flex;}
+    .modal-box{background:#fff;border-radius:20px;padding:2rem;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+    .modal-box h2{font-size:1.15rem;font-weight:800;color:#1e293b;margin-bottom:1.25rem;}
+    .modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#94a3b8;}
+    .modal-close:hover{color:#1e293b;}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;}
+    .form-group{display:flex;flex-direction:column;gap:.35rem;}
+    .form-group label{font-size:.78rem;font-weight:700;color:#475569;}
+    .form-group input,.form-group select{padding:.6rem .85rem;border:1.5px solid #e2e8f0;border-radius:10px;font-size:.88rem;outline:none;transition:border-color .18s;width:100%;box-sizing:border-box;}
+    .form-group input:focus,.form-group select:focus{border-color:#f97316;}
+    .form-full{grid-column:1/-1;}
+    .btn-submit{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border:none;padding:.7rem 2rem;border-radius:10px;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .2s;width:100%;}
+    .btn-submit:hover{opacity:.9;}
+    .mobile-toggle{display:none;background:none;border:none;font-size:1.4rem;color:#1e293b;cursor:pointer;}
+    .info-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.85rem;}
+    .info-item{flex:1;min-width:140px;}
+    .info-item label{font-size:.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;display:block;margin-bottom:.15rem;}
+    .info-item .val{font-size:.9rem;font-weight:600;color:#1e293b;}
+    .alert{padding:.75rem 1rem;border-radius:10px;font-size:.85rem;font-weight:600;margin-bottom:.75rem;}
+    .alert-error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;}
+    @media(max-width:768px){.mobile-toggle{display:block;}.toolbar{flex-direction:column;align-items:stretch;}.form-grid{grid-template-columns:1fr;}th,td{padding:.6rem .65rem;font-size:.75rem;}}
+  </style>
+</head>
+<body>
+<div class="dash-layout">
+  <nav class="sidebar admin-sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem">GG</div>
+      <div class="sidebar-logo-text">Admin Panel<br><span>Great Goals</span></div>
+    </div>
+    <div style="padding:.75rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.1);">
+      <div style="font-size:.7rem;color:#94a3b8;">Logged in as</div>
+      <div style="font-size:.95rem;font-weight:700;color:#fff;">Administrator</div>
+      <span style="font-size:.7rem;background:#f97316;color:#fff;padding:.1rem .5rem;border-radius:50px;">Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-label">Management</div>
+      <a href="admin-dashboard.html" class="sidebar-nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="admin-members.html" class="sidebar-nav-item active"><i class="fas fa-users"></i> Members</a>
+      <a href="admin-products.html" class="sidebar-nav-item"><i class="fas fa-box"></i> Products</a>
+      <a href="admin-orders.html" class="sidebar-nav-item"><i class="fas fa-shopping-bag"></i> Orders</a>
+      <a href="admin-withdrawals.html" class="sidebar-nav-item"><i class="fas fa-money-bill-wave"></i> Withdrawals</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="APP.logout();window.location.href='../login.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </nav>
+
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <div style="display:flex;align-items:center;gap:.75rem;">
+        <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></button>
+        <div>
+          <h1><i class="fas fa-users" style="color:#f97316;margin-right:.4rem;"></i>Members <span class="count-badge" id="memberCountBadge">0</span></h1>
+          <div style="font-size:.78rem;color:#94a3b8;margin-top:.1rem;">Manage all registered members</div>
+        </div>
+      </div>
+      <button class="btn-add" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Member</button>
+    </div>
+
+    <div class="dash-content">
+      <!-- KPI SUMMARY -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem;">
+        <div style="background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:4px solid #3b82f6;">
+          <div style="font-size:0.75rem;color:#64748b;text-transform:uppercase;font-weight:700;">Total Members</div>
+          <div style="font-size:1.6rem;font-weight:800;color:#1e293b;" id="kpiTotal">0</div>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:4px solid #16a34a;">
+          <div style="font-size:0.75rem;color:#64748b;text-transform:uppercase;font-weight:700;">🟢 Ordered / Active</div>
+          <div style="font-size:1.6rem;font-weight:800;color:#16a34a;" id="kpiOrdered">0</div>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:4px solid #ef4444;">
+          <div style="font-size:0.75rem;color:#64748b;text-transform:uppercase;font-weight:700;">🔴 Not Ordered (Pending)</div>
+          <div style="font-size:1.6rem;font-weight:800;color:#ef4444;" id="kpiNotOrdered">0</div>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:4px solid #f97316;">
+          <div style="font-size:0.75rem;color:#64748b;text-transform:uppercase;font-weight:700;">Total Order Revenue</div>
+          <div style="font-size:1.6rem;font-weight:800;color:#f97316;" id="kpiRevenue">₹0</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Search by ID, name, or phone…" oninput="filterMembers()" />
+        </div>
+        <select class="filter-sel" id="orderFilter" onchange="filterMembers()">
+          <option value="">All Purchase Status</option>
+          <option value="ordered">🟢 Ordered (Package Active)</option>
+          <option value="not_ordered">🔴 Not Ordered (Pending)</option>
+        </select>
+        <select class="filter-sel" id="statusFilter" onchange="filterMembers()">
+          <option value="">All Account Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="table-card">
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Name</th><th>Phone</th><th>Sponsor</th><th>Pos.</th>
+                <th>Order Status</th>
+                <th>Package</th><th>L-BV</th><th>R-BV</th>
+                <th>Wallet</th><th>Rank</th><th>Account</th><th>Joined</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="membersTbody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW MODAL -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal-box" style="max-width:700px;">
+    <button class="modal-close" onclick="closeModal('viewModal')"><i class="fas fa-times"></i></button>
+    <h2><i class="fas fa-user" style="color:#f97316;"></i> Member Details</h2>
+    <div id="viewModalContent"></div>
+  </div>
+</div>
+
+<!-- PLACE ORDER MODAL FOR MEMBER -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal-box" style="max-width:520px;">
+    <button class="modal-close" onclick="closeModal('orderModal')"><i class="fas fa-times"></i></button>
+    <h2><i class="fas fa-cart-plus" style="color:#f97316;"></i> Place Order for Member</h2>
+    <div id="orderModalInfo" style="margin-bottom:1rem;background:#f8fafc;padding:0.75rem 1rem;border-radius:10px;font-size:0.88rem;"></div>
+    <form id="placeOrderForm" onsubmit="submitAdminOrder(event)">
+      <input type="hidden" id="orderMemberId" />
+      <div class="form-group" style="margin-bottom:1rem;">
+        <label>Select Product Package *</label>
+        <select id="orderPackageSelect" required onchange="updateOrderPreview()"></select>
+      </div>
+      <div id="orderPackagePreview" style="margin-bottom:1.25rem;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:0.85rem;font-size:0.85rem;color:#9a3412;"></div>
+      <button type="submit" class="btn-submit"><i class="fas fa-check-circle"></i> Activate & Place Order</button>
+    </form>
+  </div>
+</div>
+
+<!-- ADD MEMBER MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('addModal')"><i class="fas fa-times"></i></button>
+    <h2><i class="fas fa-user-plus" style="color:#f97316;"></i> Add New Member</h2>
+    <div id="addFormError" class="alert alert-error" style="display:none;"></div>
+    <form id="addMemberForm" onsubmit="submitAddMember(event)">
+      <div class="form-grid">
+        <div class="form-group"><label>Sponsor ID *</label><input type="text" id="addSponsorId" placeholder="e.g. GG00001" required /></div>
+        <div class="form-group"><label>Position *</label><select id="addPosition" required><option value="">Select position</option><option value="left">Left</option><option value="right">Right</option></select></div>
+        <div class="form-group"><label>Full Name *</label><input type="text" id="addName" placeholder="Member full name" required /></div>
+        <div class="form-group"><label>Phone Number *</label><input type="tel" id="addPhone" placeholder="10-digit phone" required /></div>
+        <div class="form-group"><label>Password *</label><input type="password" id="addPassword" placeholder="Set password" required /></div>
+        <div class="form-group"><label>Package Purchase</label><select id="addPackage"><option value="">No Package (Register Unpaid/Pending)</option></select></div>
+        <div class="form-group form-full" style="margin-top:.5rem;"><button type="submit" class="btn-submit"><i class="fas fa-user-plus"></i> Register Member</button></div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="../assets/js/app.js"></script>
+<script>
+  APP.requireAdmin('../login.html');
+  function showToast(msg,type='success'){const tc=document.getElementById('toast-container');const t=document.createElement('div');t.className=`toast ${type}`;t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;tc.appendChild(t);setTimeout(()=>t.remove(),3500);}
+
+  const PAGE_SIZE=10;
+  let currentPage=1;
+  let filteredMembers=[];
+  const products=APP.getProducts();
+  const prodMap={};
+  products.forEach(p=>prodMap[p.id]=p);
+
+  // Populate package selects
+  const pkgSel=document.getElementById('addPackage');
+  const orderPkgSel=document.getElementById('orderPackageSelect');
+  products.filter(p=>p.active!==false).forEach(p=>{
+    const opt=document.createElement('option');
+    opt.value=p.id;
+    opt.textContent=`${p.name} – ₹${p.price.toLocaleString('en-IN')}`;
+    pkgSel.appendChild(opt);
+    const opt2=opt.cloneNode(true);
+    orderPkgSel.appendChild(opt2);
+  });
+
+  let allMembers=APP.getMembers().filter(m=>!m.isAdmin);
+  document.getElementById('memberCountBadge').textContent=allMembers.length;
+
+  function updateKPIs(){
+    const orders=APP.getOrders();
+    const orderedMemberIds=new Set(orders.map(o=>(o.memberId||'').toUpperCase()));
+    const orderedCount=allMembers.filter(m=>orderedMemberIds.has(m.id.toUpperCase())||!!m.packageId).length;
+    const notOrderedCount=allMembers.length - orderedCount;
+    const totalRev=orders.reduce((s,o)=>s+(o.price||0),0);
+
+    document.getElementById('kpiTotal').textContent=allMembers.length;
+    document.getElementById('kpiOrdered').textContent=orderedCount;
+    document.getElementById('kpiNotOrdered').textContent=notOrderedCount;
+    document.getElementById('kpiRevenue').textContent=APP.fmtINR(totalRev);
+  }
+  updateKPIs();
+
+  function filterMembers(){
+    const q=document.getElementById('searchInput').value.toLowerCase();
+    const st=document.getElementById('statusFilter').value;
+    const ordSt=document.getElementById('orderFilter').value;
+    const orders=APP.getOrders();
+    const orderedMemberIds=new Set(orders.map(o=>(o.memberId||'').toUpperCase()));
+
+    filteredMembers=allMembers.filter(m=>{
+      const matchQ=!q||m.id.toLowerCase().includes(q)||m.name.toLowerCase().includes(q)||(m.phone||'').includes(q);
+      const matchS=!st||m.status===st;
+      const isOrd=orderedMemberIds.has(m.id.toUpperCase())||!!m.packageId;
+      const matchOrd=!ordSt||(ordSt==='ordered'?isOrd:!isOrd);
+      return matchQ&&matchS&&matchOrd;
+    });
+    currentPage=1;renderTable();renderPagination();
+  }
+
+  function renderTable(){
+    const tbody=document.getElementById('membersTbody');tbody.innerHTML='';
+    const start=(currentPage-1)*PAGE_SIZE;
+    const pageItems=filteredMembers.slice(start,start+PAGE_SIZE);
+    if(!pageItems.length){tbody.innerHTML='<tr><td colspan="15" style="text-align:center;padding:2.5rem;color:#94a3b8;"><i class="fas fa-users" style="font-size:2rem;display:block;margin-bottom:.5rem;"></i>No members found matching filter</td></tr>';return;}
+    
+    pageItems.forEach(m=>{
+      const pkg=prodMap[m.packageId];
+      const isActive=m.status==='active';
+      const mOrders=APP.getMemberOrders(m.id);
+      const completedOrders=mOrders.filter(o=>o.status==='completed');
+      const pendingOrders=mOrders.filter(o=>o.status==='pending');
+      const isOrdered=completedOrders.length>0||!!m.packageId;
+      const latestOrder=mOrders.length?mOrders[mOrders.length-1]:null;
+
+      let orderStatusHtml='';
+      if(pendingOrders.length>0){
+        orderStatusHtml=`
+          <span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #fde047;font-weight:700;">
+            <i class="fas fa-clock"></i> Pending Approval (${pendingOrders.length})
+          </span>
+          <div style="margin-top:3px;">
+            <a href="admin-orders.html" class="btn-xs btn-approve" style="text-decoration:none;padding:2px 7px;font-size:0.68rem;">
+              <i class="fas fa-check"></i> Verify in Orders
+            </a>
+          </div>
+        `;
+      } else if(isOrdered){
+        orderStatusHtml=`
+          <span class="badge" style="background:#dcfce7;color:#15803d;border:1px solid #86efac;font-weight:700;">
+            <i class="fas fa-check-circle"></i> Ordered (${completedOrders.length||1})
+          </span>
+          <div style="font-size:.72rem;color:#64748b;margin-top:2px;">
+            ${latestOrder?`${latestOrder.id} • ${new Date(latestOrder.createdAt).toLocaleDateString('en-IN')}`: 'Package Active'}
+          </div>
+        `;
+      } else {
+        orderStatusHtml=`
+          <span class="badge" style="background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;font-weight:700;">
+            <i class="fas fa-times-circle"></i> Not Ordered
+          </span>
+          <div>
+            <button class="btn-xs" style="background:#f97316;color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:0.7rem;cursor:pointer;margin-top:3px;" onclick="openOrderModal('${m.id}')">
+              <i class="fas fa-cart-plus"></i> Order Now
+            </button>
+          </div>
+        `;
+      }
+
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td><span style="font-family:monospace;font-size:.78rem;font-weight:700;color:#f97316;">${m.id}</span></td>
+        <td><strong>${m.name}</strong></td>
+        <td>${m.phone||'—'}</td>
+        <td><span style="font-family:monospace;font-size:.78rem;">${m.sponsorId||'—'}</span></td>
+        <td style="text-transform:capitalize;">${m.position||'—'}</td>
+        <td>${orderStatusHtml}</td>
+        <td>${pkg?pkg.name:'<span style="color:#ef4444;font-size:0.78rem;">No Package</span>'}</td>
+        <td>${APP.fmt(m.leftBV||0)}</td>
+        <td>${APP.fmt(m.rightBV||0)}</td>
+        <td><strong style="color:#16a34a;">${APP.fmtINR(m.incomeWallet||0)}</strong></td>
+        <td>${m.rank||'Starter'}</td>
+        <td>
+          <span class="badge ${isActive?'badge-active':'badge-inactive'}" style="cursor:pointer;" onclick="toggleStatus('${m.id}')" title="Click to toggle status">
+            <i class="fas ${isActive?'fa-check-circle':'fa-ban'}"></i> ${m.status||'inactive'}
+          </span>
+        </td>
+        <td>${m.joinedAt?new Date(m.joinedAt).toLocaleDateString('en-IN'):'—'}</td>
+        <td class="action-btns">
+          <button class="btn-xs btn-view" onclick="viewMember('${m.id}')" title="View Details"><i class="fas fa-eye"></i></button>
+          <button class="btn-xs" style="background:#f97316;color:#fff;" onclick="openOrderModal('${m.id}')" title="Place Order"><i class="fas fa-shopping-cart"></i></button>
+          <button class="btn-xs ${isActive?'btn-toggle-active':'btn-toggle-inactive'}" onclick="toggleStatus('${m.id}')" title="${isActive?'Deactivate (Block login & access)':'Activate (Grant login & access)'}">
+            <i class="fas ${isActive?'fa-user-slash':'fa-user-check'}"></i> ${isActive?'Deactivate':'Activate'}
+          </button>
+          <button class="btn-xs btn-del" onclick="deleteMember('${m.id}')" title="Delete Member"><i class="fas fa-trash"></i></button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function renderPagination(){
+    const totalPages=Math.ceil(filteredMembers.length/PAGE_SIZE);
+    const pg=document.getElementById('pagination');pg.innerHTML='';
+    if(totalPages<=1)return;
+    const mkBtn=(label,page,isActive)=>{const btn=document.createElement('button');btn.className=`page-btn${isActive?' active':''}`;btn.innerHTML=label;btn.onclick=()=>{currentPage=page;renderTable();renderPagination();};pg.appendChild(btn);};
+    if(currentPage>1)mkBtn('<i class="fas fa-chevron-left"></i>',currentPage-1,false);
+    for(let i=1;i<=totalPages;i++){if(i===1||i===totalPages||Math.abs(i-currentPage)<=1)mkBtn(i,i,i===currentPage);else if(Math.abs(i-currentPage)===2){const sp=document.createElement('span');sp.textContent='…';sp.style.cssText='padding:.4rem .2rem;color:#94a3b8;font-size:.85rem;';pg.appendChild(sp);}}
+    if(currentPage<totalPages)mkBtn('<i class="fas fa-chevron-right"></i>',currentPage+1,false);
+  }
+
+  function viewMember(id){
+    const m=APP.getMemberById(id);if(!m)return;
+    const pkg=prodMap[m.packageId];
+    const mOrders=APP.getMemberOrders(m.id);
+    const isOrdered=mOrders.length>0||!!m.packageId;
+
+    let ordersTableHtml='';
+    if(mOrders.length>0){
+      ordersTableHtml=`
+        <table style="margin-top:0.5rem;width:100%;font-size:0.8rem;">
+          <thead><tr><th>Order ID</th><th>Product</th><th>Price</th><th>BV</th><th>RP</th><th>Date</th></tr></thead>
+          <tbody>
+            ${mOrders.map(o=>`
+              <tr>
+                <td style="font-family:monospace;font-weight:700;color:#f97316;">${o.id}</td>
+                <td><strong>${o.productName}</strong></td>
+                <td>${APP.fmtINR(o.price)}</td>
+                <td>${o.bv}</td>
+                <td>${o.rp}</td>
+                <td>${new Date(o.createdAt).toLocaleDateString('en-IN')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    } else {
+      ordersTableHtml=`
+        <div style="background:#fee2e2;color:#991b1b;padding:0.75rem 1rem;border-radius:8px;font-size:0.85rem;display:flex;align-items:center;justify-content:space-between;margin-top:0.5rem;">
+          <span><i class="fas fa-exclamation-triangle"></i> This member has <strong>NOT ordered</strong> any package yet.</span>
+          <button class="btn-xs" style="background:#f97316;color:#fff;" onclick="closeModal('viewModal');openOrderModal('${m.id}')"><i class="fas fa-cart-plus"></i> Order Now</button>
+        </div>
+      `;
+    }
+
+    document.getElementById('viewModalContent').innerHTML=`
+      <div style="background:linear-gradient(135deg,#f97316,#ea580c);border-radius:14px;padding:1.25rem;color:#fff;margin-bottom:1.25rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+        <div>
+          <div style="font-size:1.4rem;font-weight:800;">${m.name}</div>
+          <div style="font-size:.85rem;opacity:.9;">${m.id} &bull; ${m.phone||'No phone'}</div>
+        </div>
+        <div>
+          <span style="background:rgba(255,255,255,.2);border-radius:50px;padding:.25rem .75rem;font-size:.75rem;font-weight:700;">${m.status||'inactive'}</span>
+          <span style="background:${isOrdered?'#22c55e':'#ef4444'};color:#fff;border-radius:50px;padding:.25rem .75rem;font-size:.75rem;font-weight:700;margin-left:0.3rem;">${isOrdered?'ORDERED':'NOT ORDERED'}</span>
+        </div>
+      </div>
+      
+      <div class="info-row">
+        <div class="info-item"><label>Sponsor ID</label><div class="val">${m.sponsorId||'—'}</div></div>
+        <div class="info-item"><label>Position</label><div class="val" style="text-transform:capitalize;">${m.position||'—'}</div></div>
+        <div class="info-item"><label>Package</label><div class="val">${pkg?pkg.name:'<span style="color:#ef4444">None</span>'}</div></div>
+        <div class="info-item"><label>Rank</label><div class="val">${m.rank||'Starter'}</div></div>
+      </div>
+      <div class="info-row">
+        <div class="info-item"><label>Left BV</label><div class="val">${APP.fmt(m.leftBV||0)}</div></div>
+        <div class="info-item"><label>Right BV</label><div class="val">${APP.fmt(m.rightBV||0)}</div></div>
+        <div class="info-item"><label>Left RP</label><div class="val">${APP.fmt(m.leftRP||0)}</div></div>
+        <div class="info-item"><label>Right RP</label><div class="val">${APP.fmt(m.rightRP||0)}</div></div>
+      </div>
+      <div class="info-row">
+        <div class="info-item"><label>Left Members</label><div class="val">${m.leftMemberCount||0}</div></div>
+        <div class="info-item"><label>Right Members</label><div class="val">${m.rightMemberCount||0}</div></div>
+        <div class="info-item"><label>Income Wallet</label><div class="val" style="color:#16a34a;font-weight:700;">${APP.fmtINR(m.incomeWallet||0)}</div></div>
+        <div class="info-item"><label>Joined</label><div class="val">${m.joinedAt?new Date(m.joinedAt).toLocaleDateString('en-IN'):'—'}</div></div>
+      </div>
+
+      <div style="margin-top:1.25rem;">
+        <h3 style="font-size:0.95rem;font-weight:700;color:#1e293b;border-bottom:2px solid #f1f5f9;padding-bottom:0.4rem;display:flex;align-items:center;gap:0.4rem;">
+          <i class="fas fa-shopping-bag text-primary"></i> Order & Purchase History (${mOrders.length})
+        </h3>
+        ${ordersTableHtml}
+      </div>
+    `;
+    openModal('viewModal');
+  }
+
+  // Place Order Modal Logic
+  function openOrderModal(memberId){
+    const m=APP.getMemberById(memberId);if(!m)return;
+    document.getElementById('orderMemberId').value=m.id;
+    document.getElementById('orderModalInfo').innerHTML=`
+      <strong>Member:</strong> ${m.name} (${m.id})<br>
+      <strong>Sponsor:</strong> ${m.sponsorId||'Root'} &bull; <strong>Position:</strong> ${m.position||'—'}<br>
+      <strong>Current Package:</strong> ${prodMap[m.packageId]?prodMap[m.packageId].name:'<span style="color:#ef4444;">Not Ordered Yet</span>'}
+    `;
+    updateOrderPreview();
+    openModal('orderModal');
+  }
+
+  function updateOrderPreview(){
+    const pkgId=document.getElementById('orderPackageSelect').value;
+    const p=prodMap[pkgId];
+    const prevEl=document.getElementById('orderPackagePreview');
+    if(!p){prevEl.innerHTML='Select a package above';return;}
+    const netRef = p.referralIncome || (p.price>=10000?1020:510);
+    prevEl.innerHTML=`
+      <div style="display:flex;justify-content:space-between;font-weight:700;margin-bottom:4px;">
+        <span>${p.name}</span>
+        <span style="color:#ea580c;font-size:1.05rem;">₹${p.price.toLocaleString('en-IN')}</span>
+      </div>
+      <div>BV: <strong>${p.bv}</strong> | RP: <strong>${p.rp}</strong></div>
+      <div>Sponsor Net Referral Bonus: <strong>₹${netRef}</strong></div>
+      <div style="font-size:0.75rem;color:#78350f;margin-top:4px;">Placing this order will immediately activate the member and propagate BV/RP up the tree.</div>
+    `;
+  }
+
+  function submitAdminOrder(e){
+    e.preventDefault();
+    const memberId=document.getElementById('orderMemberId').value;
+    const productId=document.getElementById('orderPackageSelect').value;
+    // Admin direct placement auto-activates immediately (autoApprove=true)
+    const res=APP.placeOrder(memberId,productId,true);
+    if(res&&res.success){
+      showToast('Order placed & completed successfully! Member package activated.');
+      closeModal('orderModal');
+      allMembers=APP.getMembers().filter(m=>!m.isAdmin);
+      updateKPIs();
+      filterMembers();
+    } else {
+      showToast((res&&res.msg)?res.msg:'Failed to place order','error');
+    }
+  }
+
+  function toggleStatus(id){
+    const m=APP.getMemberById(id);if(!m)return;
+    const ns=m.status==='active'?'inactive':'active';
+    const warningText = ns==='inactive'
+      ? `Are you sure you want to DEACTIVATE "${m.name}" (${m.id})?\n\n⚠️ Deactivating will lock this member out and prevent login or withdrawals.`
+      : `Activate "${m.name}" (${m.id})?\n\nThis will restore login and dashboard access.`;
+    
+    if(!confirm(warningText)) return;
+    m.status=ns;
+    APP.updateMember(m);
+    showToast(`Member "${m.name}" marked as ${ns.toUpperCase()}`, ns==='active'?'success':'warning');
+    allMembers=APP.getMembers().filter(m=>!m.isAdmin);
+    document.getElementById('memberCountBadge').textContent=allMembers.length;
+    updateKPIs();
+    filterMembers();
+  }
+
+  function deleteMember(id){
+    const m=APP.getMemberById(id);if(!m)return;
+    if(!confirm(`⚠️ Permanently DELETE "${m.name}" (${id})? This cannot be undone.`))return;
+    APP.deleteMember(id);showToast('Member deleted');
+    allMembers=APP.getMembers().filter(m=>!m.isAdmin);
+    document.getElementById('memberCountBadge').textContent=allMembers.length;
+    updateKPIs();
+    filterMembers();
+  }
+
+  function openAddModal(){document.getElementById('addMemberForm').reset();document.getElementById('addFormError').style.display='none';openModal('addModal');}
+
+  function submitAddMember(e){
+    e.preventDefault();const errEl=document.getElementById('addFormError');
+    const data={sponsorId:document.getElementById('addSponsorId').value.trim(),position:document.getElementById('addPosition').value,name:document.getElementById('addName').value.trim(),phone:document.getElementById('addPhone').value.trim(),password:document.getElementById('addPassword').value,productId:document.getElementById('addPackage').value||null};
+    const result=APP.registerMember(data);
+    if(result&&result.success){
+      showToast(`Member registered! ID: ${result.memberId}`);
+      closeModal('addModal');
+      allMembers=APP.getMembers().filter(m=>!m.isAdmin);
+      document.getElementById('memberCountBadge').textContent=allMembers.length;
+      updateKPIs();
+      filterMembers();
+    } else {
+      errEl.textContent=(result&&result.message)?result.message:'Registration failed. Check sponsor ID and try again.';
+      errEl.style.display='block';
+    }
+  }
+
+  function openModal(id){document.getElementById(id).classList.add('open');}
+  function closeModal(id){document.getElementById(id).classList.remove('open');}
+  document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+  filteredMembers=[...allMembers];
+  renderTable();renderPagination();
+</script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registration — Great Goals Lifestyle</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+.reg-card { max-width:560px; }
+.auto-id-box { background:#dbeafe; border:1.5px solid #3b82f6; border-radius:8px; padding:.75rem 1rem; font-size:1rem; font-weight:700; color:#1e40af; letter-spacing:.05em; }
+.steps { display:flex; gap:0; margin-bottom:2rem; }
+.step { flex:1; text-align:center; font-size:.75rem; font-weight:600; color:var(--gray); position:relative; }
+.step::after { content:''; position:absolute; top:14px; left:50%; right:-50%; height:2px; background:#e2e8f0; z-index:0; }
+.step:last-child::after { display:none; }
+.step-dot { width:28px; height:28px; border-radius:50%; background:#e2e8f0; color:var(--gray); display:flex; align-items:center; justify-content:center; margin:0 auto .4rem; font-size:.8rem; font-weight:700; position:relative; z-index:1; }
+.step.active .step-dot { background:var(--primary); color:#fff; }
+.step.active { color:var(--dark); }
+</style>
+</head>
+<body>
+<div class="toast-container" id="toast-container"></div>
+
+<div class="auth-page">
+  <div class="auth-card reg-card">
+    <div class="auth-logo">
+      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:1.4rem;margin:0 auto;">GG</div>
+      <h2>Registration</h2>
+      <p>Create your Great Goals account</p>
+    </div>
+
+    <div id="formStep1">
+      <div class="form-group">
+        <label><i class="fas fa-id-badge"></i> Your New Member ID <span style="color:var(--gray);font-size:.8rem;">(Auto-generated)</span></label>
+        <div class="auto-id-box" id="autoId">Loading...</div>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-user-tie"></i> Sponsor ID <span style="color:var(--red)">*</span></label>
+        <input type="text" class="form-control" id="sponsorId" placeholder="Enter Sponsor's Member ID (e.g. GG00001)" oninput="validateSponsor(this.value)">
+        <div id="sponsorMsg" style="font-size:.78rem;margin-top:.3rem;"></div>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-code-branch"></i> Select Position <span style="color:var(--red)">*</span></label>
+        <select class="form-control" id="position">
+          <option value="">Select Position</option>
+          <option value="left">Left</option>
+          <option value="right">Right</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-user"></i> Full Name <span style="color:var(--red)">*</span></label>
+        <input type="text" class="form-control" id="memberName" placeholder="Enter your full name">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-phone"></i> Phone Number <span style="color:var(--red)">*</span></label>
+        <input type="tel" class="form-control" id="phone" placeholder="Enter 10-digit phone number" maxlength="10">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-lock"></i> Password <span style="color:var(--red)">*</span></label>
+        <input type="password" class="form-control" id="regPass" placeholder="Create a strong password">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-box"></i> Select Package <span style="color:var(--red)">*</span></label>
+        <select class="form-control" id="packageId" onchange="showPackageDetails()">
+          <option value="">Select a Package</option>
+        </select>
+      </div>
+      <div id="pkgDetails" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:.9rem;margin-bottom:1rem;font-size:.83rem;color:#166534;"></div>
+
+      <div class="form-check">
+        <input type="checkbox" id="termsCheck">
+        <label for="termsCheck">I AGREE WITH TERMS AND CONDITIONS</label>
+      </div>
+
+      <div id="regError"></div>
+      <button class="btn btn-primary w-100" onclick="doRegister()"><i class="fas fa-user-plus"></i> Register Now</button>
+    </div>
+
+    <div id="formSuccess" style="display:none;text-align:center;padding:1rem 0;">
+      <div style="font-size:3rem;margin-bottom:1rem;">🎉</div>
+      <h3 style="color:var(--green);font-size:1.3rem;font-weight:700;">Registration Successful!</h3>
+      <p style="color:var(--gray);margin:.5rem 0 1rem;">Your Member ID: <strong id="newMemberId" style="color:var(--primary);font-size:1.1rem;"></strong></p>
+      <p style="font-size:.85rem;color:var(--gray);">Redirecting to login in <strong id="countdown">3</strong> seconds...</p>
+    </div>
+
+    <div style="text-align:center;margin-top:1.25rem;font-size:.85rem;color:var(--gray);">
+      Already have an account? <a href="login.html" style="color:var(--primary);font-weight:600;">Login here</a>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+<script>
+function showToast(msg,type='success'){
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;
+  tc.appendChild(t); setTimeout(()=>t.remove(),3500);
+}
+
+// Generate auto ID
+function generatePreviewId(){
+  const members=APP.getMembers();
+  const num=String(members.length+1).padStart(5,'0');
+  return 'GG'+num;
+}
+document.getElementById('autoId').textContent=generatePreviewId();
+
+// Populate packages
+function populatePackages(){
+  const sel=document.getElementById('packageId');
+  APP.getProducts().filter(p=>p.active).forEach(p=>{
+    const opt=document.createElement('option');
+    opt.value=p.id;
+    opt.textContent=`${p.name} (BV: ${p.bv} | RP: ${p.rp})`;
+    sel.appendChild(opt);
+  });
+}
+populatePackages();
+
+function showPackageDetails(){
+  const pid=document.getElementById('packageId').value;
+  const box=document.getElementById('pkgDetails');
+  if(!pid){ box.style.display='none'; return; }
+  const p=APP.getProductById(pid);
+  if(!p){ box.style.display='none'; return; }
+    const refInc = p.referralIncome || (p.price >= 10000 ? 1020 : 510);
+    const gross = p.grossReferral || (p.price >= 10000 ? 1200 : 600);
+    const tax = p.serviceTax || (p.price >= 10000 ? 180 : 90);
+    box.innerHTML=`<strong>Package Includes:</strong><ul style="margin-top:.4rem;">
+    ${p.items.map(it=>`<li>✓ ${it}</li>`).join('')}
+  </ul><div style="margin-top:.5rem;"><strong>BV: ${p.bv} | RP: ${p.rp} | Net Referral Income: <span style="color:var(--green);font-size:1rem;">${APP.fmtINR(refInc)}</span></strong> <small style="color:var(--gray);">(Gross ${APP.fmtINR(gross)} − ${APP.fmtINR(tax)} Service Charge & Tax)</small></div>`;
+}
+
+let sponsorValid=false;
+function validateSponsor(val){
+  const msg=document.getElementById('sponsorMsg');
+  if(!val){ msg.innerHTML=''; sponsorValid=false; return; }
+  const m=APP.getMemberById(val.toUpperCase());
+  if(m){
+    msg.innerHTML=`<span style="color:var(--green)"><i class="fas fa-check-circle"></i> Sponsor found: <strong>${m.name}</strong></span>`;
+    sponsorValid=true;
+  } else {
+    msg.innerHTML=`<span style="color:var(--red)"><i class="fas fa-times-circle"></i> Sponsor ID not found</span>`;
+    sponsorValid=false;
+  }
+}
+
+// Check URL Params (e.g. ?sponsor=GG00001&pos=left)
+const urlParams = new URLSearchParams(window.location.search);
+const spParam = urlParams.get('sponsor');
+const posParam = urlParams.get('pos');
+if (spParam) {
+  document.getElementById('sponsorId').value = spParam;
+  validateSponsor(spParam);
+}
+if (posParam) {
+  document.getElementById('position').value = posParam.toLowerCase();
+}
+
+function doRegister(){
+  const sponsorId=document.getElementById('sponsorId').value.trim().toUpperCase();
+  const position=document.getElementById('position').value;
+  const name=document.getElementById('memberName').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const password=document.getElementById('regPass').value;
+  const productId=document.getElementById('packageId').value;
+  const terms=document.getElementById('termsCheck').checked;
+  const errEl=document.getElementById('regError');
+  errEl.innerHTML='';
+
+  if(!sponsorId||!position||!name||!phone||!password||!productId){
+    errEl.innerHTML='<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Please fill all required fields.</div>';
+    return;
+  }
+  if(!sponsorValid){
+    errEl.innerHTML='<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Invalid Sponsor ID.</div>';
+    return;
+  }
+  if(phone.length!==10||!/^\d+$/.test(phone)){
+    errEl.innerHTML='<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Please enter a valid 10-digit phone number.</div>';
+    return;
+  }
+  if(password.length<6){
+    errEl.innerHTML='<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Password must be at least 6 characters.</div>';
+    return;
+  }
+  if(!terms){
+    errEl.innerHTML='<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Please accept the Terms and Conditions.</div>';
+    return;
+  }
+
+  const result=APP.registerMember({sponsorId,position,name,phone,password,productId});
+  if(result.success){
+    document.getElementById('formStep1').style.display='none';
+    document.getElementById('formSuccess').style.display='block';
+    document.getElementById('newMemberId').textContent=result.memberId;
+    let c=3;
+    const timer=setInterval(()=>{
+      c--;
+      document.getElementById('countdown').textContent=c;
+      if(c<=0){ clearInterval(timer); window.location.href='login.html'; }
+    },1000);
+  } else {
+    errEl.innerHTML=`<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${result.msg}</div>`;
+  }
+}
+</script>
+</body>
+</html>

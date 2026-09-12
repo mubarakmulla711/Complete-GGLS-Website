@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10 Achievements - Great Goals Lifestyle</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+<div class="dash-layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem;">GG</div>
+      <div class="sidebar-logo-text">Great Goals<br><span>Lifestyle</span></div>
+    </div>
+    <div class="sidebar-user" id="sidebarUser"></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-label">Main</div>
+      <a href="dashboard.html" class="sidebar-nav-item"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="customer-tree.html" class="sidebar-nav-item"><i class="fas fa-sitemap"></i> My Tree</a>
+      <a href="customer-orders.html" class="sidebar-nav-item"><i class="fas fa-shopping-cart"></i> Order Product</a>
+      <a href="customer-wallet.html" class="sidebar-nav-item"><i class="fas fa-wallet"></i> Wallet & Withdraw</a>
+      <a href="customer-achievements.html" class="sidebar-nav-item active"><i class="fas fa-trophy"></i> Achievements</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="APP.logout();window.location.href='login.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </nav>
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <h1>10 Achievement Milestones — Earn up to ₹1.56 Crore Total</h1>
+      <div class="topbar-user">
+        <div class="topbar-avatar" id="topAvatar">?</div>
+        <span class="topbar-name" id="topName">User</span>
+      </div>
+    </div>
+    <div class="dash-content">
+      <div class="alert alert-info" style="margin-bottom:1.5rem;">
+        <i class="fas fa-info-circle"></i> Milestone achievements unlock automatically based on your weaker leg Business Value (BV). Reaching <strong>Chairman</strong> awards <strong>₹1.20 Crore in Binary Commission</strong> + <strong>₹36 Lakh in Milestone Rewards</strong> = <strong>₹1.56 Crore Total Earnings</strong>!
+      </div>
+      <div id="achievementsContainer"></div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+<script>
+if(!APP.requireMember('login.html')) throw new Error('redirect');
+const session = APP.getCurrentSession();
+const user = APP.getMemberById(session.id);
+document.getElementById('topAvatar').textContent = user.name.charAt(0).toUpperCase();
+document.getElementById('topName').textContent = user.name;
+document.getElementById('sidebarUser').innerHTML = `<div class="sidebar-user-id">${user.id}</div><div class="sidebar-user-name">${user.name}</div><span class="sidebar-status">${user.status}</span>`;
+
+function renderAchievements() {
+  const container = document.getElementById('achievementsContainer');
+  const weakBV = Math.min(user.leftBV || 0, user.rightBV || 0);
+  const unlocked = user.achievementIds || [];
+
+  container.innerHTML = APP.ACHIEVEMENTS.map(ach => {
+    const isUnlocked = unlocked.includes(ach.id) || weakBV >= ach.bv;
+    const progress = Math.min(100, (weakBV / ach.bv) * 100);
+    return `
+      <div class="ach-progress-card ${isUnlocked ? 'unlocked' : 'locked'}">
+        <div class="ach-progress-icon" style="color:${ach.color};">${ach.icon}</div>
+        <div class="ach-progress-info">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="ach-progress-name">#${ach.id} ${ach.name}</div>
+            ${isUnlocked ? '<span class="badge-status badge-active"><i class="fas fa-check"></i> UNLOCKED</span>' : '<span class="badge-status" style="background:#f1f5f9;color:#64748b;">LOCKED</span>'}
+          </div>
+          <div class="ach-progress-req" style="line-height:1.6;">
+            Target: <strong>${ach.bv.toLocaleString('en-IN')} BV</strong> (${ach.rp.toLocaleString()} RP) &nbsp;|&nbsp;
+            Matching Comm: <strong style="color:var(--blue);">₹${ach.commission.toLocaleString('en-IN')}</strong> &nbsp;|&nbsp;
+            Reward: <strong style="color:var(--green);">₹${ach.reward.toLocaleString('en-IN')}</strong>${ach.rewardTitle ? ` <small style="color:var(--dark);">(${ach.rewardTitle})</small>` : ''} &nbsp;|&nbsp;
+            <span style="background:rgba(249,115,22,0.15);color:var(--primary);padding:2px 8px;border-radius:4px;font-weight:700;">Total Earning: ₹${ach.totalEarnings.toLocaleString('en-IN')}</span>
+          </div>
+          <div class="ach-progress-bar-wrap">
+            <div class="ach-progress-bar" style="width:${progress}%;background:${ach.color};"></div>
+          </div>
+          <div class="ach-progress-percent">Current: ${weakBV.toLocaleString('en-IN')} BV (${progress.toFixed(1)}%)</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+renderAchievements();
+</script>
+</body>
+</html>
