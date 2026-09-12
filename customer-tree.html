@@ -180,6 +180,84 @@
   background: #ffedd5;
 }
 
+/* Position Badges on Nodes */
+.pos-badge {
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.3);
+  color: #fff;
+  letter-spacing: 0.04em;
+  margin-left: auto;
+}
+.pos-left > .tree-node-card .pos-badge {
+  background: #2563eb;
+}
+.pos-right > .tree-node-card .pos-badge {
+  background: #7c3aed;
+}
+
+/* Next 3 Rows (Next Page) Pill Button */
+.next-page-pill {
+  margin-top: 6px;
+  background: #fff;
+  color: #ea580c;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 50px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1.5px solid #f97316;
+}
+.next-page-pill:hover {
+  background: #ea580c;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* Level Indicator Box */
+.tree-level-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.83rem;
+  color: #475569;
+}
+.tree-breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  flex-wrap: wrap;
+}
+.tree-breadcrumb-item {
+  color: #f97316;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.tree-breadcrumb-item:hover {
+  text-decoration: underline;
+}
+.tree-breadcrumb-current {
+  color: #1e293b;
+  font-weight: 700;
+}
+
 /* Card Content Details */
 .node-header {
   display: flex;
@@ -347,6 +425,14 @@
           </div>
         </div>
 
+        <!-- Tree Level & Breadcrumb Navigation Bar -->
+        <div class="tree-level-info">
+          <div class="tree-breadcrumb-nav" id="treeBreadcrumbs"></div>
+          <div style="font-size:0.75rem; color:#64748b; font-weight:600; display:flex; align-items:center; gap:0.35rem;">
+            <i class="fas fa-layer-group text-primary"></i> Showing 3 Rows per Page
+          </div>
+        </div>
+
         <div id="treeViewport">
           <!-- Tree renders here -->
         </div>
@@ -394,6 +480,7 @@ if(!APP.requireMember('login.html')) throw new Error('redirect');
 const session = APP.getCurrentSession();
 const user = APP.getMemberById(session.id);
 let currentRootId = user.id;
+let navHistory = [user.id];
 
 document.getElementById('topAvatar').textContent = user.name.charAt(0).toUpperCase();
 document.getElementById('topName').textContent = user.name;
@@ -403,15 +490,77 @@ document.getElementById('sidebarUser').innerHTML = `
   <span class="sidebar-status">${user.status}</span>
 `;
 
-function refreshTree() {
-  document.getElementById('lblLeftBV').textContent = (user.leftBV || 0).toLocaleString('en-IN');
-  document.getElementById('lblLeftRP').textContent = Number(user.leftRP || 0).toFixed(2);
-  document.getElementById('lblRightBV').textContent = (user.rightBV || 0).toLocaleString('en-IN');
-  document.getElementById('lblRightRP').textContent = Number(user.rightRP || 0).toFixed(2);
-  document.getElementById('lblTeamCount').textContent = (user.leftMemberCount || 0) + (user.rightMemberCount || 0);
+function renderBreadcrumbs() {
+  const bcContainer = document.getElementById('treeBreadcrumbs');
+  if (!bcContainer) return;
 
+  let html = '';
+  if (navHistory.length > 1) {
+    html += `<span class="tree-breadcrumb-item" onclick="navigateHome()"><i class="fas fa-home"></i> You (${user.name.split(' ')[0]})</span>`;
+    for (let i = 1; i < navHistory.length; i++) {
+      const histId = navHistory[i];
+      const histMember = APP.getMemberById(histId);
+      const name = histMember ? (histMember.name || histId) : histId;
+      html += ` <i class="fas fa-chevron-right" style="font-size:0.65rem;color:#94a3b8;"></i> `;
+      if (i === navHistory.length - 1) {
+        html += `<span class="tree-breadcrumb-current"><i class="fas fa-user text-primary"></i> ${name} (${histId})</span>`;
+      } else {
+        html += `<span class="tree-breadcrumb-item" onclick="navigateToHistoryIndex(${i})">${name}</span>`;
+      }
+    }
+    html += ` <button class="btn btn-xs btn-outline" style="margin-left:0.5rem;padding:2px 8px;font-size:0.72rem;" onclick="navigateBack()"><i class="fas fa-arrow-up"></i> Up One Level</button>`;
+  } else {
+    html = `<span class="tree-breadcrumb-current"><i class="fas fa-home text-primary"></i> Your Tree View: ${user.name} (${user.id})</span>`;
+  }
+  bcContainer.innerHTML = html;
+}
+
+window.navigateToTreeNode = function(id) {
+  if (!id) return;
+  if (!navHistory.includes(id)) {
+    navHistory.push(id);
+  } else {
+    const existingIdx = navHistory.indexOf(id);
+    navHistory = navHistory.slice(0, existingIdx + 1);
+  }
+  currentRootId = id;
+  refreshTree();
+};
+
+function navigateToHistoryIndex(index) {
+  if (index >= 0 && index < navHistory.length) {
+    navHistory = navHistory.slice(0, index + 1);
+    currentRootId = navHistory[navHistory.length - 1];
+    refreshTree();
+  }
+}
+
+function navigateBack() {
+  if (navHistory.length > 1) {
+    navHistory.pop();
+    currentRootId = navHistory[navHistory.length - 1];
+    refreshTree();
+  }
+}
+
+function navigateHome() {
+  navHistory = [user.id];
+  currentRootId = user.id;
+  refreshTree();
+}
+
+function refreshTree() {
+  const rootMember = APP.getMemberById(currentRootId) || user;
+  document.getElementById('lblLeftBV').textContent = (rootMember.leftBV || 0).toLocaleString('en-IN');
+  document.getElementById('lblLeftRP').textContent = Number(rootMember.leftRP || 0).toFixed(2);
+  document.getElementById('lblRightBV').textContent = (rootMember.rightBV || 0).toLocaleString('en-IN');
+  document.getElementById('lblRightRP').textContent = Number(rootMember.rightRP || 0).toFixed(2);
+  document.getElementById('lblTeamCount').textContent = (rootMember.leftMemberCount || 0) + (rootMember.rightMemberCount || 0);
+
+  renderBreadcrumbs();
   const container = document.getElementById('treeViewport');
-  TREE.render(currentRootId, container, 4);
+  // Render strictly 3 rows (Root = Row 1, Children = Row 2, Grandchildren = Row 3)
+  TREE.render(currentRootId, container, 3);
 }
 
 function searchTreeNode() {
@@ -422,14 +571,12 @@ function searchTreeNode() {
     showToast('Member not found: ' + query, 'error');
     return;
   }
-  currentRootId = target.id;
-  refreshTree();
+  window.navigateToTreeNode(target.id);
 }
 
 function resetTree() {
-  currentRootId = user.id;
   document.getElementById('treeSearchInput').value = '';
-  refreshTree();
+  navigateHome();
 }
 
 let selectedModalId = null;
@@ -441,9 +588,9 @@ TREE.showNodeDetail = function(memberId) {
 
 function viewDownlineAsRoot() {
   if(!selectedModalId) return;
-  currentRootId = selectedModalId;
+  const targetId = selectedModalId;
   document.getElementById('treeModal').classList.remove('active');
-  refreshTree();
+  window.navigateToTreeNode(targetId);
 }
 
 refreshTree();

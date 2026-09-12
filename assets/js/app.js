@@ -469,18 +469,22 @@ const APP = {
     const sponsor = members.find(m => m.id.toUpperCase() === sponsorId.toUpperCase());
     if (!sponsor) return { success:false, msg:'Sponsor ID not found. Check your Sponsor ID.' };
 
-    if (position === 'left'  && sponsor.leftMemberId)
+    const cleanPos = (position || 'left').toLowerCase();
+    if (cleanPos === 'left' && sponsor.leftMemberId)
       return { success:false, msg:'Left position is already filled under this sponsor.' };
-    if (position === 'right' && sponsor.rightMemberId)
+    if (cleanPos === 'right' && sponsor.rightMemberId)
       return { success:false, msg:'Right position is already filled under this sponsor.' };
 
     const newId     = this.generateId();
-    const newMember = this._blankMember(newId, name, phone, this.hashPwd(password), sponsor.id, position);
+    const newMember = this._blankMember(newId, name, phone, this.hashPwd(password), sponsor.id, cleanPos);
     if (productId) newMember.packageId = productId;
 
-    // Update sponsor's slot
-    if (position === 'left')  sponsor.leftMemberId  = newId;
-    else                       sponsor.rightMemberId = newId;
+    // Strictly update sponsor's slot based on chosen position
+    if (cleanPos === 'left') {
+      sponsor.leftMemberId  = newId;
+    } else {
+      sponsor.rightMemberId = newId;
+    }
 
     // Referral income for sponsor after deducting service charge & tax:
     // ₹10,000 package -> ₹1,020 (₹180 tax/service charge deducted from ₹1,200)
@@ -509,7 +513,7 @@ const APP = {
           id:'ORD'+Date.now(), memberId:newId, memberName:name,
           productId, productName:product.name, price:product.price,
           bv:product.bv, rp:product.rp,
-          status:'completed', createdAt:new Date().toISOString()
+          status:'completed', createdAt:new Date().toISOString(), completedAt:new Date().toISOString()
         };
         const orders = this.getOrders();
         orders.push(order);
