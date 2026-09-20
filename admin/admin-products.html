@@ -96,6 +96,7 @@
       <div class="sidebar-nav-label">Management</div>
       <a href="admin-dashboard.html" class="sidebar-nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
       <a href="admin-members.html" class="sidebar-nav-item"><i class="fas fa-users"></i> Customers</a>
+      <a href="admin-kyc.html" class="sidebar-nav-item"><i class="fas fa-id-card"></i> KYC Verification</a>
       <a href="admin-products.html" class="sidebar-nav-item active"><i class="fas fa-box"></i> Products</a>
       <a href="admin-orders.html" class="sidebar-nav-item"><i class="fas fa-shopping-bag"></i> Orders</a>
       <a href="admin-withdrawals.html" class="sidebar-nav-item"><i class="fas fa-money-bill-wave"></i> Withdrawals</a>
@@ -213,9 +214,13 @@
 </div>
 
 <div id="toast-container" class="toast-container"></div>
+<script src="../assets/js/api.js"></script>
 <script src="../assets/js/app.js"></script>
 <script>
   APP.requireAdmin('../login.html');
+
+  let selectedImageFile = null;
+  let productsCache = [];
 
   function showToast(msg, type='success'){
     const tc = document.getElementById('toast-container');
@@ -224,10 +229,6 @@
     t.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;
     tc.appendChild(t);
     setTimeout(() => t.remove(), 3500);
-  }
-
-  function generateId(){
-    return 'P' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2,5).toUpperCase();
   }
 
   // Auto-calculate suggested BV, RP, Referral Income on price change
@@ -260,19 +261,19 @@
     }
   });
 
-  // Handle image file upload with base64 conversion & preview
+  // Handle image file selection
   function handleImageUpload(e){
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      showToast('Image file size must be less than 2MB', 'error');
+    if (file.size > 3 * 1024 * 1024) {
+      showToast('Image file size must be less than 3MB', 'error');
       e.target.value = '';
       return;
     }
+    selectedImageFile = file;
     const reader = new FileReader();
     reader.onload = function(evt) {
       const b64 = evt.target.result;
-      document.getElementById('fieldImageData').value = b64;
       const prev = document.getElementById('imgPreview');
       prev.src = b64;
       prev.style.display = 'block';
@@ -280,25 +281,46 @@
     reader.readAsDataURL(file);
   }
 
+  async function loadProducts(){
+    try {
+      const res = await API.get('/api/products');
+      if (res && res.success && Array.isArray(res.data)) {
+        productsCache = res.data;
+      } else if (Array.isArray(res)) {
+        productsCache = res;
+      } else {
+        productsCache = APP.getProducts();
+      }
+    } catch(err) {
+      console.warn('Backend unavailable, using local cache:', err);
+      productsCache = APP.getProducts();
+    }
+    localStorage.setItem('gg_products', JSON.stringify(productsCache));
+    renderProducts();
+  }
+
   function renderProducts(){
-    const products = APP.getProducts();
     const orders = APP.getOrders();
     const orderedPids = new Set(orders.map(o => o.productId));
     const grid = document.getElementById('productsGrid');
     grid.innerHTML = '';
 
-    if (!products.length) {
+    if (!productsCache || !productsCache.length) {
       grid.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p style="font-size:1rem;font-weight:600;">No products yet</p><div style="font-size:.85rem;margin-top:.25rem;">Click "Add New Product" to create your first product.</div></div>';
       return;
     }
 
-    products.forEach(p => {
+    productsCache.forEach(p => {
       const isActive = p.active !== false;
       const hasOrders = orderedPids.has(p.id);
-      const items = Array.isArray(p.items) ? p.items : [];
+      const items = Array.isArray(p.items) ? p.items : (typeof p.items === 'string' ? p.items.split('\n') : []);
       let imgSrc = '../assets/images/p2_5000.jpg';
       if (p.image) {
-        imgSrc = p.image.startsWith('data:') || p.image.startsWith('http') ? p.image : ('../' + p.image);
+        if (p.image.startsWith('http') || p.image.startsWith('data:') || p.image.startsWith('/')) {
+          imgSrc = p.image;
+        } else {
+          imgSrc = '../' + p.image;
+        }
       } else if (p.price >= 10000) {
         imgSrc = '../assets/images/p1_10000.jpg';
       }
@@ -310,7 +332,7 @@
       card.className = `product-card${!isActive ? ' inactive-card' : ''}`;
       card.innerHTML = `
         <div class="product-img-wrap" style="height:175px;position:relative;overflow:hidden;background:#f8fafc;">
-          <img src="${imgSrc}" alt="${p.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+          <img src="${imgSrc}" alt="${p.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='../assets/images/p2_5000.jpg'">
           <span class="status-pill ${isActive ? 'pill-active' : 'pill-inactive'}">
             ${isActive ? 'ACTIVE' : 'INACTIVE'}
           </span>
@@ -347,6 +369,8 @@
     document.getElementById('productForm').reset();
     document.getElementById('editProductId').value = '';
     document.getElementById('fieldImageData').value = '';
+    selectedImageFile = null;
+    document.getElementById('fieldImageFile').value = '';
     document.getElementById('imgPreview').style.display = 'none';
     document.getElementById('imgPreview').src = '';
     document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle" style="color:#f97316;"></i> Add New Product';
@@ -359,18 +383,20 @@
   }
 
   function editProduct(id){
-    const p = APP.getProductById(id);
+    const p = productsCache.find(x => x.id === id) || APP.getProductById(id);
     if (!p) return;
+    selectedImageFile = null;
+    document.getElementById('fieldImageFile').value = '';
     document.getElementById('editProductId').value = p.id;
     document.getElementById('fieldName').value = p.name || '';
     document.getElementById('fieldCategory').value = p.category || 'Package';
     document.getElementById('fieldStock').value = typeof p.stock === 'number' ? p.stock : 100;
     document.getElementById('fieldPrice').value = p.price || '';
-    document.getElementById('fieldBV').value = p.bv || '';
-    document.getElementById('fieldRP').value = p.rp || '';
+    document.getElementById('fieldBV').value = p.bv !== undefined ? p.bv : '';
+    document.getElementById('fieldRP').value = p.rp !== undefined ? p.rp : '';
     document.getElementById('fieldReferral').value = p.referralIncome || (p.price >= 10000 ? 1020 : 510);
     document.getElementById('fieldDesc').value = p.description || '';
-    document.getElementById('fieldItems').value = Array.isArray(p.items) ? p.items.join('\n') : '';
+    document.getElementById('fieldItems').value = Array.isArray(p.items) ? p.items.join('\n') : (p.items || '');
     document.getElementById('fieldActive').checked = p.active !== false;
 
     const label = document.getElementById('activeStatusLabel');
@@ -385,7 +411,11 @@
     const prev = document.getElementById('imgPreview');
     if (p.image) {
       document.getElementById('fieldImageData').value = p.image;
-      prev.src = p.image.startsWith('data:') || p.image.startsWith('http') ? p.image : ('../' + p.image);
+      if (p.image.startsWith('http') || p.image.startsWith('data:') || p.image.startsWith('/')) {
+        prev.src = p.image;
+      } else {
+        prev.src = '../' + p.image;
+      }
       prev.style.display = 'block';
     } else {
       document.getElementById('fieldImageData').value = '';
@@ -397,28 +427,57 @@
     openModal();
   }
 
-  function toggleProduct(id){
-    const p = APP.getProductById(id);
+  async function toggleProduct(id){
+    const p = productsCache.find(x => x.id === id) || APP.getProductById(id);
     if (!p) return;
-    p.active = p.active === false ? true : false;
-    APP.updateProduct(p);
-    showToast(`Product "${p.name}" ${p.active ? 'activated' : 'deactivated'} successfully!`);
-    renderProducts();
+    const newActive = p.active === false ? true : false;
+    
+    try {
+      const fd = new FormData();
+      fd.append('active', newActive);
+      const res = await API.put('/api/products/' + encodeURIComponent(id), fd);
+      if (res && res.success) {
+        showToast(`Product "${p.name}" ${newActive ? 'activated' : 'deactivated'} successfully!`);
+        await loadProducts();
+      } else {
+        // Local fallback
+        p.active = newActive;
+        APP.updateProduct(p);
+        showToast(`Product "${p.name}" ${newActive ? 'activated' : 'deactivated'} successfully!`);
+        await loadProducts();
+      }
+    } catch(err) {
+      p.active = newActive;
+      APP.updateProduct(p);
+      showToast(`Product "${p.name}" status updated`);
+      renderProducts();
+    }
   }
 
-  function deleteProduct(id, hasOrders){
+  async function deleteProduct(id, hasOrders){
     if (hasOrders) {
       showToast('Cannot delete product: Existing orders are linked to this package!', 'error');
       return;
     }
-    const p = APP.getProductById(id);
+    const p = productsCache.find(x => x.id === id) || APP.getProductById(id);
     if (!confirm(`Are you sure you want to delete "${p ? p.name : 'this product'}"?`)) return;
-    APP.deleteProduct(id);
-    showToast('Product deleted successfully');
-    renderProducts();
+
+    try {
+      const res = await API.delete('/api/products/' + encodeURIComponent(id));
+      if (res && res.success) {
+        showToast('Product deleted successfully');
+        await loadProducts();
+      } else {
+        showToast((res && (res.error || res.message)) || 'Failed to delete product', 'error');
+      }
+    } catch(err) {
+      APP.deleteProduct(id);
+      showToast('Product deleted successfully');
+      renderProducts();
+    }
   }
 
-  function submitProduct(e){
+  async function submitProduct(e){
     e.preventDefault();
     const editId = document.getElementById('editProductId').value;
     const name = document.getElementById('fieldName').value.trim();
@@ -431,7 +490,7 @@
     const desc = document.getElementById('fieldDesc').value.trim();
     const itemsRaw = document.getElementById('fieldItems').value;
     const active = document.getElementById('fieldActive').checked;
-    const imageData = document.getElementById('fieldImageData').value;
+    const existingImg = document.getElementById('fieldImageData').value;
 
     if (!name) {
       showToast('Product name is required', 'error');
@@ -448,39 +507,51 @@
 
     const items = itemsRaw.split('\n').map(s => s.trim()).filter(Boolean);
 
-    const pd = {
-      name,
-      category,
-      stock,
-      price,
-      bv: isNaN(bv) ? (price >= 10000 ? 600 : 300) : bv,
-      rp: isNaN(rp) ? (price >= 10000 ? 1 : 0.5) : rp,
-      referralIncome: isNaN(referralIncome) ? (price >= 10000 ? 1020 : 510) : referralIncome,
-      description: desc,
-      items,
-      active
-    };
+    const fd = new FormData();
+    fd.append('name', name);
+    fd.append('category', category);
+    fd.append('stock', stock);
+    fd.append('price', price);
+    fd.append('bv', isNaN(bv) ? (price >= 10000 ? 600 : 300) : bv);
+    fd.append('rp', isNaN(rp) ? (price >= 10000 ? 1 : 0.5) : rp);
+    fd.append('referralIncome', isNaN(referralIncome) ? (price >= 10000 ? 1020 : 510) : referralIncome);
+    fd.append('description', desc);
+    fd.append('items', JSON.stringify(items));
+    fd.append('active', active);
 
-    if (imageData) {
-      pd.image = imageData;
+    if (selectedImageFile) {
+      fd.append('productImage', selectedImageFile);
+    } else if (existingImg) {
+      fd.append('image', existingImg);
     }
 
-    if (editId) {
-      pd.id = editId;
-      const existing = APP.getProductById(editId);
-      if (existing && !imageData && existing.image) {
-        pd.image = existing.image;
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const origBtnHtml = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    try {
+      let res;
+      if (editId) {
+        res = await API.put('/api/products/' + encodeURIComponent(editId), fd);
+      } else {
+        res = await API.post('/api/products', fd);
       }
-      APP.updateProduct(pd);
-      showToast(`Product "${name}" updated successfully!`);
-    } else {
-      pd.id = generateId();
-      APP.addProduct(pd);
-      showToast(`New product "${name}" added successfully!`);
-    }
 
-    closeModal();
-    renderProducts();
+      if (res && res.success) {
+        showToast(editId ? 'Product updated successfully.' : 'Product added successfully.', 'success');
+        closeModal();
+        await loadProducts();
+      } else {
+        showToast((res && (res.error || res.message)) || 'Failed to save product', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Error saving product: ' + err.message, 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = origBtnHtml;
+    }
   }
 
   function openModal(){ document.getElementById('productModal').classList.add('open'); }
@@ -489,7 +560,7 @@
     if (e.target === document.getElementById('productModal')) closeModal();
   });
 
-  renderProducts();
+  loadProducts();
 </script>
 </body>
 </html>

@@ -55,13 +55,46 @@ const APP = {
 
   // ─── Init & Fresh Data Reset ────────────────────────────────────────────────
   init() {
-    const version = localStorage.getItem(this.KEYS.DATA_VERSION);
-    if (version !== 'gg_v5_pure_fresh_binary') {
+    const hasMembers = !!localStorage.getItem(this.KEYS.MEMBERS);
+    const hasProducts = !!localStorage.getItem(this.KEYS.PRODUCTS);
+    
+    if (!hasMembers && !hasProducts) {
       this.resetToFreshData();
-      return;
+    } else {
+      localStorage.setItem(this.KEYS.DATA_VERSION, 'gg_v5_pure_fresh_binary');
     }
+
     if (!localStorage.getItem(this.KEYS.PRODUCTS)) {
       this.saveProducts(this._defaultProducts());
+    }
+
+    // Immediately trigger persistent backend database sync
+    this.syncWithBackend();
+  },
+
+  async syncWithBackend() {
+    try {
+      if (typeof API === 'undefined') return;
+      // 1. Sync Products from Database
+      const prodsRes = await API.get('/api/products');
+      const prods = (prodsRes && prodsRes.success && Array.isArray(prodsRes.data)) ? prodsRes.data : (Array.isArray(prodsRes) ? prodsRes : null);
+      if (prods && prods.length > 0) {
+        this.saveProducts(prods);
+      }
+      // 2. Sync Customers from Database
+      const memRes = await API.get('/api/customers');
+      const mems = (memRes && memRes.success && Array.isArray(memRes.data)) ? memRes.data : (Array.isArray(memRes) ? memRes : null);
+      if (mems && mems.length > 0) {
+        this.saveMembers(mems);
+      }
+      // 3. Sync Notifications
+      const notifRes = await API.get('/api/notifications');
+      const notifs = (notifRes && notifRes.success && Array.isArray(notifRes.data)) ? notifRes.data : (Array.isArray(notifRes) ? notifRes : null);
+      if (notifs) {
+        this.saveNotifications(notifs);
+      }
+    } catch (e) {
+      console.warn('Backend sync:', e.message);
     }
   },
 
@@ -529,6 +562,11 @@ const APP = {
     member.activatedAt = new Date().toISOString();
     this.updateMember(member);
 
+    // Sync with backend API
+    if (typeof API !== 'undefined') {
+      API.patch('/api/customers/' + encodeURIComponent(memberId) + '/status', { status: 'active' }).catch(e=>console.warn(e));
+    }
+
     // Mark pending notification for this member as resolved
     const notifs = this.getNotifications();
     notifs.forEach(n => {
@@ -544,6 +582,12 @@ const APP = {
     if (!member) return { success:false, msg:'Member not found' };
     member.status = 'inactive';
     this.updateMember(member);
+
+    // Sync with backend API
+    if (typeof API !== 'undefined') {
+      API.patch('/api/customers/' + encodeURIComponent(memberId) + '/status', { status: 'inactive' }).catch(e=>console.warn(e));
+    }
+
     return { success:true, member };
   },
 
@@ -565,6 +609,24 @@ const APP = {
     });
     member.updatedAt = new Date().toISOString();
     this.updateMember(member);
+
+    // Sync with backend API
+    if (typeof API !== 'undefined') {
+      API.put('/api/customers/' + encodeURIComponent(memberId) + '/profile', {
+        name: member.name,
+        email: member.email,
+        phone: member.phone,
+        dob: member.profile.dob,
+        gender: member.profile.gender,
+        address: member.profile.address,
+        city: member.profile.city,
+        state: member.profile.state,
+        pincode: member.profile.pincode,
+        country: member.profile.country,
+        photo: member.profile.photo
+      }).catch(e=>console.warn(e));
+    }
+
     return { success:true, member };
   },
 
@@ -608,6 +670,14 @@ const APP = {
       }
     }
     this.updateMember(member);
+
+    // Sync with backend API
+    if (typeof API !== 'undefined') {
+      API.put('/api/customers/' + encodeURIComponent(memberId) + '/kyc/review', {
+        status,
+        reason: rejectReason
+      }).catch(e=>console.warn(e));
+    }
 
     // Mark KYC notification read
     const notifs = this.getNotifications();

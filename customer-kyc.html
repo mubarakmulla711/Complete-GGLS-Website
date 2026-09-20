@@ -213,7 +213,7 @@
           Please upload valid government-issued identity documents (Aadhaar Card, PAN Card, Voter ID, or Bank Passbook). Ensure text and photos are clearly visible.
         </p>
 
-        <form id="addDocForm" onsubmit="addDocumentToQueue(event)">
+        <form id="addDocForm" onsubmit="uploadDocument(event)">
           <div class="form-grid">
             <div class="form-group">
               <label>Document Type <span>*</span></label>
@@ -233,36 +233,29 @@
             </div>
 
             <div class="form-group">
-              <label>Choose File (Max 3MB) <span>*</span></label>
+              <label>Choose File (PDF, JPG, PNG - Max 5MB) <span>*</span></label>
               <input type="file" id="docFile" accept="image/*,application/pdf" required onchange="handleDocFile(event)" />
-              <input type="hidden" id="docFileData" />
-              <input type="hidden" id="docFileName" />
             </div>
           </div>
 
           <div style="margin-top:1rem;display:flex;justify-content:flex-end;">
-            <button type="submit" class="btn-add-doc">
-              <i class="fas fa-plus"></i> Add Document to List
+            <button type="submit" class="btn-add-doc" id="uploadBtn">
+              <i class="fas fa-cloud-upload-alt"></i> Upload & Submit Document
             </button>
           </div>
         </form>
       </div>
 
-      <!-- SUBMITTED / QUEUED DOCUMENTS LIST -->
+      <!-- SUBMITTED DOCUMENTS LIST -->
       <div class="kyc-card">
-        <h2><i class="fas fa-folder-open text-primary"></i> Verification Documents</h2>
+        <h2><i class="fas fa-folder-open text-primary"></i> Submitted Verification Documents</h2>
         <div id="docsList"></div>
-
-        <div id="submitSection" style="margin-top:1.5rem;text-align:right;">
-          <button type="button" class="btn-submit-kyc" onclick="submitKYC()">
-            <i class="fas fa-paper-plane"></i> Submit KYC for Administrator Verification
-          </button>
-        </div>
       </div>
     </div>
   </div>
 </div>
 
+<script src="assets/js/api.js"></script>
 <script src="assets/js/app.js"></script>
 <script>
 function showToast(msg, type='success'){
@@ -280,10 +273,63 @@ let session = APP.getCurrentSession();
 let user = APP.getMemberById(session.id);
 if (!user) { APP.logout(); window.location.href='login.html'; }
 
-// In-memory document staging list
-let stagedDocs = [];
+let selectedDocFile = null;
 
-function initKYCPage(){
+function handleDocFile(e){
+  const file = e.target.files[0];
+  if (!file) {
+    selectedDocFile = null;
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('Document file size must be less than 5MB', 'error');
+    e.target.value = '';
+    selectedDocFile = null;
+    return;
+  }
+  selectedDocFile = file;
+}
+
+async function uploadDocument(e){
+  e.preventDefault();
+  const docType = document.getElementById('docType').value;
+  const docNumber = document.getElementById('docNumber').value.trim();
+
+  if (!docType || !docNumber || !selectedDocFile) {
+    showToast('Please fill in all fields and select a document file', 'error');
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append('documentType', docType);
+  fd.append('documentNumber', docNumber);
+  fd.append('documentFile', selectedDocFile);
+
+  const btn = document.getElementById('uploadBtn');
+  const origText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+  try {
+    const res = await API.post('/api/customers/' + encodeURIComponent(user.id) + '/kyc', fd);
+    if (res && res.success) {
+      showToast('Document uploaded successfully and submitted for review!');
+      document.getElementById('addDocForm').reset();
+      selectedDocFile = null;
+      await initKYCPage();
+    } else {
+      showToast((res && (res.error || res.message)) || 'Upload failed', 'error');
+    }
+  } catch (err) {
+    console.error('KYC Upload error:', err);
+    showToast('Upload failed: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origText;
+  }
+}
+
+async function initKYCPage(){
   user = APP.getMemberById(session.id);
 
   // Topbar
@@ -296,15 +342,28 @@ function initKYCPage(){
     <span class="sidebar-status">${user.status}</span>
   `;
 
-  const kycStatus = user.kycStatus || 'NOT_SUBMITTED';
+  // Fetch KYC details from backend REST API
+  let kycData = null;
+  try {
+    const res = await API.get('/api/customers/' + encodeURIComponent(user.id) + '/kyc');
+    if (res && (res.customerId || res.success)) {
+      kycData = res.data || res;
+    }
+  } catch(e) {
+    console.warn('Could not fetch backend KYC:', e);
+  }
+
+  const kycStatus = (kycData && kycData.kycStatus) || user.kycStatus || 'NOT_SUBMITTED';
+  const rejectionReason = (kycData && kycData.rejectionReason) || user.kycRejectionReason || '';
+  const documents = (kycData && Array.isArray(kycData.documents)) ? kycData.documents : (user.kycDocuments || []);
+
+  // Sync back to local user object
+  user.kycStatus = kycStatus;
+  user.kycRejectionReason = rejectionReason;
+  APP.updateMember(user);
+
   const banner = document.getElementById('kycStatusBanner');
   const uploadCard = document.getElementById('uploadCard');
-  const submitSection = document.getElementById('submitSection');
-
-  // Copy existing submitted documents if stage is empty
-  if (stagedDocs.length === 0 && user.kycDocuments && user.kycDocuments.length > 0) {
-    stagedDocs = [...user.kycDocuments];
-  }
 
   if (kycStatus === 'VERIFIED') {
     banner.className = 'kyc-status-banner banner-verified';
@@ -318,7 +377,6 @@ function initKYCPage(){
       </div>
     `;
     uploadCard.style.display = 'none';
-    submitSection.style.display = 'none';
   } else if (kycStatus === 'UNDER_REVIEW') {
     banner.className = 'kyc-status-banner banner-review';
     banner.innerHTML = `
@@ -330,8 +388,7 @@ function initKYCPage(){
         </p>
       </div>
     `;
-    uploadCard.style.display = 'none';
-    submitSection.style.display = 'none';
+    uploadCard.style.display = 'block';
   } else if (kycStatus === 'REJECTED') {
     banner.className = 'kyc-status-banner banner-rejected';
     banner.innerHTML = `
@@ -339,13 +396,12 @@ function initKYCPage(){
       <div>
         <strong style="font-size:1.15rem;display:block;margin-bottom:3px;">KYC Status: REJECTED</strong>
         <p style="font-size:0.85rem;margin:0 0 6px 0;">
-          Reason: <strong>${user.kycRejectionReason || 'Documents blurred or details mismatched.'}</strong>
+          Reason: <strong>${rejectionReason || 'Documents blurred or details mismatched.'}</strong>
         </p>
-        <span style="font-size:0.8rem;opacity:0.9;">Please review the issues above, remove the invalid documents, attach corrected files, and re-submit for verification.</span>
+        <span style="font-size:0.8rem;opacity:0.9;">Please review the issues above, attach corrected files below, and re-submit for verification.</span>
       </div>
     `;
     uploadCard.style.display = 'block';
-    submitSection.style.display = 'block';
   } else {
     banner.className = 'kyc-status-banner banner-none';
     banner.innerHTML = `
@@ -358,102 +414,50 @@ function initKYCPage(){
       </div>
     `;
     uploadCard.style.display = 'block';
-    submitSection.style.display = 'block';
   }
 
-  renderDocsList();
+  renderDocsList(documents);
 }
 
-function handleDocFile(e){
-  const file = e.target.files[0];
-  if (!file) return;
-  if (file.size > 3 * 1024 * 1024) {
-    showToast('Document file size must be less than 3MB', 'error');
-    e.target.value = '';
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = function(evt) {
-    document.getElementById('docFileData').value = evt.target.result;
-    document.getElementById('docFileName').value = file.name;
-  };
-  reader.readAsDataURL(file);
-}
-
-function addDocumentToQueue(e){
-  e.preventDefault();
-  const docType = document.getElementById('docType').value;
-  const docNumber = document.getElementById('docNumber').value.trim();
-  const fileData = document.getElementById('docFileData').value;
-  const fileName = document.getElementById('docFileName').value;
-
-  if (!docType || !docNumber || !fileData) {
-    showToast('Please fill all fields and select a valid document file', 'error');
-    return;
-  }
-
-  stagedDocs.push({
-    docType,
-    docNumber,
-    fileName,
-    fileData,
-    uploadedAt: new Date().toISOString()
-  });
-
-  showToast(`Added ${docType} to list!`);
-  document.getElementById('addDocForm').reset();
-  document.getElementById('docFileData').value = '';
-  document.getElementById('docFileName').value = '';
-  renderDocsList();
-}
-
-function removeDoc(idx){
-  stagedDocs.splice(idx, 1);
-  renderDocsList();
-}
-
-function renderDocsList(){
+function renderDocsList(documents){
   const listEl = document.getElementById('docsList');
-  const kycStatus = user.kycStatus || 'NOT_SUBMITTED';
-  const canEdit = (kycStatus === 'NOT_SUBMITTED' || kycStatus === 'REJECTED');
 
-  if (stagedDocs.length === 0) {
-    listEl.innerHTML = `<div style="text-align:center;padding:2rem;color:#94a3b8;font-size:0.88rem;"><i class="fas fa-file-upload" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>No documents added yet.</div>`;
+  if (!documents || documents.length === 0) {
+    listEl.innerHTML = `<div style="text-align:center;padding:2rem;color:#94a3b8;font-size:0.88rem;"><i class="fas fa-file-upload" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>No documents uploaded yet.</div>`;
     return;
   }
 
-  listEl.innerHTML = stagedDocs.map((doc, idx) => `
-    <div class="doc-item-row">
-      <div>
-        <strong style="color:#1e293b;">${doc.docType}</strong>
-        <span style="font-family:monospace;font-size:0.83rem;color:#2563eb;margin-left:0.4rem;">(${doc.docNumber})</span>
-        <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">
-          File: <strong>${doc.fileName}</strong> &bull; Uploaded: ${doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString('en-IN') : 'Just now'}
+  listEl.innerHTML = documents.map((doc) => {
+    const docType = doc.documentType || doc.docType || 'Identity Document';
+    const docNum = doc.documentNumber || doc.docNumber || '';
+    const origName = doc.documentOriginalName || doc.fileName || 'document';
+    const status = doc.documentStatus || doc.status || 'UNDER_REVIEW';
+    const uploaded = doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString('en-IN') : 'Recently';
+    const docId = doc.id || doc.fileRef;
+    const viewHref = docId ? `/api/kyc/document/${encodeURIComponent(docId)}` : (doc.fileData || '#');
+
+    let badgeBg = '#fef3c7';
+    let badgeColor = '#92400e';
+    if (status === 'VERIFIED') { badgeBg = '#dcfce7'; badgeColor = '#166534'; }
+    if (status === 'REJECTED') { badgeBg = '#fee2e2'; badgeColor = '#991b1b'; }
+
+    return `
+      <div class="doc-item-row">
+        <div>
+          <strong style="color:#1e293b;">${docType}</strong>
+          ${docNum ? `<span style="font-family:monospace;font-size:0.83rem;color:#2563eb;margin-left:0.4rem;">(${docNum})</span>` : ''}
+          <span style="font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:4px;background:${badgeBg};color:${badgeColor};margin-left:0.5rem;">${status}</span>
+          <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">
+            File: <strong>${origName}</strong> &bull; Uploaded: ${uploaded}
+          </div>
+          ${doc.rejectionReason ? `<div style="font-size:0.75rem;color:#dc2626;margin-top:3px;"><i class="fas fa-info-circle"></i> Reason: ${doc.rejectionReason}</div>` : ''}
+        </div>
+        <div style="display:flex;gap:0.4rem;align-items:center;">
+          <a href="${viewHref}" target="_blank" class="btn-xs btn-view-doc"><i class="fas fa-external-link-alt"></i> View</a>
         </div>
       </div>
-      <div style="display:flex;gap:0.4rem;align-items:center;">
-        ${doc.fileData ? `<a href="${doc.fileData}" target="_blank" class="btn-xs btn-view-doc"><i class="fas fa-external-link-alt"></i> View</a>` : ''}
-        ${canEdit ? `<button class="btn-xs btn-del-doc" onclick="removeDoc(${idx})"><i class="fas fa-trash"></i> Remove</button>` : ''}
-      </div>
-    </div>
-  `).join('');
-}
-
-function submitKYC(){
-  if (stagedDocs.length === 0) {
-    showToast('Please upload at least one document before submitting', 'error');
-    return;
-  }
-
-  if (!confirm('Submit these documents for Administrator KYC verification?')) return;
-
-  const res = APP.submitCustomerKYC(user.id, stagedDocs);
-  if (res.success) {
-    showToast('KYC submitted successfully! Administrator notified.');
-    initKYCPage();
-  } else {
-    showToast(res.msg || 'Failed to submit KYC', 'error');
-  }
+    `;
+  }).join('');
 }
 
 initKYCPage();

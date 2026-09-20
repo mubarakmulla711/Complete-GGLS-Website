@@ -71,13 +71,15 @@
     <nav class="sidebar-nav">
       <div class="sidebar-nav-label">Management</div>
       <a href="admin-dashboard.html" class="sidebar-nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-      <a href="admin-members.html" class="sidebar-nav-item"><i class="fas fa-users"></i> Members</a>
+      <a href="admin-members.html" class="sidebar-nav-item"><i class="fas fa-users"></i> Customers</a>
+      <a href="admin-kyc.html" class="sidebar-nav-item"><i class="fas fa-id-card"></i> KYC Verification</a>
       <a href="admin-products.html" class="sidebar-nav-item"><i class="fas fa-box"></i> Products</a>
       <a href="admin-orders.html" class="sidebar-nav-item active">
         <i class="fas fa-shopping-bag"></i> Orders
         <span id="navPendingBadge" style="display:none;background:#ef4444;color:#fff;font-size:.65rem;font-weight:700;padding:.1rem .45rem;border-radius:50px;margin-left:auto;">0</span>
       </a>
       <a href="admin-withdrawals.html" class="sidebar-nav-item"><i class="fas fa-money-bill-wave"></i> Withdrawals</a>
+      <a href="../customer-tree.html" class="sidebar-nav-item"><i class="fas fa-sitemap"></i> Genealogy Tree</a>
     </nav>
     <div class="sidebar-footer">
       <button class="btn-logout" onclick="APP.logout();window.location.href='../login.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -158,6 +160,7 @@
 </div>
 
 <div id="toast-container" class="toast-container"></div>
+<script src="../assets/js/api.js"></script>
 <script src="../assets/js/app.js"></script>
 <script>
   APP.requireAdmin('../login.html');
