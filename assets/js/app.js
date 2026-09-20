@@ -6,6 +6,7 @@
 
 const APP = {
   KEYS: {
+    DATA_VERSION: 'gg_v4_royal_gold_fresh',
     MEMBERS:      'gg_members',
     PRODUCTS:     'gg_products',
     ORDERS:       'gg_orders',
@@ -17,18 +18,27 @@ const APP = {
   RP_TO_BV: 600,
   REFERRAL_RATE: 0.12,          // 12 % of package price
   BINARY_MATCH_PER_RP: 600,    // ₹600 income per matched RP pair
+  DAILY_CEILING: 10200,         // ₹10,200 per day capping
+  TAX_SERVICE_DEDUCTION: 0.15, // 15% TDS + Service Charge
+
+  LPB_INFO: {
+    title: 'Leadership Performance Bonus (LPB) — 5%',
+    titleKn: 'ಎಲ್.ಪಿ.ಬಿ (ಲೀಡರ್‌ಶಿಪ್ ಪರ್ಫಾಮೆನ್ಸ್ ಬೋನಸ್) — 5%',
+    desc: '5% of total company achievers turnover is distributed among Ruby and higher achievers according to rank.',
+    descKn: 'ಗ್ರೇಟ್‌ಗೋಲ್ಸ್ ಸಂಸ್ಥೆಯ ಅಚೀವರ್ಸ್ ಆದ ಟೀಮಿನ ಒಟ್ಟು ಮೊತ್ತದ 5% ವನ್ನು ರೂಬಿ ಮತ್ತು ಹೆಚ್ಚಿನ ಸಾಧಕರಿಗೆ ಅವರ ರ್ಯಾಂಕ್ ಅನುಗುಣವಾಗಿ ಹಂಚಲಾಗುತ್ತದೆ.'
+  },
 
   ACHIEVEMENTS: [
-    { id:1,  name:'Silver',          bv:1200,     rp:2,     commission:1200,     reward:1200,    totalEarnings:2400,     rewardTitle:'Cash Reward',                 color:'#94a3b8', icon:'🥈' },
-    { id:2,  name:'Gold',            bv:6000,     rp:10,    commission:6000,     reward:5000,    totalEarnings:11000,    rewardTitle:'Tablet / Cash Fund',          color:'#f59e0b', icon:'🥇' },
-    { id:3,  name:'Platinum',        bv:18000,    rp:30,    commission:18000,    reward:15000,   totalEarnings:33000,    rewardTitle:'Laptop Fund',                 color:'#0ea5e9', icon:'⚪' },
-    { id:4,  name:'Ruby',            bv:60000,    rp:100,   commission:60000,    reward:40000,   totalEarnings:100000,   rewardTitle:'Bike Fund',                   color:'#e11d48', icon:'🔴' },
-    { id:5,  name:'Emerald',         bv:180000,   rp:300,   commission:180000,   reward:100000,  totalEarnings:280000,   rewardTitle:'Foreign Tour Fund',           color:'#059669', icon:'🟢' },
-    { id:6,  name:'Diamond',         bv:600000,   rp:1000,  commission:600000,   reward:250000,  totalEarnings:850000,   rewardTitle:'Gold Fund',                   color:'#06b6d4', icon:'💎' },
-    { id:7,  name:'Blue Diamond',    bv:1800000,  rp:3000,  commission:1800000,  reward:600000,  totalEarnings:2400000,  rewardTitle:'Car Fund',                    color:'#2563eb', icon:'🔷' },
-    { id:8,  name:'Royal Diamond',   bv:4500000,  rp:7500,  commission:4500000,  reward:1200000, totalEarnings:5700000,  rewardTitle:'Luxury Car Fund',             color:'#7c3aed', icon:'👑' },
-    { id:9,  name:'Ambassador',      bv:9000000,  rp:15000, commission:9000000,  reward:2000000, totalEarnings:11000000, rewardTitle:'Dream House Fund',            color:'#d97706', icon:'🎖️' },
-    { id:10, name:'Chairman',        bv:12000000, rp:20000, commission:12000000, reward:3600000, totalEarnings:15600000, rewardTitle:'Chairman Villa / Super Car Fund', color:'#be185d', icon:'🏆' }
+    { id:1,  name:'Silver',       nameKn:'ಸಿಲ್ವರ್',        rp5k:10,    rp10k:5,     bv:6000,     commission:6000,     reward:'1 Bag + T-Shirt Complete Felicitation', rewardKn:'1 ಬ್ಯಾಗ್ + ಟಿ ಶರ್ಟ್ ಕಂಪ್ಲೀಟ್ ಸನ್ಮಾನ', rewardValue:0,       totalEarnings:6000,     color:'#94a3b8', icon:'🥈' },
+    { id:2,  name:'Gold',         nameKn:'ಗೋಲ್ಡ್',         rp5k:20,    rp10k:10,    bv:12000,    commission:12000,    reward:'10 Gram Silver with Locket',            rewardKn:'10 ಗ್ರಾಂ ಬೆಳ್ಳಿಯ ಜೊತೆಗೆ ಲಾಕೆಟ್',      rewardValue:0,       totalEarnings:12000,    color:'#f59e0b', icon:'🥇' },
+    { id:3,  name:'Platinum',     nameKn:'ಪ್ಲಾಟಿನಮ್',     rp5k:60,    rp10k:30,    bv:36000,    commission:36000,    reward:'Goa Tour 3D/2N',                        rewardKn:'ಗೋವಾ ಟೂರ್ 3D/2N',                     rewardValue:0,       totalEarnings:36000,    color:'#0ea5e9', icon:'⚪' },
+    { id:4,  name:'Ruby',         nameKn:'ರೂಬಿ (ಮಾಣಿಕ್ಯ)', rp5k:120,   rp10k:60,    bv:72000,    commission:72000,    reward:'Mini Laptop (₹13,000)',                 rewardKn:'ಮಿನಿ ಲ್ಯಾಪ್‌ಟಾಪ್ (13000 ರೂಪಾಯಿ)',       rewardValue:13000,   totalEarnings:85000,    color:'#e11d48', icon:'🔴' },
+    { id:5,  name:'Emerald',      nameKn:'ಎಮರಾಲ್ಡ್',       rp5k:500,   rp10k:250,   bv:300000,   commission:300000,   reward:'Bike Fund (₹50,000)',                   rewardKn:'ಬೈಕ್ ಫಂಡ್ (50000 ರೂಪಾಯಿ)',             rewardValue:50000,   totalEarnings:350000,   color:'#059669', icon:'🟢' },
+    { id:6,  name:'Diamond',      nameKn:'ಡೈಮಂಡ್',         rp5k:1000,  rp10k:500,   bv:600000,   commission:600000,   reward:'Free Thailand Trip OR 10g Gold',        rewardKn:'ಉಚಿತ ಥೈಲ್ಯಾಂಡ್ ಪ್ರವಾಸ ಅಥವಾ 10 ಗ್ರಾಂ ಬಂಗಾರ', rewardValue:0,    totalEarnings:600000,   color:'#06b6d4', icon:'💎' },
+    { id:7,  name:'Blue Diamond', nameKn:'ಬ್ಲೂಡೈಮಂಡ್',     rp5k:3000,  rp10k:1500,  bv:1800000,  commission:1800000,  reward:'Mini Car Fund (₹3 Lakh)',               rewardKn:'ಮಿನಿ ಕಾರ್ ಫಂಡ್ (3 ಲಕ್ಷ)',              rewardValue:300000,  totalEarnings:2100000,  color:'#2563eb', icon:'🔷' },
+    { id:8,  name:'Royal Diamond',nameKn:'ರಾಯಲ್ ಡೈಮಂಡ್',   rp5k:6000,  rp10k:3000,  bv:3600000,  commission:3600000,  reward:'Luxury Car Fund (₹6.90 Lakh)',          rewardKn:'ಲಕ್ಸೂರಿ ಕಾರ್ ಫಂಡ್ (6.90 ಲಕ್ಷ)',         rewardValue:690000,  totalEarnings:4290000,  color:'#7c3aed', icon:'👑' },
+    { id:9,  name:'Ambassador',   nameKn:'ಅಂಬಾಸಡರ್',       rp5k:10000, rp10k:5000,  bv:6000000,  commission:6000000,  reward:'Monthly ₹5,000 Honorarium',             rewardKn:'ಪ್ರತಿ ತಿಂಗಳು 5000 ಗೌರವಧನ',             rewardValue:5000,    totalEarnings:6005000,  color:'#d97706', icon:'🎖️' },
+    { id:10, name:'Chairman',     nameKn:'ಚೇರಮನ್',         rp5k:20000, rp10k:10000, bv:12000000, commission:12000000, reward:'House Fund (₹15 Lakh)',                 rewardKn:'ಹೌಸ್ ಫಂಡ್ (15 ಲಕ್ಷ)',                  rewardValue:1500000, totalEarnings:13500000, color:'#be185d', icon:'🏆' }
   ],
 
   // ─── Utility ───────────────────────────────────────────────────────────────
@@ -43,92 +53,88 @@ const APP = {
     return 'GG' + num;
   },
 
-  // ─── Init ──────────────────────────────────────────────────────────────────
+  // ─── Init & Fresh Data Reset ────────────────────────────────────────────────
   init() {
-    const existingMembers = localStorage.getItem(this.KEYS.MEMBERS);
-    // If empty or only 1 member without child tree links, seed realistic full binary network
-    if (!existingMembers || JSON.parse(existingMembers).length <= 1) {
-      const p1Pwd = this.hashPwd('Admin@1234');
-      const p2Pwd = this.hashPwd('123456');
-
-      // Root Member (GG00001)
-      const m1 = this._blankMember('GG00001', 'Great Goals Admin', '9110871460', p1Pwd, null, null);
-      m1.isAdmin = true;
-      m1.status = 'active';
-      m1.packageId = 'P1';
-      m1.leftMemberId = 'GG00002';
-      m1.rightMemberId = 'GG00003';
-      m1.leftBV = 1800;
-      m1.rightBV = 1500;
-      m1.leftRP = 3.0;
-      m1.rightRP = 2.5;
-      m1.leftMemberCount = 3;
-      m1.rightMemberCount = 2;
-      m1.referralIncome = 3600;
-      m1.binaryIncome = 1500;
-      m1.incomeWallet = 3000;
-      m1.successWithdrawals = 1200;
-      m1.matchedPairs = 2;
-      m1.leftCarryForward = 300;
-      m1.rightCarryForward = 0;
-      m1.rank = 'Silver';
-      m1.achievementIds = [1];
-
-      // Left Child (GG00002)
-      const m2 = this._blankMember('GG00002', 'Ramesh Patil', '9876543210', p2Pwd, 'GG00001', 'left');
-      m2.packageId = 'P1';
-      m2.leftMemberId = 'GG00004';
-      m2.rightMemberId = 'GG00005';
-      m2.leftBV = 600;
-      m2.rightBV = 600;
-      m2.leftRP = 1.0;
-      m2.rightRP = 1.0;
-      m2.leftMemberCount = 1;
-      m2.rightMemberCount = 1;
-      m2.incomeWallet = 1200;
-      m2.referralIncome = 1200;
-      m2.binaryIncome = 600;
-
-      // Right Child (GG00003)
-      const m3 = this._blankMember('GG00003', 'Suresh Kulkarni', '9845012345', p2Pwd, 'GG00001', 'right');
-      m3.packageId = 'P2';
-      m3.leftMemberId = 'GG00006';
-      m3.rightMemberId = null;
-      m3.leftBV = 600;
-      m3.rightBV = 0;
-      m3.leftRP = 1.0;
-      m3.rightRP = 0;
-      m3.leftMemberCount = 1;
-      m3.rightMemberCount = 0;
-      m3.incomeWallet = 600;
-      m3.referralIncome = 600;
-
-      // Level 2 Children
-      const m4 = this._blankMember('GG00004', 'Anand Kumar', '9741234567', p2Pwd, 'GG00002', 'left');
-      m4.packageId = 'P1';
-      m4.leftBV = 0; m4.rightBV = 0;
-
-      const m5 = this._blankMember('GG00005', 'Vijay Sharma', '9611223344', p2Pwd, 'GG00002', 'right');
-      m5.packageId = 'P1';
-      m5.leftBV = 0; m5.rightBV = 0;
-
-      const m6 = this._blankMember('GG00006', 'Deepa Hegde', '9988776655', p2Pwd, 'GG00003', 'left');
-      m6.packageId = null; // Registered member who has NOT ordered yet
-      m6.leftBV = 0; m6.rightBV = 0;
-
-      this.saveMembers([m1, m2, m3, m4, m5, m6]);
+    const version = localStorage.getItem(this.KEYS.DATA_VERSION);
+    if (version !== 'gg_v4_royal_gold_fresh') {
+      this.resetToFreshData();
+      return;
     }
+    if (!localStorage.getItem(this.KEYS.PRODUCTS)) {
+      this.saveProducts(this._defaultProducts());
+    }
+  },
 
-    // Products configuration with tax & service charge deduction:
-    // 10000 pkg: 1200 BV (1 RP), Gross ₹1200 - ₹180 (service charge & tax) = ₹1020 Net Referral
-    // 5000 pkg: 600 BV (1 RP), Gross ₹600 - ₹90 (service charge & tax) = ₹510 Net Referral
-    const defaultProds = [
+  resetToFreshData() {
+    // Wipes all demo data and initializes with clean seed data
+    localStorage.removeItem(this.KEYS.MEMBERS);
+    localStorage.removeItem(this.KEYS.PRODUCTS);
+    localStorage.removeItem(this.KEYS.ORDERS);
+    localStorage.removeItem(this.KEYS.WITHDRAWALS);
+    localStorage.removeItem(this.KEYS.NOTIFICATIONS);
+    localStorage.removeItem(this.KEYS.CURRENT_USER);
+    localStorage.setItem(this.KEYS.DATA_VERSION, 'gg_v4_royal_gold_fresh');
+
+    const p1Pwd = this.hashPwd('Admin@1234');
+    const p2Pwd = this.hashPwd('123456');
+
+    // Root Admin (GG00001)
+    const m1 = this._blankMember('GG00001', 'Great Goals Admin', '9110871460', p1Pwd, null, null);
+    m1.isAdmin = true;
+    m1.status = 'active';
+    m1.packageId = 'P1';
+    m1.leftMemberId = 'GG00002';
+    m1.rightMemberId = 'GG00003';
+    m1.leftBV = 6000;
+    m1.rightBV = 6000;
+    m1.leftRP = 10.0;
+    m1.rightRP = 10.0;
+    m1.leftMemberCount = 1;
+    m1.rightMemberCount = 1;
+    m1.referralIncome = 2040;
+    m1.binaryIncome = 6000;
+    m1.incomeWallet = 8040;
+    m1.successWithdrawals = 0;
+    m1.matchedPairs = 10;
+    m1.leftCarryForward = 0;
+    m1.rightCarryForward = 0;
+    m1.rank = 'Silver';
+    m1.achievementIds = [1];
+
+    // Left Child (GG00002)
+    const m2 = this._blankMember('GG00002', 'Ramesh Patil', '9876543210', p2Pwd, 'GG00001', 'left');
+    m2.packageId = 'P1';
+    m2.leftBV = 0; m2.rightBV = 0;
+    m2.leftRP = 0; m2.rightRP = 0;
+    m2.incomeWallet = 0;
+
+    // Right Child (GG00003)
+    const m3 = this._blankMember('GG00003', 'Suresh Kulkarni', '9845012345', p2Pwd, 'GG00001', 'right');
+    m3.packageId = 'P2';
+    m3.leftBV = 0; m3.rightBV = 0;
+    m3.leftRP = 0; m3.rightRP = 0;
+    m3.incomeWallet = 0;
+
+    this.saveMembers([m1, m2, m3]);
+    this.saveProducts(this._defaultProducts());
+
+    const sampleOrders = [
+      { id:'ORD10001', memberId:'GG00002', memberName:'Ramesh Patil', productId:'P1', productName:'Premium Plus Package ₹10,000', price:10000, bv:1200, rp:1, status:'completed', createdAt:new Date(Date.now()-86400000*2).toISOString() },
+      { id:'ORD10002', memberId:'GG00003', memberName:'Suresh Kulkarni', productId:'P2', productName:'Standard Package ₹5,000', price:5000, bv:600, rp:1, status:'completed', createdAt:new Date(Date.now()-86400000).toISOString() }
+    ];
+    this.saveOrders(sampleOrders);
+    this.saveWithdrawals([]);
+    this.saveNotifications([]);
+  },
+
+  _defaultProducts() {
+    return [
       {
-        id:'P1', name:'Premium Package ₹10,000', price:10000, bv:1200, rp:1,
+        id:'P1', name:'Premium Plus Package ₹10,000', price:10000, bv:1200, rp:1,
         grossReferral:1200, serviceTax:180, referralIncome:1020,
         image:'assets/images/p1_10000.jpg',
         badge:'MOST POPULAR',
-        description:'Exclusive lifestyle package with premium textile products and travel vouchers.',
+        description:'1200 BV package requiring only half RP pairs for rank milestones.',
         items:[
           '1× Kanchipuram Wedding Saree',
           '1× Premier Pant & Shirt Piece',
@@ -142,7 +148,7 @@ const APP = {
         grossReferral:600, serviceTax:90, referralIncome:510,
         image:'assets/images/p2_5000.jpg',
         badge:'STARTER CHOICE',
-        description:'Quality lifestyle package with textile products and travel vouchers.',
+        description:'600 BV package with textile products and travel vouchers.',
         items:[
           '1× Banarasi Saree OR 1× Suite Length',
           '3× Compact Tour Discount Voucher (CTDV) @ ₹6,000 printed value',
@@ -151,59 +157,6 @@ const APP = {
         active:true
       }
     ];
-
-    const currentProds = localStorage.getItem(this.KEYS.PRODUCTS);
-    if (!currentProds) {
-      this.saveProducts(defaultProds);
-    } else {
-      // Synchronize existing P1 and P2 in case of existing storage
-      const prods = JSON.parse(currentProds);
-      const p1 = prods.find(p => p.id === 'P1');
-      if (p1) {
-        p1.bv = 1200; p1.rp = 1; p1.grossReferral = 1200; p1.serviceTax = 180; p1.referralIncome = 1020;
-        p1.image = 'assets/images/p1_10000.jpg'; p1.badge = 'MOST POPULAR';
-      }
-      const p2 = prods.find(p => p.id === 'P2');
-      if (p2) {
-        p2.bv = 600; p2.rp = 1; p2.grossReferral = 600; p2.serviceTax = 90; p2.referralIncome = 510;
-        p2.image = 'assets/images/p2_5000.jpg'; p2.badge = 'STARTER CHOICE';
-      }
-      this.saveProducts(prods);
-    }
-
-    // Migrate stored member ranks to new 10 rank names
-    const savedMembers = localStorage.getItem(this.KEYS.MEMBERS);
-    if (savedMembers) {
-      const rankMap = {
-        'Star': 'Silver',
-        'Silver Star': 'Gold',
-        'Gold Star': 'Platinum',
-        'Black Diamond': 'Diamond',
-        'Crown Diamond': 'Royal Diamond',
-        'Presidential': 'Chairman'
-      };
-      let changed = false;
-      const mems = JSON.parse(savedMembers);
-      mems.forEach(m => {
-        if (m.rank && rankMap[m.rank]) {
-          m.rank = rankMap[m.rank];
-          changed = true;
-        }
-      });
-      if (changed) this.saveMembers(mems);
-    }
-
-    const existingOrders = localStorage.getItem(this.KEYS.ORDERS);
-    if (!existingOrders || JSON.parse(existingOrders).length === 0) {
-      const sampleOrders = [
-        { id:'ORD10001', memberId:'GG00002', memberName:'Ramesh Patil', productId:'P1', productName:'Premium Package ₹10,000', price:10000, bv:1200, rp:1, status:'completed', createdAt:new Date(Date.now()-86400000*5).toISOString() },
-        { id:'ORD10002', memberId:'GG00003', memberName:'Suresh Kulkarni', productId:'P2', productName:'Standard Package ₹5,000', price:5000, bv:600, rp:1, status:'completed', createdAt:new Date(Date.now()-86400000*4).toISOString() },
-        { id:'ORD10003', memberId:'GG00004', memberName:'Anand Kumar', productId:'P1', productName:'Premium Package ₹10,000', price:10000, bv:1200, rp:1, status:'completed', createdAt:new Date(Date.now()-86400000*3).toISOString() },
-        { id:'ORD10004', memberId:'GG00005', memberName:'Vijay Sharma', productId:'P1', productName:'Premium Package ₹10,000', price:10000, bv:1200, rp:1, status:'completed', createdAt:new Date(Date.now()-86400000*2).toISOString() }
-      ];
-      this.saveOrders(sampleOrders);
-    }
-    if (!localStorage.getItem(this.KEYS.WITHDRAWALS)) this.saveWithdrawals([]);
   },
 
   _blankMember(id, name, phone, hashedPwd, sponsorId, position) {
@@ -455,7 +408,9 @@ const APP = {
         if (!(m.achievementIds || []).includes(ach.id)) {
           m.achievementIds = m.achievementIds || [];
           m.achievementIds.push(ach.id);
-          m.incomeWallet = (m.incomeWallet || 0) + ach.reward;
+          if (ach.rewardValue > 0) {
+            m.incomeWallet = (m.incomeWallet || 0) + ach.rewardValue;
+          }
         }
         m.rank = ach.name;
         break;

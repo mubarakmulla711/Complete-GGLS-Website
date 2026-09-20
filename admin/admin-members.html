@@ -48,10 +48,10 @@
     .form-group{display:flex;flex-direction:column;gap:.35rem;}
     .form-group label{font-size:.78rem;font-weight:700;color:#475569;}
     .form-group input,.form-group select{padding:.6rem .85rem;border:1.5px solid #e2e8f0;border-radius:10px;font-size:.88rem;outline:none;transition:border-color .18s;width:100%;box-sizing:border-box;}
-    .form-group input:focus,.form-group select:focus{border-color:#f97316;}
+    .form-group input:focus,.form-group select:focus{border-color:#0b2ac9;}
     .form-full{grid-column:1/-1;}
-    .btn-submit{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border:none;padding:.7rem 2rem;border-radius:10px;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .2s;width:100%;}
-    .btn-submit:hover{opacity:.9;}
+    .btn-submit{background:linear-gradient(135deg,#071a82,#0b2ac9);border:1px solid var(--gold);color:#fff;padding:.7rem 2rem;border-radius:10px;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .2s;width:100%;}
+    .btn-submit:hover{background:linear-gradient(135deg,#f5b800,#d97706);color:#071a82;}
     .mobile-toggle{display:none;background:none;border:none;font-size:1.4rem;color:#1e293b;cursor:pointer;}
     .info-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.85rem;}
     .info-item{flex:1;min-width:140px;}
@@ -66,13 +66,13 @@
 <div class="dash-layout">
   <nav class="sidebar admin-sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem">GG</div>
+      <img src="../assets/images/logo.png" alt="Great Goals Lifestyle" style="width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);box-shadow:0 0 10px rgba(245,184,0,0.4);object-fit:cover;">
       <div class="sidebar-logo-text">Admin Panel<br><span>Great Goals</span></div>
     </div>
     <div style="padding:.75rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.1);">
       <div style="font-size:.7rem;color:#94a3b8;">Logged in as</div>
       <div style="font-size:.95rem;font-weight:700;color:#fff;">Administrator</div>
-      <span style="font-size:.7rem;background:#f97316;color:#fff;padding:.1rem .5rem;border-radius:50px;">Admin</span>
+      <span style="font-size:.7rem;background:var(--gold);color:#071a82;font-weight:800;padding:.1rem .5rem;border-radius:50px;">Admin</span>
     </div>
     <nav class="sidebar-nav">
       <div class="sidebar-nav-label">Management</div>
@@ -388,7 +388,7 @@
     }
 
     document.getElementById('viewModalContent').innerHTML=`
-      <div style="background:linear-gradient(135deg,#f97316,#ea580c);border-radius:14px;padding:1.25rem;color:#fff;margin-bottom:1.25rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+      <div style="background:linear-gradient(135deg,#071a82,#0b2ac9);border:1px solid var(--gold);border-radius:14px;padding:1.25rem;color:#fff;margin-bottom:1.25rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;box-shadow:0 4px 15px rgba(11,42,201,0.3);">
         <div>
           <div style="font-size:1.4rem;font-weight:800;">${m.name}</div>
           <div style="font-size:.85rem;opacity:.9;">${m.id} &bull; ${m.phone||'No phone'}</div>

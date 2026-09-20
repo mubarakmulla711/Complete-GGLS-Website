@@ -30,20 +30,20 @@ table.plan-tbl .icon-cell{font-size:1.3rem;}
 
 <nav class="navbar">
   <a href="index.html" class="nav-logo">
-    <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1e293b,#0f172a);border:3px solid #f97316;display:flex;align-items:center;justify-content:center;color:#f97316;font-weight:900;font-size:1.1rem;">GG</div>
+    <img src="assets/images/logo.png" alt="Great Goals Lifestyle" class="nav-logo-img">
     <div class="nav-logo-text">Great Goals<br><span>Lifestyle Pvt. Ltd.</span></div>
   </a>
   <div class="hamburger" onclick="document.getElementById('nL').classList.toggle('open')"><span></span><span></span><span></span></div>
   <div class="nav-links" id="nL">
-    <a href="mainpage.html">HOME</a><a href="plan.html" class="active">PLAN</a><a href="about.html">ABOUT</a>
+    <a href="index.html">HOME</a><a href="plan.html" class="active">PLAN</a><a href="about.html">ABOUT</a>
     <a href="support.html">SUPPORT</a><a href="login.html" class="btn-nav">LOGIN</a><a href="register.html" class="btn-nav">REGISTRATION</a>
   </div>
 </nav>
 
 <div class="page-header">
   <div class="page-header-inner">
-    <h1>Business Plan</h1>
-    <div class="breadcrumb"><a href="mainpage.html">Home</a> ▶ Business Plan</div>
+    <h1>Business Plan & Achievements</h1>
+    <div class="breadcrumb"><a href="index.html">Home</a> ▶ Business Plan</div>
   </div>
 </div>
 
@@ -93,18 +93,58 @@ table.plan-tbl .icon-cell{font-size:1.3rem;}
 
     <!-- Achievement Table -->
     <div class="section-header reveal" style="margin-top:3rem;">
-      <h2>10 Achievement <span>Milestones & Earnings</span></h2>
-      <p>Earn up to ₹1.56 Crore total (₹1.20 Cr matching commission + ₹36 Lakh milestone rewards)</p>
+      <h2>10 Achievement <span>Milestones & Rewards Plan</span></h2>
+      <p>Official plan: Earn up to <strong>₹1.20 Crore in Binary Commission</strong> + <strong>Milestone Rewards</strong> (Total up to ₹1.56 Crore+)!</p>
       <div class="section-line"></div>
     </div>
+
+    <!-- Official Brochure Preview Banner -->
+    <div class="reveal" style="background:linear-gradient(135deg,#070d1e,#0b1a3e); border:2px solid var(--gold); border-radius:var(--radius-lg); padding:1.5rem 2rem; margin-bottom:2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1.5rem; color:#fff;">
+      <div style="display:flex; align-items:center; gap:1.2rem;">
+        <img src="assets/images/logo.png" alt="Great Goals Lifestyle" style="width:65px; height:65px; border-radius:50%; border:2px solid var(--gold); object-fit:cover;">
+        <div>
+          <h3 style="color:var(--gold); font-size:1.15rem; margin-bottom:0.25rem;">Official Plan Brochure & Rank Matrix</h3>
+          <p style="color:#cbd5e1; font-size:0.85rem; margin:0;">
+            ಕಾನೂನಾತ್ಮಕವಾಗಿ, ನೈತಿಕವಾಗಿ ದುಡಿಯುವ ಸುವರ್ಣಾವಕಾಶ ಗ್ರೇಟ್‌ಗೋಲ್ಸ್ ಲೈಫ್‌ಸ್ಟೈಲ್. ಮಾರ್ಗದರ್ಶನ: <strong>ಶ್ರೀಯುತ ಲಕ್ಷ್ಮಣ್ ಎಸ್. ಜಾಧವ್</strong>
+          </p>
+        </div>
+      </div>
+      <a href="assets/images/plan-brochure.jpg" target="_blank" class="btn btn-gold btn-sm">
+        <i class="fas fa-file-image"></i> View Original Brochure Image
+      </a>
+    </div>
+
     <div class="ach-grid mb-3" id="achGrid"></div>
-    <div class="table-card reveal" style="margin-top:2rem;">
-      <div class="table-card-header"><h3>Achievement & Earnings Details (10 Ranks)</h3></div>
+
+    <div class="table-card reveal" style="margin-top:2rem; border-top:4px solid var(--gold);">
+      <div class="table-card-header" style="background:var(--royal-gradient); color:#fff; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <h3 style="color:#fff; margin:0;"><i class="fas fa-trophy text-gold"></i> Official Milestone & Rewards Matrix</h3>
+        <span style="background:var(--gold); color:#071a82; padding:4px 14px; border-radius:50px; font-weight:800; font-size:0.78rem;">
+          Daily Capping: ₹10,200 | Monthly: ₹3 Lakh+
+        </span>
+      </div>
       <div class="table-responsive">
         <table class="plan-tbl" id="achTable">
-          <thead><tr><th>#</th><th>Icon</th><th>Rank Name</th><th>Target BV & RP</th><th>Matching Commission</th><th>Rank Reward</th><th>Total Earnings</th><th>Reward Benefit</th></tr></thead>
-          <tbody></tbody>
+          <thead>
+            <tr>
+              <th style="text-align:center;">ಕ್ರ. ಸಂ.<br>(Sl)</th>
+              <th>5000ರೂ = 600ಬಿವಿ<br><small style="color:var(--primary);font-weight:800;">LEFT(RP) : RIGHT(RP)</small></th>
+              <th>ಪ್ರೀಮಿಯಮ್ ಪ್ಲಸ್ 10000ರೂ = 1200ಬಿವಿ<br><small style="color:var(--primary);font-weight:800;">LEFT(RP) : RIGHT(RP)</small></th>
+              <th>ಅಚೀವ್‌ಮೆಂಟ್ಸ್<br>(Achievements)</th>
+              <th>ಬಹುಮಾನ / ರಿವಾರ್ಡ್<br>(Reward / Gift)</th>
+              <th>ಕಮೀಷನ್<br>(Commission)</th>
+            </tr>
+          </thead>
+          <tbody id="achTableBody"></tbody>
         </table>
+      </div>
+      <div style="padding:1.25rem 1.5rem; background:#f8fafc; border-top:1px solid #e2e8f0; font-size:0.85rem; color:#64748b; display:flex; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <i class="fas fa-university text-primary"></i> ಬಹುಮಾನ ಮೊತ್ತವನ್ನು ತಮ್ಮ ನೇರವಾದ ಬ್ಯಾಂಕ್ ಖಾತೆಗೆ ಹಾಕಲಾಗುವುದು. ಇದರಲ್ಲಿ ಟಿ ಡಿ ಎಸ್ ಮತ್ತು ಸರ್ವಿಸ್‌ಚಾರ್ಜ್ 15% ಕಡಿತಗೊಳಿಸಿ ಹಾಕಲಾಗುವುದು.
+        </div>
+        <div>
+          <i class="fas fa-award text-gold"></i> ಮಾರ್ಗದರ್ಶನ: <strong>ಶ್ರೀಯುತ ಲಕ್ಷ್ಮಣ್ ಎಸ್. ಜಾಧವ್</strong>
+        </div>
       </div>
     </div>
 
@@ -113,26 +153,26 @@ table.plan-tbl .icon-cell{font-size:1.3rem;}
       <h2>Binary <span>Plan Diagram</span></h2>
       <div class="section-line"></div>
     </div>
-    <div style="background:var(--dark);border-radius:var(--radius-lg);padding:3rem;text-align:center;color:#fff;" class="reveal">
+    <div style="background:radial-gradient(circle at 50% 30%, #0d1e57 0%, #070d1e 75%, #030712 100%);border-radius:var(--radius-lg);border:1px solid rgba(245,184,0,0.25);padding:3rem;text-align:center;color:#fff;" class="reveal">
       <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
-        <div style="background:var(--primary);padding:.75rem 2rem;border-radius:10px;font-weight:700;font-size:1.1rem;">YOU</div>
-        <div style="display:flex;width:200px;height:2px;background:rgba(255,255,255,.3);margin-top:20px;"></div>
+        <div style="background:var(--gold-gradient);color:#071a82;padding:.75rem 2.2rem;border-radius:10px;font-weight:800;font-size:1.1rem;box-shadow:0 4px 15px rgba(245,184,0,0.4);">YOU</div>
+        <div style="display:flex;width:200px;height:2px;background:rgba(245,184,0,.4);margin-top:20px;"></div>
         <div style="display:flex;gap:5rem;margin-top:0;">
           <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
-            <div style="width:2px;height:30px;background:rgba(255,255,255,.3);"></div>
-            <div style="background:var(--purple);padding:.6rem 1.5rem;border-radius:8px;font-weight:600;">LEFT LEG</div>
-            <div style="font-size:.75rem;color:#94a3b8;">Earn BV & RP<br>from all downlines</div>
+            <div style="width:2px;height:30px;background:rgba(245,184,0,.4);"></div>
+            <div style="background:linear-gradient(135deg, #0b2ac9, #1e40af);padding:.6rem 1.5rem;border-radius:8px;font-weight:700;border:1px solid rgba(255,255,255,0.2);">LEFT LEG</div>
+            <div style="font-size:.75rem;color:#cbd5e1;">Earn BV & RP<br>from all downlines</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
-            <div style="width:2px;height:30px;background:rgba(255,255,255,.3);"></div>
-            <div style="background:var(--blue);padding:.6rem 1.5rem;border-radius:8px;font-weight:600;">RIGHT LEG</div>
-            <div style="font-size:.75rem;color:#94a3b8;">Earn BV & RP<br>from all downlines</div>
+            <div style="width:2px;height:30px;background:rgba(245,184,0,.4);"></div>
+            <div style="background:linear-gradient(135deg, #0b2ac9, #1e40af);padding:.6rem 1.5rem;border-radius:8px;font-weight:700;border:1px solid rgba(255,255,255,0.2);">RIGHT LEG</div>
+            <div style="font-size:.75rem;color:#cbd5e1;">Earn BV & RP<br>from all downlines</div>
           </div>
         </div>
-        <div style="margin-top:2rem;background:rgba(255,255,255,.08);border-radius:10px;padding:1rem 2rem;max-width:400px;">
-          <div style="font-size:.9rem;color:#94a3b8;margin-bottom:.5rem;">Income Calculation:</div>
-          <div style="color:var(--primary);font-weight:700;font-size:1rem;">Left RP matched with Right RP = ₹600/pair</div>
-          <div style="font-size:.8rem;color:#94a3b8;margin-top:.4rem;">Unmatched BV carries forward automatically</div>
+        <div style="margin-top:2rem;background:rgba(255,255,255,.08);border:1px solid rgba(245,184,0,0.3);border-radius:10px;padding:1.2rem 2rem;max-width:440px;">
+          <div style="font-size:.85rem;color:#cbd5e1;margin-bottom:.35rem;">Income Calculation Rule:</div>
+          <div style="color:var(--gold);font-weight:800;font-size:1.05rem;">1 RP Left + 1 RP Right = ₹600 Matching</div>
+          <div style="font-size:.8rem;color:#94a3b8;margin-top:.4rem;">Weaker leg determines matching | Carry forward prevents loss</div>
         </div>
       </div>
     </div>
@@ -142,18 +182,22 @@ table.plan-tbl .icon-cell{font-size:1.3rem;}
 <section class="section section-alt" style="text-align:center;">
   <div class="container reveal">
     <h2 style="font-size:2rem;font-weight:800;margin-bottom:1rem;">Start Earning Today</h2>
-    <p style="color:var(--gray);max-width:550px;margin:0 auto 2rem;">Choose your package, build your team, and achieve up to ₹1.56 Crore total income (₹1.20 Cr matching commission + ₹36 Lakh milestone rewards)!</p>
-    <a href="register.html" class="btn btn-primary" style="font-size:1rem;padding:1rem 2.5rem;"><i class="fas fa-rocket"></i> Register Now</a>
+    <p style="color:var(--gray);max-width:580px;margin:0 auto 2rem;">Choose your package, build your team, and achieve up to ₹1.20 Crore commission plus luxury rewards with Great Goals Lifestyle!</p>
+    <a href="register.html" class="btn btn-gold" style="font-size:1rem;padding:1rem 2.5rem;"><i class="fas fa-rocket"></i> Register Now — Free</a>
   </div>
 </section>
 
 <footer>
   <div class="footer-grid">
-    <div class="footer-brand"><div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:1.3rem;">GG</div><h3>Great Goals Lifestyle Pvt. Ltd.</h3><p>1 Lakh Great Goal Leaders in India before 2028</p></div>
+    <div class="footer-brand">
+      <img src="assets/images/logo.png" alt="Great Goals Lifestyle" style="width:64px;height:64px;border-radius:50%;border:2px solid var(--gold);box-shadow:0 0 15px rgba(245,184,0,0.5);margin-bottom:0.75rem;object-fit:cover;">
+      <h3>Great Goals Lifestyle Pvt. Ltd.</h3>
+      <p>1 Lakh Great Goal Leaders in India before 2028</p>
+    </div>
     <div class="footer-col"><h4>Quick Links</h4><ul><li><a href="index.html">Home</a></li><li><a href="plan.html">Business Plan</a></li><li><a href="about.html">About Us</a></li><li><a href="support.html">Support</a></li><li><a href="login.html">Login</a></li></ul></div>
     <div class="footer-col"><h4>Contact</h4><ul><li><a href="#">Naragund Dt; Gadag 582207</a></li><li><a href="#">Karnataka, India</a></li><li><a href="mailto:greatgoalslifestyle@gmail.com">greatgoalslifestyle@gmail.com</a></li><li><a href="tel:9110871460">9110871460</a></li></ul></div>
   </div>
-  <div class="footer-bottom"><p>© 2026 <span>Great Goals Lifestyle Pvt. Ltd.</span> All rights reserved.</p></div>
+  <div class="footer-bottom"><p>© 2026 <span style="color:var(--gold);font-weight:700;">Great Goals Lifestyle Pvt. Ltd.</span> All rights reserved. | One Team One Goal</p></div>
 </footer>
 
 <script src="assets/js/app.js"></script>
@@ -164,11 +208,12 @@ reveals.forEach(r=>obs.observe(r));
 
 function renderProducts(){
   const grid=document.getElementById('productsGrid');
+  grid.innerHTML='';
   APP.getProducts().filter(p=>p.active).forEach((p,i)=>{
-        const refInc = p.referralIncome || (p.price >= 10000 ? 1020 : 510);
-        const imgSrc = p.image || (p.price >= 10000 ? 'assets/images/p1_10000.jpg' : 'assets/images/p2_5000.jpg');
-        const badgeTxt = p.badge || (p.price >= 10000 ? 'MOST POPULAR' : 'BEST VALUE');
-        grid.innerHTML+=`<div class="product-card ${i===0?'p1':'p2'} reveal">
+    const refInc = p.referralIncome || (p.price >= 10000 ? 1020 : 510);
+    const imgSrc = p.image || (p.price >= 10000 ? 'assets/images/p1_10000.jpg' : 'assets/images/p2_5000.jpg');
+    const badgeTxt = p.badge || (p.price >= 10000 ? 'MOST POPULAR' : 'BEST VALUE');
+    grid.innerHTML+=`<div class="product-card ${i===0?'p1':'p2'} reveal">
       <div class="product-img-wrap">
         <img src="${imgSrc}" alt="${p.name}" loading="lazy">
         <span class="product-badge-float">${badgeTxt}</span>
@@ -190,29 +235,64 @@ function renderProducts(){
 
 function renderAchievements(){
   const grid=document.getElementById('achGrid');
-  const tbody=document.querySelector('#achTable tbody');
+  const tbody=document.getElementById('achTableBody');
+  grid.innerHTML = '';
+  tbody.innerHTML = '';
+
   APP.ACHIEVEMENTS.forEach((a,i)=>{
+    // Top summary card
     grid.innerHTML+=`<div class="ach-card" style="background:${a.color};animation-delay:${i*.08}s">
       <div class="ach-icon">${a.icon}</div>
-      <div class="ach-name">${a.name}</div>
-      <div class="ach-bv">${a.bv.toLocaleString('en-IN')} BV (${a.rp.toLocaleString()} RP)</div>
+      <div class="ach-name" style="font-size:0.95rem;">${a.name} <small style="display:block;font-size:0.75rem;opacity:0.95;">(${a.nameKn})</small></div>
+      <div class="ach-bv" style="font-size:0.75rem;background:rgba(0,0,0,0.2);padding:3px 6px;border-radius:4px;margin-top:4px;">
+        ₹5K: <strong>${a.rp5k}:${a.rp5k} RP</strong> | ₹10K: <strong>${a.rp10k}:${a.rp10k} RP</strong>
+      </div>
       <div style="font-size:0.8rem;margin-top:4px;opacity:0.95;">Comm: <strong>${APP.fmtINR(a.commission)}</strong></div>
-      <div class="ach-reward">Reward: ${APP.fmtINR(a.reward)}</div>
-      <div style="font-size:0.88rem;font-weight:800;background:rgba(0,0,0,0.25);padding:3px 8px;border-radius:6px;margin-top:5px;">
+      <div class="ach-reward" style="font-size:0.75rem;line-height:1.3;margin-top:3px;"><i class="fas fa-gift"></i> ${a.reward}</div>
+      <div style="font-size:0.85rem;font-weight:800;background:rgba(0,0,0,0.28);padding:3px 8px;border-radius:6px;margin-top:5px;">
         Total: ${APP.fmtINR(a.totalEarnings)}
       </div>
-      ${a.rewardTitle ? `<div style="font-size:0.75rem;opacity:0.92;margin-top:3px;background:rgba(255,255,255,0.18);padding:2px 6px;border-radius:4px;">${a.rewardTitle}</div>` : ''}
     </div>`;
+
+    // 6-column Table Row matching the Kannada brochure
     tbody.innerHTML+=`<tr>
-      <td><strong>${a.id}</strong></td>
-      <td class="icon-cell">${a.icon}</td>
-      <td><strong>${a.name}</strong></td>
-      <td>${a.bv.toLocaleString('en-IN')} BV<br><small style="color:var(--gray)">(${a.rp.toLocaleString()} RP)</small></td>
-      <td style="color:var(--blue);font-weight:700;">${APP.fmtINR(a.commission)}</td>
-      <td style="color:var(--green);font-weight:700;">${APP.fmtINR(a.reward)}</td>
-      <td><strong style="color:var(--primary);font-size:0.95rem;">${APP.fmtINR(a.totalEarnings)}</strong></td>
-      <td><span style="font-weight:600;color:var(--dark);">${a.rewardTitle || 'Cash Bonus'}</span></td>
+      <td style="font-weight:800; text-align:center; font-size:0.95rem;">${a.id}</td>
+      <td style="font-weight:700; color:#1e293b; background:#fdfdfd;">
+        <span style="font-size:0.9rem;">${a.rp5k} RP : ${a.rp5k} RP</span>
+        <div style="font-size:0.75rem; color:#64748b;">(Left ${a.rp5k} : Right ${a.rp5k})</div>
+      </td>
+      <td style="font-weight:700; color:var(--primary); background:#fdfefe;">
+        <span style="font-size:0.9rem;">${a.rp10k} RP : ${a.rp10k} RP</span>
+        <div style="font-size:0.75rem; color:#64748b;">(Left ${a.rp10k} : Right ${a.rp10k})</div>
+      </td>
+      <td>
+        <strong style="font-size:0.95rem; color:var(--dark);">${a.name}</strong>
+        <div style="font-size:0.82rem; color:var(--primary); font-weight:700;">${a.nameKn}</div>
+      </td>
+      <td>
+        <div style="font-weight:700; color:var(--dark); font-size:0.88rem;"><i class="fas fa-gift text-gold"></i> ${a.reward}</div>
+        <div style="font-size:0.78rem; color:#64748b; margin-top:2px;">${a.rewardKn}</div>
+      </td>
+      <td style="color:var(--primary); font-weight:800; font-size:0.95rem; white-space:nowrap;">
+        ${APP.fmtINR(a.commission)}
+      </td>
     </tr>`;
+
+    // Insert LPB (Leadership Performance Bonus 5%) Banner row after Emerald (#5)
+    if (a.id === 5) {
+      tbody.innerHTML += `
+        <tr style="background:linear-gradient(90deg, #f5b800 0%, #ffe580 50%, #f5b800 100%);">
+          <td colspan="6" style="padding:1.1rem 1.5rem; text-align:center; color:#071a82;">
+            <div style="font-weight:800; font-size:0.98rem; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+              <i class="fas fa-crown"></i> ${APP.LPB_INFO.titleKn} — ${APP.LPB_INFO.title}
+            </div>
+            <div style="font-size:0.85rem; font-weight:600; margin-top:4px; max-width:850px; margin-left:auto; margin-right:auto;">
+              ${APP.LPB_INFO.descKn}
+            </div>
+          </td>
+        </tr>
+      `;
+    }
   });
 }
 renderProducts(); renderAchievements();

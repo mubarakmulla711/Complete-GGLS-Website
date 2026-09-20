@@ -56,7 +56,7 @@
 <!-- NAVBAR -->
 <nav class="navbar" id="navbar">
   <a href="index.html" class="nav-logo">
-    <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1e293b,#0f172a);border:3px solid #f97316;display:flex;align-items:center;justify-content:center;color:#f97316;font-weight:900;font-size:1.1rem;flex-shrink:0;">GG</div>
+    <img src="assets/images/logo.png" alt="Great Goals Lifestyle" class="nav-logo-img">
     <div class="nav-logo-text">Great Goals<br><span>Lifestyle Pvt. Ltd.</span></div>
   </a>
   <div class="hamburger" id="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">
@@ -306,7 +306,7 @@
 <footer>
   <div class="footer-grid">
     <div class="footer-brand">
-      <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:1.3rem;">GG</div>
+      <img src="assets/images/logo.png" alt="Great Goals Lifestyle" style="width:64px;height:64px;border-radius:50%;border:2px solid var(--gold);box-shadow:0 0 15px rgba(245,184,0,0.5);margin-bottom:0.75rem;object-fit:cover;">
       <h3>Great Goals Lifestyle Pvt. Ltd.</h3>
       <p>We Are Going To Create 1lakh Great Goal Leaders In India Before 2028</p>
     </div>
@@ -338,23 +338,24 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <p>© 2026 <span>Great Goals Lifestyle Pvt. Ltd.</span> All rights reserved. | Designed with ❤️ for Indian Entrepreneurs</p>
+    <p>© 2026 <span style="color:var(--gold);font-weight:700;">Great Goals Lifestyle Pvt. Ltd.</span> All rights reserved. | One Team One Goal</p>
   </div>
 </footer>
 
 <script src="assets/js/app.js"></script>
 <script>
-// Particle Canvas
+// Particle Canvas (Royal Blue & Gold Constellation)
 (function(){
   const canvas = document.getElementById('particles-canvas');
   const ctx = canvas.getContext('2d');
   let particles = [];
   function resize(){ canvas.width=innerWidth; canvas.height=canvas.parentElement.clientHeight||window.innerHeight; }
   resize(); window.addEventListener('resize', resize);
-  for(let i=0;i<80;i++) particles.push({
+  for(let i=0;i<85;i++) particles.push({
     x: Math.random()*innerWidth, y: Math.random()*innerHeight,
     vx: (Math.random()-.5)*.4, vy: (Math.random()-.5)*.4,
-    r: Math.random()*2+1, opacity: Math.random()*.5+.1
+    r: Math.random()*2.2+1, opacity: Math.random()*.5+.15,
+    isGold: Math.random() > 0.4
   });
   function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -364,7 +365,7 @@
       if(p.y<0||p.y>canvas.height) p.vy*=-1;
       ctx.beginPath();
       ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(249,115,22,${p.opacity})`;
+      ctx.fillStyle = p.isGold ? `rgba(245,184,0,${p.opacity})` : `rgba(37,99,235,${p.opacity})`;
       ctx.fill();
     });
     // Lines
@@ -372,11 +373,11 @@
       for(let j=i+1;j<particles.length;j++){
         const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
         const dist=Math.sqrt(dx*dx+dy*dy);
-        if(dist<100){
+        if(dist<110){
           ctx.beginPath();
           ctx.moveTo(particles[i].x,particles[i].y);
           ctx.lineTo(particles[j].x,particles[j].y);
-          ctx.strokeStyle=`rgba(249,115,22,${.15*(1-dist/100)})`;
+          ctx.strokeStyle=`rgba(245,184,0,${.18*(1-dist/110)})`;
           ctx.stroke();
         }
       }
@@ -461,21 +462,25 @@ function renderAchievements(){
   grid.innerHTML='';
   APP.ACHIEVEMENTS.forEach((a,i)=>{
     grid.innerHTML+=`
-    <div class="ach-card reveal animate-delay-${(i%5)+1}" style="background:${a.color};animation-delay:${i*.1}s">
+    <div class="ach-card reveal animate-delay-${(i%5)+1}" style="background:${a.color};animation-delay:${i*.08}s">
       <div class="ach-icon">${a.icon}</div>
-      <div class="ach-name">${a.name}</div>
-      <div class="ach-bv">Target: ${a.bv.toLocaleString('en-IN')} BV (${a.rp.toLocaleString()} RP)</div>
+      <div class="ach-name" style="font-size:0.95rem;">${a.name} <small style="display:block;font-size:0.75rem;opacity:0.95;">(${a.nameKn})</small></div>
+      <div class="ach-bv" style="font-size:0.75rem;background:rgba(0,0,0,0.2);padding:3px 6px;border-radius:4px;margin-top:4px;">
+        ₹5K Pkg: <strong>${a.rp5k}:${a.rp5k} RP</strong> | ₹10K: <strong>${a.rp10k}:${a.rp10k} RP</strong>
+      </div>
       <div style="font-size:0.8rem;margin-top:4px;opacity:0.95;">Commission: <strong>${APP.fmtINR(a.commission)}</strong></div>
-      <div class="ach-reward">Reward: ${APP.fmtINR(a.reward)}</div>
-      <div style="font-size:0.85rem;font-weight:800;background:rgba(0,0,0,0.25);padding:3px 8px;border-radius:6px;margin-top:5px;">
+      <div class="ach-reward" style="font-size:0.75rem;line-height:1.3;margin-top:3px;">
+        <i class="fas fa-gift"></i> ${a.reward}
+        <small style="display:block;opacity:0.9;font-size:0.7rem;">(${a.rewardKn})</small>
+      </div>
+      <div style="font-size:0.85rem;font-weight:800;background:rgba(0,0,0,0.3);padding:3px 8px;border-radius:6px;margin-top:5px;">
         Total: ${APP.fmtINR(a.totalEarnings)}
       </div>
-      ${a.rewardTitle ? `<div style="font-size:0.75rem;opacity:0.92;margin-top:3px;background:rgba(255,255,255,0.18);padding:2px 8px;border-radius:4px;">${a.rewardTitle}</div>` : ''}
     </div>`;
   });
   // Footer
   const fl=document.getElementById('footerAch');
-  APP.ACHIEVEMENTS.forEach(a=>{ fl.innerHTML+=`<li><a href="plan.html">${a.icon} ${a.name}</a></li>`; });
+  APP.ACHIEVEMENTS.forEach(a=>{ fl.innerHTML+=`<li><a href="plan.html">${a.icon} ${a.name} (${a.nameKn})</a></li>`; });
 }
 renderAchievements();
 </script>

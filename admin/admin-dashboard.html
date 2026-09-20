@@ -57,13 +57,13 @@
 <div class="dash-layout">
   <nav class="sidebar admin-sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem">GG</div>
+      <img src="../assets/images/logo.png" alt="Great Goals Lifestyle" style="width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);box-shadow:0 0 10px rgba(245,184,0,0.4);object-fit:cover;">
       <div class="sidebar-logo-text">Admin Panel<br><span>Great Goals</span></div>
     </div>
     <div style="padding:.75rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.1);">
       <div style="font-size:.7rem;color:#94a3b8;">Logged in as</div>
       <div style="font-size:.95rem;font-weight:700;color:#fff;">Administrator</div>
-      <span style="font-size:.7rem;background:#f97316;color:#fff;padding:.1rem .5rem;border-radius:50px;">Admin</span>
+      <span style="font-size:.7rem;background:var(--gold);color:#071a82;font-weight:800;padding:.1rem .5rem;border-radius:50px;">Admin</span>
     </div>
     <nav class="sidebar-nav">
       <div class="sidebar-nav-label">Management</div>
@@ -83,13 +83,18 @@
       <div style="display:flex;align-items:center;gap:.75rem;">
         <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></button>
         <div>
-          <h1><i class="fas fa-tachometer-alt" style="color:#f97316;margin-right:.4rem;"></i>Admin Dashboard</h1>
+          <h1><i class="fas fa-tachometer-alt" style="color:var(--gold);margin-right:.4rem;"></i>Admin Dashboard</h1>
           <div style="font-size:.78rem;color:#94a3b8;margin-top:.1rem;">Overview and quick actions</div>
         </div>
       </div>
-      <div class="topbar-right">
-        <i class="fas fa-calendar-alt" style="color:#f97316;"></i>
-        <span class="date" id="topbarDate"></span>
+      <div class="topbar-right" style="display:flex;align-items:center;gap:1rem;">
+        <button class="btn btn-sm btn-gold" onclick="confirmResetFreshData()" title="Erase all data and reset to fresh seed state">
+          <i class="fas fa-redo"></i> Reset to Fresh Data
+        </button>
+        <div style="display:flex;align-items:center;gap:0.4rem;">
+          <i class="fas fa-calendar-alt" style="color:var(--gold);"></i>
+          <span class="date" id="topbarDate"></span>
+        </div>
       </div>
     </div>
 
@@ -339,6 +344,13 @@
   else withdrawals.forEach(w=>{const mem=memberMap[w.memberId];const tr=document.createElement('tr');tr.innerHTML=`<td><span style="font-family:monospace;font-size:.78rem;">${w.id}</span></td><td>${mem?mem.name:w.memberId}</td><td><strong style="color:#16a34a;">${APP.fmtINR(w.amount)}</strong></td><td>${w.requestedAt?new Date(w.requestedAt).toLocaleDateString('en-IN'):'—'}</td><td><span class="badge badge-pending">Pending</span></td><td><button class="btn-xs btn-approve" onclick="approveWD('${w.id}')"><i class="fas fa-check"></i> Approve</button><button class="btn-xs btn-reject" onclick="rejectWD('${w.id}')"><i class="fas fa-times"></i> Reject</button></td>`;wTbody.appendChild(tr);});
   function approveWD(id){const r=APP.approveWithdrawal(id);if(r&&r.success){showToast('Withdrawal approved successfully!');setTimeout(()=>location.reload(),1000);}else showToast('Failed to approve withdrawal','error');}
   function rejectWD(id){const r=APP.rejectWithdrawal(id);if(r&&r.success){showToast('Withdrawal rejected, amount refunded');setTimeout(()=>location.reload(),1000);}else showToast('Failed to reject withdrawal','error');}
+  function confirmResetFreshData(){
+    if(confirm("Are you sure you want to erase all data and reset to fresh brochure seed data? This cannot be undone.")){
+      APP.resetToFreshData();
+      showToast('All data erased and reset to fresh seed state!');
+      setTimeout(()=>location.reload(), 1000);
+    }
+  }
 </script>
 </body>
 </html>

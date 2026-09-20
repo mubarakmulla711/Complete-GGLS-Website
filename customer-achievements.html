@@ -11,7 +11,7 @@
 <div class="dash-layout">
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem;">GG</div>
+      <img src="assets/images/logo.png" alt="Great Goals Lifestyle" style="width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);box-shadow:0 0 10px rgba(245,184,0,0.4);object-fit:cover;">
       <div class="sidebar-logo-text">Great Goals<br><span>Lifestyle</span></div>
     </div>
     <div class="sidebar-user" id="sidebarUser"></div>
@@ -29,15 +29,15 @@
   </nav>
   <div class="dash-main">
     <div class="dash-topbar">
-      <h1>10 Achievement Milestones — Earn up to ₹1.56 Crore Total</h1>
+      <h1>10 Achievement Milestones — Official Plan</h1>
       <div class="topbar-user">
-        <div class="topbar-avatar" id="topAvatar">?</div>
+        <div class="topbar-avatar" id="topAvatar" style="background:var(--gold);color:#071a82;font-weight:800;">?</div>
         <span class="topbar-name" id="topName">User</span>
       </div>
     </div>
     <div class="dash-content">
-      <div class="alert alert-info" style="margin-bottom:1.5rem;">
-        <i class="fas fa-info-circle"></i> Milestone achievements unlock automatically based on your weaker leg Business Value (BV). Reaching <strong>Chairman</strong> awards <strong>₹1.20 Crore in Binary Commission</strong> + <strong>₹36 Lakh in Milestone Rewards</strong> = <strong>₹1.56 Crore Total Earnings</strong>!
+      <div class="alert alert-info" style="margin-bottom:1.5rem;background:#f0f7ff;border:1px solid #bfdbfe;color:#1e3a8a;">
+        <i class="fas fa-info-circle text-primary"></i> Ranks unlock automatically based on your weaker leg Business Value (BV). Chairman earns up to <strong>₹1.20 Crore in Binary Commission</strong> + <strong>₹15 Lakh House Fund</strong>!
       </div>
       <div id="achievementsContainer"></div>
     </div>
@@ -61,26 +61,37 @@ function renderAchievements() {
   container.innerHTML = APP.ACHIEVEMENTS.map(ach => {
     const isUnlocked = unlocked.includes(ach.id) || weakBV >= ach.bv;
     const progress = Math.min(100, (weakBV / ach.bv) * 100);
+    const lpbHtml = ach.id === 5 ? `
+      <div style="margin:1rem 0;padding:0.9rem 1.25rem;background:linear-gradient(90deg,#f5b800,#ffe580,#f5b800);border-radius:10px;color:#071a82;font-size:0.85rem;font-weight:700;box-shadow:0 3px 12px rgba(245,184,0,0.35);">
+        <i class="fas fa-crown"></i> ${APP.LPB_INFO.titleKn} (${APP.LPB_INFO.title}): ${APP.LPB_INFO.descKn}
+      </div>
+    ` : '';
+
     return `
-      <div class="ach-progress-card ${isUnlocked ? 'unlocked' : 'locked'}">
-        <div class="ach-progress-icon" style="color:${ach.color};">${ach.icon}</div>
-        <div class="ach-progress-info">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div class="ach-progress-name">#${ach.id} ${ach.name}</div>
+      <div class="ach-progress-card ${isUnlocked ? 'unlocked' : 'locked'}" style="margin-bottom:1rem;background:#fff;border-radius:12px;padding:1.25rem;box-shadow:var(--shadow);border-left:5px solid ${ach.color};display:flex;gap:1.2rem;align-items:flex-start;">
+        <div class="ach-progress-icon" style="font-size:2.2rem;color:${ach.color};flex-shrink:0;">${ach.icon}</div>
+        <div class="ach-progress-info" style="flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+            <div class="ach-progress-name" style="font-weight:800;font-size:1.05rem;color:var(--dark);">
+              #${ach.id} ${ach.name} <span style="color:var(--primary);font-size:0.9rem;">(${ach.nameKn})</span>
+            </div>
             ${isUnlocked ? '<span class="badge-status badge-active"><i class="fas fa-check"></i> UNLOCKED</span>' : '<span class="badge-status" style="background:#f1f5f9;color:#64748b;">LOCKED</span>'}
           </div>
-          <div class="ach-progress-req" style="line-height:1.6;">
-            Target: <strong>${ach.bv.toLocaleString('en-IN')} BV</strong> (${ach.rp.toLocaleString()} RP) &nbsp;|&nbsp;
-            Matching Comm: <strong style="color:var(--blue);">₹${ach.commission.toLocaleString('en-IN')}</strong> &nbsp;|&nbsp;
-            Reward: <strong style="color:var(--green);">₹${ach.reward.toLocaleString('en-IN')}</strong>${ach.rewardTitle ? ` <small style="color:var(--dark);">(${ach.rewardTitle})</small>` : ''} &nbsp;|&nbsp;
-            <span style="background:rgba(249,115,22,0.15);color:var(--primary);padding:2px 8px;border-radius:4px;font-weight:700;">Total Earning: ₹${ach.totalEarnings.toLocaleString('en-IN')}</span>
+          <div class="ach-progress-req" style="line-height:1.7;margin:0.4rem 0;font-size:0.88rem;">
+            ₹5K Pkg: <strong>${ach.rp5k}:${ach.rp5k} RP</strong> &nbsp;|&nbsp;
+            ₹10K Pkg: <strong>${ach.rp10k}:${ach.rp10k} RP</strong> &nbsp;|&nbsp;
+            Matching Comm: <strong style="color:var(--primary);">${APP.fmtINR(ach.commission)}</strong> &nbsp;|&nbsp;
+            Reward: <strong style="color:var(--dark);">${ach.reward}</strong> <small style="color:#64748b;">(${ach.rewardKn})</small>
           </div>
-          <div class="ach-progress-bar-wrap">
-            <div class="ach-progress-bar" style="width:${progress}%;background:${ach.color};"></div>
+          <div class="ach-progress-bar-wrap" style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:0.4rem;">
+            <div class="ach-progress-bar" style="width:${progress}%;height:100%;background:${ach.color};transition:width 0.6s ease;"></div>
           </div>
-          <div class="ach-progress-percent">Current: ${weakBV.toLocaleString('en-IN')} BV (${progress.toFixed(1)}%)</div>
+          <div class="ach-progress-percent" style="font-size:0.78rem;color:#64748b;margin-top:0.25rem;">
+            Progress: ${weakBV.toLocaleString('en-IN')} BV / ${ach.bv.toLocaleString('en-IN')} BV (${progress.toFixed(1)}%)
+          </div>
         </div>
       </div>
+      ${lpbHtml}
     `;
   }).join('');
 }
