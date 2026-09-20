@@ -1,12 +1,12 @@
 /**
  * tree.js — High Quality Binary MLM Tree Renderer
- * Clean tree layout with SVG connecting lines, 3-row display, and multi-page pagination.
+ * Clean tree layout with SVG/CSS connecting lines, strict 3-row display, and multi-page pagination.
  */
 
 const TREE = {
   colors: {
-    P1: { bg: 'linear-gradient(135deg, #7c3aed, #9333ea)', text: '#fff', border: '#6d28d9' },
-    P2: { bg: 'linear-gradient(135deg, #2563eb, #3b82f6)', text: '#fff', border: '#1d4ed8' },
+    P1: { bg: 'linear-gradient(135deg, #071a82, #0b2ac9)', text: '#fff', border: '#f5b800' },
+    P2: { bg: 'linear-gradient(135deg, #1e40af, #2563eb)', text: '#fff', border: '#60a5fa' },
     empty: { bg: '#f8fafc', text: '#64748b', border: '#cbd5e1' }
   },
 
@@ -15,7 +15,7 @@ const TREE = {
    * Row 1: Root node (1 node)
    * Row 2: Left & Right child (2 nodes)
    * Row 3: Grandchildren (4 nodes)
-   * Nodes at Row 3 with further children offer a "Next Page / Expand" button.
+   * Nodes at Row 3 with further children offer a "Next 3 Rows" button.
    * @param {string} rootId
    * @param {HTMLElement} container
    * @param {number} maxDepth
@@ -24,7 +24,7 @@ const TREE = {
     if (!container) return;
     container.innerHTML = '';
 
-    const rootMember = APP.getMemberById(rootId);
+    const rootMember = APP.getMemberById(rootId) || (APP.getMembers && APP.getMembers()[0]);
     if (!rootMember) {
       container.innerHTML = '<div class="no-data"><i class="fas fa-exclamation-circle"></i> Member not found</div>';
       return;
@@ -48,7 +48,7 @@ const TREE = {
 
     const m = memberId ? APP.getMemberById(memberId) : null;
     const isBottomRow = currentDepth === maxDepth;
-    const hasChildren = m && (m.leftMemberId || m.rightMemberId || (APP.getMembers && APP.getMembers().some(item => item.parentId === m.id)));
+    const hasChildren = !!(m && (m.leftMemberId || m.rightMemberId || (APP.getMembers && APP.getMembers().some(item => item.parentId === m.id))));
 
     const nodeEl = this._createNodeCard(memberId, parentId, position, isBottomRow && hasChildren);
     branch.appendChild(nodeEl);
@@ -56,28 +56,27 @@ const TREE = {
     // If within the 3 rows, render left and right children
     if (currentDepth < maxDepth) {
       if (memberId && m) {
-        // Retrieve explicit left and right children
-        // Also safeguard in case child's position is recorded on child object
+        // Retrieve strictly placed left and right children
         let leftId = m.leftMemberId;
         let rightId = m.rightMemberId;
 
-        // Double check members who have m.id as sponsor/parent and specified position
+        // Double check members who have m.id as parentId/sponsorId and position
         const allMembers = APP.getMembers();
         if (!leftId) {
-          const foundLeft = allMembers.find(item => item.parentId === m.id && item.position === 'left');
+          const foundLeft = allMembers.find(item => item.parentId === m.id && (item.position || '').toLowerCase() === 'left');
           if (foundLeft) leftId = foundLeft.id;
         }
         if (!rightId) {
-          const foundRight = allMembers.find(item => item.parentId === m.id && item.position === 'right');
+          const foundRight = allMembers.find(item => item.parentId === m.id && (item.position || '').toLowerCase() === 'right');
           if (foundRight) rightId = foundRight.id;
         }
 
         const childrenRow = document.createElement('div');
         childrenRow.className = 'tree-children-row';
 
-        // LEFT branch strictly contains leftId
+        // LEFT branch strictly contains leftId (if null, renders empty left slot)
         const leftBranch = this._buildBranch(leftId, currentDepth + 1, maxDepth, m.id, 'left');
-        // RIGHT branch strictly contains rightId
+        // RIGHT branch strictly contains rightId (if null, renders empty right slot)
         const rightBranch = this._buildBranch(rightId, currentDepth + 1, maxDepth, m.id, 'right');
 
         childrenRow.appendChild(leftBranch);
@@ -129,6 +128,11 @@ const TREE = {
       </div>
     ` : '';
 
+    const lbv = (m.leftBV || 0).toLocaleString('en-IN');
+    const rbv = (m.rightBV || 0).toLocaleString('en-IN');
+    const lrp = Number(m.leftRP || 0).toFixed(1);
+    const rrp = Number(m.rightRP || 0).toFixed(1);
+
     card.innerHTML = `
       <div class="node-header">
         <span class="node-avatar">${initials}</span>
@@ -138,8 +142,8 @@ const TREE = {
       <div class="node-name" title="${m.name}">${m.name}</div>
       <div class="node-rank">${m.rank || 'Member'}</div>
       <div class="node-stats-grid">
-        <div class="stat-col"><span class="lbl">L:</span> ${APP.fmt(m.leftBV || 0)}</div>
-        <div class="stat-col"><span class="lbl">R:</span> ${APP.fmt(m.rightBV || 0)}</div>
+        <div class="stat-col"><span class="lbl">L:</span> ${lbv} <small>(${lrp} RP)</small></div>
+        <div class="stat-col"><span class="lbl">R:</span> ${rbv} <small>(${rrp} RP)</small></div>
       </div>
       ${nextBtnHtml}
     `;
@@ -157,13 +161,13 @@ const TREE = {
     document.getElementById('modal-id').textContent   = m.id;
     document.getElementById('modal-name').textContent = m.name;
     document.getElementById('modal-rank').textContent = m.rank || 'Member';
-    document.getElementById('modal-lbv').textContent  = (m.leftBV || 0).toLocaleString('en-IN');
-    document.getElementById('modal-rbv').textContent  = (m.rightBV || 0).toLocaleString('en-IN');
-    document.getElementById('modal-lrp').textContent  = Number(m.leftRP || 0).toFixed(2);
-    document.getElementById('modal-rrp').textContent  = Number(m.rightRP || 0).toFixed(2);
+    document.getElementById('modal-lbv').textContent  = (m.leftBV || 0).toLocaleString('en-IN') + ' BV';
+    document.getElementById('modal-rbv').textContent  = (m.rightBV || 0).toLocaleString('en-IN') + ' BV';
+    document.getElementById('modal-lrp').textContent  = Number(m.leftRP || 0).toFixed(2) + ' RP';
+    document.getElementById('modal-rrp').textContent  = Number(m.rightRP || 0).toFixed(2) + ' RP';
     document.getElementById('modal-pkg').textContent  = m.packageId === 'P1'
-      ? '₹10,000 Premium Package'
-      : (m.packageId === 'P2' ? '₹5,000 Standard Package' : 'Standard');
+      ? '₹10,000 Premium Plus Package (1,200 BV / 2 RP)'
+      : (m.packageId === 'P2' ? '₹5,000 Standard Package (600 BV / 1 RP)' : 'Unpaid / Pending');
     
     const sponsor = m.sponsorId ? APP.getMemberById(m.sponsorId) : null;
     const sponsorEl = document.getElementById('modal-sponsor');

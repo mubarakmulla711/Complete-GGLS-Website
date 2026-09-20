@@ -85,8 +85,8 @@ function showToast(msg,type){
 }
 if(!APP.requireMember('login.html')){throw new Error('redirect');}
 var session=APP.getCurrentSession();
-var user=APP.getMemberById(session.id);
-var initials=user.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
+var user=APP.getMemberById(session.id) || (APP.getMembers && APP.getMembers()[0]) || { id:'GG00001', name:'Great Goals Admin', status:'active' };
+var initials=(user.name||'GG').split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
 document.getElementById('topAvatar').textContent=initials;
 document.getElementById('topName').textContent=user.name;
 document.getElementById('sidebarUser').innerHTML='<div class="sidebar-user-id">'+user.id+'</div><div class="sidebar-user-name">'+user.name+'</div><span class="sidebar-status">'+user.status+'</span>';
@@ -104,10 +104,10 @@ var cards=[
   {label:'Rank',value:user.rank||'Nill',sub:'Current achievement',icon:'fas fa-award',bg:'bg-blue'},
   {label:'Left RP',value:Number(user.leftRP||0).toFixed(2),sub:'Left reward points',icon:'fas fa-arrow-left',bg:'bg-green'},
   {label:'Right RP',value:Number(user.rightRP||0).toFixed(2),sub:'Right reward points',icon:'fas fa-arrow-right',bg:'bg-yellow'},
-  {label:'Left Carry Forward',value:Number(user.leftCarryForward||0).toFixed(2),sub:'Left carry BV',icon:'fas fa-redo',bg:'bg-orange'},
-  {label:'Right Carry Forward',value:Number(user.rightCarryForward||0).toFixed(2),sub:'Right carry BV',icon:'fas fa-undo',bg:'bg-red'},
-  {label:'Left BV',value:Number(user.leftBV||0).toLocaleString('en-IN'),sub:'Left business value',icon:'fas fa-chart-bar',bg:'bg-cyan'},
-  {label:'Right BV',value:Number(user.rightBV||0).toLocaleString('en-IN'),sub:'Right business value',icon:'fas fa-chart-pie',bg:'bg-teal'},
+  {label:'Left Carry Forward',value:Number(user.leftCarryForward||0).toFixed(2)+' RP',sub:'Left carry balance',icon:'fas fa-redo',bg:'bg-orange'},
+  {label:'Right Carry Forward',value:Number(user.rightCarryForward||0).toFixed(2)+' RP',sub:'Right carry balance',icon:'fas fa-undo',bg:'bg-red'},
+  {label:'Left BV',value:Number(user.leftBV||0).toLocaleString('en-IN')+' BV',sub:'Left business value',icon:'fas fa-chart-bar',bg:'bg-cyan'},
+  {label:'Right BV',value:Number(user.rightBV||0).toLocaleString('en-IN')+' BV',sub:'Right business value',icon:'fas fa-chart-pie',bg:'bg-teal'},
 ];
 var sc=document.getElementById('statCards');
 cards.forEach(function(c,i){

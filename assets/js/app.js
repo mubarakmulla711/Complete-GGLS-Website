@@ -6,7 +6,7 @@
 
 const APP = {
   KEYS: {
-    DATA_VERSION: 'gg_v4_royal_gold_fresh',
+    DATA_VERSION: 'gg_v5_pure_fresh_binary',
     MEMBERS:      'gg_members',
     PRODUCTS:     'gg_products',
     ORDERS:       'gg_orders',
@@ -56,7 +56,7 @@ const APP = {
   // ─── Init & Fresh Data Reset ────────────────────────────────────────────────
   init() {
     const version = localStorage.getItem(this.KEYS.DATA_VERSION);
-    if (version !== 'gg_v4_royal_gold_fresh') {
+    if (version !== 'gg_v5_pure_fresh_binary') {
       this.resetToFreshData();
       return;
     }
@@ -66,63 +66,45 @@ const APP = {
   },
 
   resetToFreshData() {
-    // Wipes all demo data and initializes with clean seed data
+    // Clean wipe of all data and start 100% fresh from root admin GG00001
     localStorage.removeItem(this.KEYS.MEMBERS);
     localStorage.removeItem(this.KEYS.PRODUCTS);
     localStorage.removeItem(this.KEYS.ORDERS);
     localStorage.removeItem(this.KEYS.WITHDRAWALS);
     localStorage.removeItem(this.KEYS.NOTIFICATIONS);
     localStorage.removeItem(this.KEYS.CURRENT_USER);
-    localStorage.setItem(this.KEYS.DATA_VERSION, 'gg_v4_royal_gold_fresh');
+    localStorage.setItem(this.KEYS.DATA_VERSION, 'gg_v5_pure_fresh_binary');
 
-    const p1Pwd = this.hashPwd('Admin@1234');
-    const p2Pwd = this.hashPwd('123456');
+    const adminPwd = this.hashPwd('Admin@1234');
 
-    // Root Admin (GG00001)
-    const m1 = this._blankMember('GG00001', 'Great Goals Admin', '9110871460', p1Pwd, null, null);
-    m1.isAdmin = true;
-    m1.status = 'active';
-    m1.packageId = 'P1';
-    m1.leftMemberId = 'GG00002';
-    m1.rightMemberId = 'GG00003';
-    m1.leftBV = 6000;
-    m1.rightBV = 6000;
-    m1.leftRP = 10.0;
-    m1.rightRP = 10.0;
-    m1.leftMemberCount = 1;
-    m1.rightMemberCount = 1;
-    m1.referralIncome = 2040;
-    m1.binaryIncome = 6000;
-    m1.incomeWallet = 8040;
-    m1.successWithdrawals = 0;
-    m1.matchedPairs = 10;
-    m1.leftCarryForward = 0;
-    m1.rightCarryForward = 0;
-    m1.rank = 'Silver';
-    m1.achievementIds = [1];
+    // ONLY the top Root Admin account (GG00001) is seeded.
+    // Left and Right legs start completely clean with 0 members, 0 BV, 0 RP.
+    const rootAdmin = this._blankMember('GG00001', 'Great Goals Admin', '9110871460', adminPwd, null, null);
+    rootAdmin.isAdmin = true;
+    rootAdmin.status = 'active';
+    rootAdmin.packageId = 'P1';
+    rootAdmin.leftMemberId = null;
+    rootAdmin.rightMemberId = null;
+    rootAdmin.leftBV = 0;
+    rootAdmin.rightBV = 0;
+    rootAdmin.leftRP = 0;
+    rootAdmin.rightRP = 0;
+    rootAdmin.leftMemberCount = 0;
+    rootAdmin.rightMemberCount = 0;
+    rootAdmin.referralIncome = 0;
+    rootAdmin.binaryIncome = 0;
+    rootAdmin.incomeWallet = 0;
+    rootAdmin.activationWallet = 0;
+    rootAdmin.successWithdrawals = 0;
+    rootAdmin.matchedPairs = 0;
+    rootAdmin.leftCarryForward = 0;
+    rootAdmin.rightCarryForward = 0;
+    rootAdmin.rank = null;
+    rootAdmin.achievementIds = [];
 
-    // Left Child (GG00002)
-    const m2 = this._blankMember('GG00002', 'Ramesh Patil', '9876543210', p2Pwd, 'GG00001', 'left');
-    m2.packageId = 'P1';
-    m2.leftBV = 0; m2.rightBV = 0;
-    m2.leftRP = 0; m2.rightRP = 0;
-    m2.incomeWallet = 0;
-
-    // Right Child (GG00003)
-    const m3 = this._blankMember('GG00003', 'Suresh Kulkarni', '9845012345', p2Pwd, 'GG00001', 'right');
-    m3.packageId = 'P2';
-    m3.leftBV = 0; m3.rightBV = 0;
-    m3.leftRP = 0; m3.rightRP = 0;
-    m3.incomeWallet = 0;
-
-    this.saveMembers([m1, m2, m3]);
+    this.saveMembers([rootAdmin]);
     this.saveProducts(this._defaultProducts());
-
-    const sampleOrders = [
-      { id:'ORD10001', memberId:'GG00002', memberName:'Ramesh Patil', productId:'P1', productName:'Premium Plus Package ₹10,000', price:10000, bv:1200, rp:1, status:'completed', createdAt:new Date(Date.now()-86400000*2).toISOString() },
-      { id:'ORD10002', memberId:'GG00003', memberName:'Suresh Kulkarni', productId:'P2', productName:'Standard Package ₹5,000', price:5000, bv:600, rp:1, status:'completed', createdAt:new Date(Date.now()-86400000).toISOString() }
-    ];
-    this.saveOrders(sampleOrders);
+    this.saveOrders([]);
     this.saveWithdrawals([]);
     this.saveNotifications([]);
   },
@@ -130,11 +112,11 @@ const APP = {
   _defaultProducts() {
     return [
       {
-        id:'P1', name:'Premium Plus Package ₹10,000', price:10000, bv:1200, rp:1,
+        id:'P1', name:'Premium Plus Package ₹10,000', price:10000, bv:1200, rp:2,
         grossReferral:1200, serviceTax:180, referralIncome:1020,
         image:'assets/images/p1_10000.jpg',
         badge:'MOST POPULAR',
-        description:'1200 BV package requiring only half RP pairs for rank milestones.',
+        description:'1200 BV (2 RP) package requiring only half the pair count for rank milestones.',
         items:[
           '1× Kanchipuram Wedding Saree',
           '1× Premier Pant & Shirt Piece',
@@ -148,7 +130,7 @@ const APP = {
         grossReferral:600, serviceTax:90, referralIncome:510,
         image:'assets/images/p2_5000.jpg',
         badge:'STARTER CHOICE',
-        description:'600 BV package with textile products and travel vouchers.',
+        description:'600 BV (1 RP) package with textile products and travel vouchers.',
         items:[
           '1× Banarasi Saree OR 1× Suite Length',
           '3× Compact Tour Discount Voucher (CTDV) @ ₹6,000 printed value',
@@ -249,6 +231,18 @@ const APP = {
       // Direct activation
       const m = this.getMemberById(memberId);
       m.packageId = productId;
+
+      // Credit referral to sponsor if not yet credited
+      if (m.sponsorId) {
+        const sponsor = this.getMemberById(m.sponsorId);
+        if (sponsor) {
+          const ref = product.referralIncome || (product.price >= 10000 ? 1020 : (product.price >= 5000 ? 510 : Math.round(product.price * 0.102)));
+          sponsor.referralIncome = (sponsor.referralIncome || 0) + ref;
+          sponsor.incomeWallet   = (sponsor.incomeWallet   || 0) + ref;
+          this.updateMember(sponsor);
+        }
+      }
+
       this.updateMember(m);
       this._propagateBV(memberId, product.bv, product.rp);
     } else {
@@ -361,13 +355,14 @@ const APP = {
       const parent = this.getMemberById(member.parentId);
       if (!parent) break;
 
-      if (member.position === 'left') {
+      const pos = (member.position || '').toLowerCase();
+      if (pos === 'left') {
         parent.leftBV           = (parent.leftBV || 0) + bv;
-        parent.leftRP           = (parent.leftRP || 0) + rp;
+        parent.leftRP           = +(parent.leftBV / this.RP_TO_BV).toFixed(2);
         parent.leftMemberCount  = (parent.leftMemberCount || 0) + 1;
       } else {
         parent.rightBV          = (parent.rightBV || 0) + bv;
-        parent.rightRP          = (parent.rightRP || 0) + rp;
+        parent.rightRP          = +(parent.rightBV / this.RP_TO_BV).toFixed(2);
         parent.rightMemberCount = (parent.rightMemberCount || 0) + 1;
       }
 
@@ -379,25 +374,25 @@ const APP = {
   },
 
   _checkBinaryMatch(m) {
-    const leftTotal  = (m.leftRP  || 0) + (m.leftCarryForward  || 0);
-    const rightTotal = (m.rightRP || 0) + (m.rightCarryForward || 0);
-    const matched    = Math.floor(Math.min(leftTotal, rightTotal));
-    const prev       = m.matchedPairs || 0;
-    const newMatch   = matched - prev;
+    const leftRP  = (m.leftBV || 0) / this.RP_TO_BV;
+    const rightRP = (m.rightBV || 0) / this.RP_TO_BV;
+    const matched = Math.floor(Math.min(leftRP, rightRP));
+    const prev    = m.matchedPairs || 0;
+    const newMatch = matched - prev;
 
     if (newMatch > 0) {
       const income = newMatch * this.BINARY_MATCH_PER_RP;
       m.binaryIncome   = (m.binaryIncome   || 0) + income;
       m.incomeWallet   = (m.incomeWallet   || 0) + income;
       m.matchedPairs   = matched;
+    }
 
-      if (leftTotal > rightTotal) {
-        m.leftCarryForward  = +(leftTotal - rightTotal).toFixed(2);
-        m.rightCarryForward = 0;
-      } else {
-        m.rightCarryForward = +(rightTotal - leftTotal).toFixed(2);
-        m.leftCarryForward  = 0;
-      }
+    if (leftRP > rightRP) {
+      m.leftCarryForward  = +(leftRP - matched).toFixed(2);
+      m.rightCarryForward = 0;
+    } else {
+      m.rightCarryForward = +(rightRP - matched).toFixed(2);
+      m.leftCarryForward  = 0;
     }
   },
 
@@ -545,8 +540,9 @@ const APP = {
         msg:'Your account is currently INACTIVE / DEACTIVATED by the administrator. Please contact Great Goals support for reactivation.'
       };
     }
-    localStorage.setItem(this.KEYS.CURRENT_USER, JSON.stringify({ id:member.id, isAdmin:false }));
-    return { success:true, isAdmin:false, member };
+    const isAdmin = !!member.isAdmin;
+    localStorage.setItem(this.KEYS.CURRENT_USER, JSON.stringify({ id:member.id, isAdmin }));
+    return { success:true, isAdmin, member };
   },
 
   setMemberStatus(memberId, status) {

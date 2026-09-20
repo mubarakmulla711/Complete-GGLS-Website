@@ -61,11 +61,20 @@
 }
 
 /* Binary Tree Canvas & Nodes */
+.tree-outer-container {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  padding: 1.5rem;
+}
 .binary-tree-canvas {
-  display: inline-flex;
+  display: flex;
   justify-content: center;
-  min-width: 100%;
-  padding: 1rem 2rem 3rem 2rem;
+  min-width: max-content;
+  width: 100%;
+  padding: 1.5rem 1rem 3rem 1rem;
   user-select: none;
 }
 .tree-branch {
@@ -73,11 +82,14 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  padding: 0 8px;
+  padding: 0 14px;
+  flex: 1 1 0;
+  min-width: 165px;
 }
 .tree-children-row {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   position: relative;
   padding-top: 36px;
   width: 100%;
@@ -91,34 +103,39 @@
   right: 25%;
   height: 2px;
   background: #94a3b8;
+  z-index: 1;
 }
 .tree-branch::before {
   content: '';
   position: absolute;
-  top: -18px;
+  top: -36px;
   left: 50%;
+  transform: translateX(-50%);
   width: 2px;
-  height: 18px;
+  height: 36px;
   background: #94a3b8;
+  z-index: 1;
 }
 /* Root branch doesn't need top connector */
 .binary-tree-canvas > .tree-branch::before {
-  display: none;
+  display: none !important;
 }
-/* Downward vertical branch line to children */
-.tree-branch > .tree-node-card + .tree-children-row::after {
+/* Downward vertical branch line from parent to children crossbar */
+.tree-children-row::after {
   content: '';
   position: absolute;
-  top: -18px;
+  top: -36px;
   left: 50%;
+  transform: translateX(-50%);
   width: 2px;
-  height: 18px;
+  height: 36px;
   background: #94a3b8;
+  z-index: 1;
 }
 
 /* Node Cards */
 .tree-node-card {
-  width: 140px;
+  width: 155px;
   border-radius: 12px;
   padding: 10px 12px;
   color: #fff;
@@ -480,11 +497,11 @@ function showToast(msg, type='success'){
 
 if(!APP.requireMember('login.html')) throw new Error('redirect');
 const session = APP.getCurrentSession();
-const user = APP.getMemberById(session.id);
+const user = APP.getMemberById(session.id) || (APP.getMembers && APP.getMembers()[0]) || { id:'GG00001', name:'Great Goals Admin', status:'active' };
 let currentRootId = user.id;
 let navHistory = [user.id];
 
-document.getElementById('topAvatar').textContent = user.name.charAt(0).toUpperCase();
+document.getElementById('topAvatar').textContent = (user.name || 'U').charAt(0).toUpperCase();
 document.getElementById('topName').textContent = user.name;
 document.getElementById('sidebarUser').innerHTML = `
   <div class="sidebar-user-id">${user.id}</div>
