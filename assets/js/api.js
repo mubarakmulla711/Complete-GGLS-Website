@@ -5,13 +5,42 @@
  */
 
 const API = {
-  BASE_URL: (window.location.origin && window.location.origin !== 'null' && !window.location.origin.startsWith('file'))
-    ? window.location.origin
-    : 'http://localhost:5000',
+  getBaseUrl() {
+    if (window.API_BASE_URL) return window.API_BASE_URL;
+    // If running directly on the Express server port 5000
+    if (window.location && window.location.port === '5000') {
+      return window.location.origin;
+    }
+    // If accessed via Live Server (e.g. port 5500, 3000) or file:///
+    const host = (window.location && window.location.hostname && window.location.hostname !== '')
+      ? window.location.hostname
+      : 'localhost';
+    return `http://${host}:5000`;
+  },
+
+  getToken() {
+    return localStorage.getItem('gg_auth_token') || sessionStorage.getItem('gg_auth_token') || '';
+  },
+
+  setToken(token) {
+    if (token) {
+      localStorage.setItem('gg_auth_token', token);
+    } else {
+      localStorage.removeItem('gg_auth_token');
+      sessionStorage.removeItem('gg_auth_token');
+    }
+  },
 
   async request(endpoint, options = {}) {
-    const url = this.BASE_URL + endpoint;
+    const baseUrl = this.getBaseUrl();
+    const url = baseUrl + endpoint;
     const headers = options.headers || {};
+
+    // Auto-attach authorization token if available
+    const token = this.getToken();
+    if (token && !headers['Authorization']) {
+      headers['Authorization'] = 'Bearer ' + token;
+    }
 
     if (!(options.body instanceof FormData) && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
@@ -29,7 +58,7 @@ const API = {
       }
 
       if (!res.ok) {
-        const errorMsg = (data && data.error) || (data && data.msg) || res.statusText || 'Server error';
+        const errorMsg = (data && data.error) || (data && data.msg) || (data && data.message) || res.statusText || 'Server error';
         return { success: false, status: res.status, error: errorMsg, message: errorMsg, data };
       }
 

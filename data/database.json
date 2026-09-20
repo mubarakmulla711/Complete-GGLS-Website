@@ -22,7 +22,7 @@
       ],
       "active": true,
       "createdAt": "2026-09-20T10:16:32.649Z",
-      "updatedAt": "2026-09-20T10:16:32.649Z"
+      "updatedAt": "2026-09-20T10:33:49.941Z"
     },
     {
       "id": "P2",
@@ -106,11 +106,122 @@
       "packageId": "P1",
       "joinedAt": "2026-09-20T10:16:32.650Z",
       "activatedAt": "2026-09-20T10:16:32.650Z",
-      "updatedAt": "2026-09-20T10:16:32.650Z"
+      "updatedAt": "2026-09-20T10:34:01.608Z"
+    },
+    {
+      "id": "GG00002",
+      "name": "Suresh Kumar Updated",
+      "phone": "9876532601",
+      "email": "testuser_1789902027239@example.com",
+      "password": "UGFzc3dvcmRAMTIz",
+      "sponsorId": "GG00001",
+      "position": "left",
+      "parentId": "GG00001",
+      "leftMemberId": null,
+      "rightMemberId": null,
+      "leftBV": 0,
+      "rightBV": 0,
+      "leftRP": 0,
+      "rightRP": 0,
+      "leftCarryForward": 0,
+      "rightCarryForward": 0,
+      "leftMemberCount": 0,
+      "rightMemberCount": 0,
+      "referralIncome": 0,
+      "binaryIncome": 0,
+      "incomeWallet": 0,
+      "activationWallet": 0,
+      "successWithdrawals": 0,
+      "matchedPairs": 0,
+      "rank": null,
+      "achievementIds": [],
+      "status": "active",
+      "kycStatus": "VERIFIED",
+      "kycRejectionReason": "",
+      "kycSubmittedAt": "2026-09-20T11:00:27.327Z",
+      "kycReviewedAt": "2026-09-20T11:00:27.354Z",
+      "kycDocuments": [
+        {
+          "id": "KYCDOC_1789902027327_mfve",
+          "docType": "Aadhaar Card",
+          "docNumber": "8899-7766-5544",
+          "fileName": "aadhaar_card.pdf",
+          "fileRef": "KYCDOC_1789902027327_mfve",
+          "status": "VERIFIED",
+          "uploadedAt": "2026-09-20T11:00:27.327Z"
+        }
+      ],
+      "profile": {
+        "dob": "1992-05-15",
+        "gender": "male",
+        "address": "Plot 45, Vidyanagar",
+        "city": "Hubballi",
+        "state": "Karnataka",
+        "pincode": "580020",
+        "country": "India",
+        "photo": "uploads/profiles/USER_1789902027297_i5cukz.png"
+      },
+      "isAdmin": false,
+      "packageId": "P1",
+      "joinedAt": "2026-09-20T11:00:27.244Z",
+      "activatedAt": "2026-09-20T11:00:27.267Z",
+      "updatedAt": "2026-09-20T11:00:27.354Z"
     }
   ],
-  "kyc_documents": [],
+  "kyc_documents": [
+    {
+      "id": "KYCDOC_1789902027327_mfve",
+      "customerId": "GG00002",
+      "customerName": "Suresh Kumar Updated",
+      "customerEmail": "testuser_1789902027239@example.com",
+      "documentType": "Aadhaar Card",
+      "documentNumber": "8899-7766-5544",
+      "documentFile": "KYC_1789902027323_59yz29.pdf",
+      "documentOriginalName": "aadhaar_card.pdf",
+      "documentMime": "application/pdf",
+      "documentSize": 39,
+      "documentStatus": "VERIFIED",
+      "rejectionReason": "",
+      "uploadedAt": "2026-09-20T11:00:27.327Z",
+      "updatedAt": "2026-09-20T11:00:27.354Z"
+    }
+  ],
   "orders": [],
   "withdrawals": [],
-  "notifications": []
+  "notifications": [
+    {
+      "id": "NOTIF_1789902027327",
+      "type": "kyc_submission",
+      "title": "New KYC Document Submitted",
+      "message": "Customer Suresh Kumar Updated (GG00002) uploaded Aadhaar Card (8899-7766-5544). Status is UNDER REVIEW.",
+      "referenceId": "GG00002",
+      "customerName": "Suresh Kumar Updated",
+      "createdAt": "2026-09-20T11:00:27.327Z",
+      "read": true
+    },
+    {
+      "id": "NOTIF_1789902027244",
+      "type": "customer_registration",
+      "title": "New Customer Registration (Pending Approval)",
+      "message": "Customer Suresh Kumar (GG00002) registered with Sponsor GG00001. Account is PENDING approval.",
+      "referenceId": "GG00002",
+      "customerName": "Suresh Kumar",
+      "createdAt": "2026-09-20T11:00:27.244Z",
+      "read": true
+    }
+  ],
+  "sessions": {
+    "tok_adm_9768a394188ae9cad6d715a0036adf9efa7b293b0d63f6eb": {
+      "id": "admin",
+      "name": "Administrator",
+      "isAdmin": true,
+      "createdAt": "2026-09-20T11:00:27.234Z"
+    },
+    "tok_mbr_7f30565b867f59efa01a5093688153f513987f37823fad5d": {
+      "id": "GG00002",
+      "name": "Suresh Kumar",
+      "isAdmin": false,
+      "createdAt": "2026-09-20T11:00:27.279Z"
+    }
+  }
 }

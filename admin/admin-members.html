@@ -435,39 +435,72 @@
     if (currentPage < totalPages) mkBtn('<i class="fas fa-chevron-right"></i>', currentPage + 1, false);
   }
 
-  function activateCustomer(id){
-    const m = APP.getMemberById(id);
+  async function loadMembersFromAPI() {
+    try {
+      const res = await API.get('/api/customers');
+      const members = (res && res.success && Array.isArray(res.data)) ? res.data : (Array.isArray(res) ? res : null);
+      if (members && members.length > 0) {
+        APP.saveMembers(members);
+        allMembers = members.filter(m => !m.isAdmin);
+        document.getElementById('memberCountBadge').textContent = allMembers.length;
+        updateKPIs();
+        filterMembers();
+      }
+    } catch (e) {
+      console.warn('Could not fetch members from API:', e);
+    }
+  }
+
+  async function activateCustomer(id){
+    const m = APP.getMemberById(id) || allMembers.find(x => x.id === id);
     if (!m) return;
     if (!confirm(`Activate customer "${m.name}" (${m.id})?\n\nThis will approve their account and allow them to log into the customer dashboard.`)) return;
     
-    const res = APP.activateMember(id);
-    if (res.success) {
-      showToast(`Customer "${m.name}" activated successfully!`);
-      allMembers = APP.getMembers().filter(x => !x.isAdmin);
-      updateKPIs();
-      filterMembers();
-    } else {
-      showToast(res.msg || 'Activation failed', 'error');
+    showToast('Activating customer...', 'info');
+    try {
+      const res = await API.patch('/api/customers/' + encodeURIComponent(id) + '/status', { status: 'active' });
+      if (res && res.success) {
+        showToast(`Customer "${m.name}" activated successfully!`, 'success');
+        // Update local object immediately
+        m.status = 'active';
+        APP.updateMember(m);
+        await loadMembersFromAPI();
+        if (document.getElementById('viewModal').classList.contains('open')) {
+          viewMember(id);
+        }
+      } else {
+        showToast(res.error || res.message || 'Activation failed', 'error');
+      }
+    } catch(err) {
+      showToast('Activation failed: ' + err.message, 'error');
     }
   }
 
-  function deactivateCustomer(id){
-    const m = APP.getMemberById(id);
+  async function deactivateCustomer(id){
+    const m = APP.getMemberById(id) || allMembers.find(x => x.id === id);
     if (!m) return;
     if (!confirm(`Deactivate customer "${m.name}" (${m.id})?\n\nThis will block their access and prevent login until reactivated.`)) return;
 
-    const res = APP.deactivateMember(id);
-    if (res.success) {
-      showToast(`Customer "${m.name}" has been deactivated.`, 'warning');
-      allMembers = APP.getMembers().filter(x => !x.isAdmin);
-      updateKPIs();
-      filterMembers();
-    } else {
-      showToast(res.msg || 'Deactivation failed', 'error');
+    showToast('Deactivating customer...', 'info');
+    try {
+      const res = await API.patch('/api/customers/' + encodeURIComponent(id) + '/status', { status: 'inactive' });
+      if (res && res.success) {
+        showToast(`Customer "${m.name}" has been deactivated.`, 'warning');
+        m.status = 'inactive';
+        APP.updateMember(m);
+        await loadMembersFromAPI();
+        if (document.getElementById('viewModal').classList.contains('open')) {
+          viewMember(id);
+        }
+      } else {
+        showToast(res.error || res.message || 'Deactivation failed', 'error');
+      }
+    } catch(err) {
+      showToast('Deactivation failed: ' + err.message, 'error');
     }
   }
 
-  function reviewKYC(memberId, status){
+  async function reviewKYC(memberId, status){
     let reason = '';
     if (status === 'REJECTED') {
       const reasonInput = document.getElementById('kycRejectReason');
@@ -478,15 +511,20 @@
       }
     }
 
-    const res = APP.reviewCustomerKYC(memberId, status, reason);
-    if (res.success) {
-      showToast(`KYC status updated to ${status}!`);
-      allMembers = APP.getMembers().filter(x => !x.isAdmin);
-      updateKPIs();
-      filterMembers();
-      viewMember(memberId);
-    } else {
-      showToast(res.msg || 'Failed to review KYC', 'error');
+    try {
+      const res = await API.put('/api/customers/' + encodeURIComponent(memberId) + '/kyc/review', {
+        status,
+        reason
+      });
+      if (res && res.success) {
+        showToast(`KYC status updated to ${status}!`, 'success');
+        await loadMembersFromAPI();
+        viewMember(memberId);
+      } else {
+        showToast(res.error || res.message || 'Failed to review KYC', 'error');
+      }
+    } catch (err) {
+      showToast('KYC review error: ' + err.message, 'error');
     }
   }
 
@@ -497,17 +535,34 @@
     }
   }
 
-  function viewMember(id){
-    const m = APP.getMemberById(id);
+  async function viewMember(id){
+    let m = APP.getMemberById(id) || allMembers.find(x => x.id === id);
     if (!m) return;
+
+    // Fetch latest KYC records from backend
+    try {
+      const kycRes = await API.get('/api/customers/' + encodeURIComponent(id) + '/kyc');
+      if (kycRes && (kycRes.customerId || kycRes.success)) {
+        const kData = kycRes.data || kycRes;
+        m.kycStatus = kData.kycStatus || m.kycStatus;
+        m.kycRejectionReason = kData.rejectionReason || m.kycRejectionReason;
+        if (Array.isArray(kData.documents)) {
+          m.kycDocuments = kData.documents;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not fetch kyc for viewMember:', e);
+    }
+
     const pkg = prodMap[m.packageId];
     const mOrders = APP.getMemberOrders(m.id);
     const profile = m.profile || {};
     const kycDocs = m.kycDocuments || [];
     const kycStatus = m.kycStatus || 'NOT_SUBMITTED';
 
-    const photoHtml = profile.photo
-      ? `<img src="${profile.photo}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--gold);" />`
+    const photoSrc = profile.photo ? (profile.photo.startsWith('http') || profile.photo.startsWith('/') || profile.photo.startsWith('data:') ? profile.photo : '/' + profile.photo) : '';
+    const photoHtml = photoSrc
+      ? `<img src="${photoSrc}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--gold);" />`
       : `<div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#071a82,#0b2ac9);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.8rem;border:2px solid var(--gold);">${(m.name||'U').charAt(0).toUpperCase()}</div>`;
 
     // KYC Review HTML
@@ -515,19 +570,22 @@
     if (kycDocs.length > 0) {
       kycHtml = `
         <div style="margin-top:0.5rem;">
-          ${kycDocs.map((doc, idx) => `
+          ${kycDocs.map((doc, idx) => {
+            const docId = doc.id || doc.fileRef;
+            const docUrl = docId ? `/api/kyc/document/${encodeURIComponent(docId)}` : (doc.fileData || '#');
+            return `
             <div class="kyc-doc-card">
               <div>
-                <strong>${doc.docType || 'Document'}</strong>: <span style="font-family:monospace;color:#1e293b;">${doc.docNumber || '—'}</span>
+                <strong>${doc.documentType || doc.docType || 'Document'}</strong>: <span style="font-family:monospace;color:#1e293b;">${doc.documentNumber || doc.docNumber || '—'}</span>
                 <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">
-                  File: <strong>${doc.fileName || 'Attached document'}</strong> &bull; Uploaded: ${doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString('en-IN') : '—'}
+                  File: <strong>${doc.documentOriginalName || doc.fileName || 'Attached document'}</strong> &bull; Uploaded: ${doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString('en-IN') : '—'}
                 </div>
               </div>
               <div>
-                ${doc.fileData ? `<a href="${doc.fileData}" target="_blank" class="btn-xs btn-view"><i class="fas fa-external-link-alt"></i> View Document</a>` : '<span style="font-size:0.75rem;color:#94a3b8;">No preview</span>'}
+                <a href="${docUrl}" target="_blank" class="btn-xs btn-view"><i class="fas fa-external-link-alt"></i> View Document</a>
               </div>
             </div>
-          `).join('')}
+          `;}).join('')}
         </div>
       `;
     } else {
@@ -694,6 +752,7 @@
   filteredMembers = [...allMembers];
   renderTable();
   renderPagination();
+  loadMembersFromAPI();
 </script>
 </body>
 </html>

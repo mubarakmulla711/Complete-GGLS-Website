@@ -108,6 +108,7 @@
   </div>
 </div>
 
+<script src="assets/js/api.js"></script>
 <script src="assets/js/app.js"></script>
 <script>
 function showToast(msg,type='success'){
@@ -127,9 +128,18 @@ function generatePreviewId(){
 document.getElementById('autoId').textContent=generatePreviewId();
 
 // Populate packages
-function populatePackages(){
+async function populatePackages(){
   const sel=document.getElementById('packageId');
-  APP.getProducts().filter(p=>p.active).forEach(p=>{
+  let prods = [];
+  try {
+    const res = await API.get('/api/products');
+    if (res && res.success && Array.isArray(res.data)) prods = res.data;
+    else if (Array.isArray(res)) prods = res;
+  } catch(e) {}
+  if (!prods.length) prods = APP.getProducts();
+
+  sel.innerHTML = '<option value="">Select a Package</option>';
+  prods.filter(p=>p.active !== false).forEach(p=>{
     const opt=document.createElement('option');
     opt.value=p.id;
     opt.textContent=`${p.name} (BV: ${p.bv} | RP: ${p.rp})`;
@@ -147,9 +157,11 @@ function showPackageDetails(){
     const refInc = p.referralIncome || (p.price >= 10000 ? 1020 : 510);
     const gross = p.grossReferral || (p.price >= 10000 ? 1200 : 600);
     const tax = p.serviceTax || (p.price >= 10000 ? 180 : 90);
+    const items = Array.isArray(p.items) ? p.items : (typeof p.items === 'string' ? p.items.split('\n') : []);
     box.innerHTML=`<strong>Package Includes:</strong><ul style="margin-top:.4rem;">
-    ${p.items.map(it=>`<li>✓ ${it}</li>`).join('')}
+    ${items.map(it=>`<li>✓ ${it}</li>`).join('')}
   </ul><div style="margin-top:.5rem;"><strong>BV: ${p.bv} | RP: ${p.rp} | Net Referral Income: <span style="color:var(--green);font-size:1rem;">${APP.fmtINR(refInc)}</span></strong> <small style="color:var(--gray);">(Gross ${APP.fmtINR(gross)} − ${APP.fmtINR(tax)} Service Charge & Tax)</small></div>`;
+    box.style.display = 'block';
 }
 
 let sponsorValid=false;
@@ -178,7 +190,7 @@ if (posParam) {
   document.getElementById('position').value = posParam.toLowerCase();
 }
 
-function doRegister(){
+async function doRegister(){
   const sponsorId=document.getElementById('sponsorId').value.trim().toUpperCase();
   const position=document.getElementById('position').value;
   const name=document.getElementById('memberName').value.trim();
@@ -215,20 +227,38 @@ function doRegister(){
     return;
   }
 
-  const result=APP.registerMember({sponsorId,position,name,email,phone,password,productId});
-  if(result.success){
-    document.getElementById('formStep1').style.display='none';
-    document.getElementById('formSuccess').style.display='block';
-    document.getElementById('newMemberId').textContent=result.memberId;
-    let c=5;
-    const timer=setInterval(()=>{
-      c--;
-      const cdEl=document.getElementById('countdown');
-      if(cdEl) cdEl.textContent=c;
-      if(c<=0){ clearInterval(timer); window.location.href='login.html'; }
-    },1000);
-  } else {
-    errEl.innerHTML=`<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${result.msg}</div>`;
+  const btn = document.querySelector('button[onclick="doRegister()"]');
+  const origText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering Account...';
+
+  try {
+    const res = await API.post('/api/customers/register', {
+      sponsorId, position, name, email, phone, password, productId
+    });
+
+    if (res && res.success) {
+      // Synchronize with local storage mirror
+      APP.registerMember({ sponsorId, position, name, email, phone, password, productId });
+
+      document.getElementById('formStep1').style.display='none';
+      document.getElementById('formSuccess').style.display='block';
+      document.getElementById('newMemberId').textContent=res.memberId;
+      let c=5;
+      const timer=setInterval(()=>{
+        c--;
+        const cdEl=document.getElementById('countdown');
+        if(cdEl) cdEl.textContent=c;
+        if(c<=0){ clearInterval(timer); window.location.href='login.html'; }
+      },1000);
+    } else {
+      errEl.innerHTML=`<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${(res && (res.error || res.msg || res.message)) || 'Registration failed'}</div>`;
+    }
+  } catch(err) {
+    errEl.innerHTML=`<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${err.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origText;
   }
 }
 </script>

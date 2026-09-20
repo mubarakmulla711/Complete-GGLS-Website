@@ -88,7 +88,8 @@ function showToast(msg,type){
 }
 if(!APP.requireMember('login.html')){throw new Error('redirect');}
 var session=APP.getCurrentSession();
-var user=APP.getMemberById(session.id) || (APP.getMembers && APP.getMembers()[0]) || { id:'GG00001', name:'Great Goals Admin', status:'active' };
+if (!session) { window.location.href='login.html'; }
+var user=APP.getMemberById(session.id) || { id: session.id, name: 'Member', status: 'active' };
 var initials=(user.name||'GG').split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
 document.getElementById('topAvatar').textContent=initials;
 document.getElementById('topName').textContent=user.name;

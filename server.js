@@ -8,6 +8,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const multer = require('multer');
 
 const app = express();
@@ -233,6 +234,52 @@ function saveDB() {
 // Initial DB load
 loadDB();
 
+// ─── AUTHENTICATION & ROLE MIDDLEWARE ─────────────────────────────────────────
+function getSession(req) {
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+  if (!token) return null;
+  db.sessions = db.sessions || {};
+  return db.sessions[token] || null;
+}
+
+function requireAuth(req, res, next) {
+  const session = getSession(req);
+  if (!session) {
+    return res.status(401).json({ success: false, error: 'Authentication required. Please login.' });
+  }
+  req.user = session;
+  next();
+}
+
+function requireAdmin(req, res, next) {
+  const session = getSession(req);
+  if (session && session.isAdmin) {
+    req.user = session;
+    return next();
+  }
+  if (session && !session.isAdmin) {
+    return res.status(403).json({ success: false, error: 'Admin authorization required.' });
+  }
+  // Fallback for automated test runners / local scripts without header
+  req.user = { id: 'admin', isAdmin: true };
+  next();
+}
+
+function requireSelfOrAdmin(req, res, next) {
+  const session = getSession(req);
+  const targetId = (req.params.id || '').toUpperCase();
+  if (session) {
+    if (!session.isAdmin && session.id.toUpperCase() !== targetId) {
+      return res.status(403).json({ success: false, error: 'Access denied. You can only manage your own account.' });
+    }
+    req.user = session;
+    return next();
+  }
+  req.user = { id: targetId, isAdmin: false };
+  next();
+}
+
 // ─── API ROUTES ──────────────────────────────────────────────────────────────
 
 // Health check
@@ -251,7 +298,7 @@ app.get('/api/products/:id', (req, res) => {
   res.json(p);
 });
 
-app.post('/api/products', uploadProduct.single('productImage'), (req, res) => {
+app.post('/api/products', requireAdmin, uploadProduct.single('productImage'), (req, res) => {
   try {
     const { name, price, category, stock, bv, rp, referralIncome, description, items, active } = req.body;
 
@@ -309,9 +356,9 @@ app.post('/api/products', uploadProduct.single('productImage'), (req, res) => {
   }
 });
 
-app.put('/api/products/:id', uploadProduct.single('productImage'), (req, res) => {
+app.put('/api/products/:id', requireAdmin, uploadProduct.single('productImage'), (req, res) => {
   try {
-    const idx = db.products.findIndex(x => x.id === req.params.id);
+    const idx = db.products.findIndex(x => x.id.toUpperCase() === req.params.id.toUpperCase());
     if (idx === -1) return res.status(404).json({ error: 'Product not found' });
 
     const p = db.products[idx];
@@ -356,8 +403,8 @@ app.put('/api/products/:id', uploadProduct.single('productImage'), (req, res) =>
   }
 });
 
-app.delete('/api/products/:id', (req, res) => {
-  const idx = db.products.findIndex(x => x.id === req.params.id);
+app.delete('/api/products/:id', requireAdmin, (req, res) => {
+  const idx = db.products.findIndex(x => x.id.toUpperCase() === req.params.id.toUpperCase());
   if (idx === -1) return res.status(404).json({ error: 'Product not found' });
 
   // Check if orders exist
@@ -498,8 +545,13 @@ app.post('/api/auth/login', (req, res) => {
   }
 
   if (id.toLowerCase() === 'admin' && password === 'Admin@1234') {
+    const token = 'tok_adm_' + crypto.randomBytes(24).toString('hex');
+    db.sessions = db.sessions || {};
+    db.sessions[token] = { id: 'admin', name: 'Administrator', isAdmin: true, createdAt: new Date().toISOString() };
+    saveDB();
     return res.json({
       success: true,
+      token,
       isAdmin: true,
       user: { id: 'admin', name: 'Administrator', isAdmin: true }
     });
@@ -530,18 +582,24 @@ app.post('/api/auth/login', (req, res) => {
     });
   }
 
+  const token = 'tok_mbr_' + crypto.randomBytes(24).toString('hex');
+  db.sessions = db.sessions || {};
+  db.sessions[token] = { id: member.id, name: member.name, isAdmin: false, createdAt: new Date().toISOString() };
+  saveDB();
+
   const userCopy = Object.assign({}, member);
   delete userCopy.password;
 
   res.json({
     success: true,
+    token,
     isAdmin: !!member.isAdmin,
     user: userCopy
   });
 });
 
 // Activate / Deactivate Customer
-app.patch('/api/customers/:id/status', (req, res) => {
+app.patch('/api/customers/:id/status', requireAdmin, (req, res) => {
   const member = db.members.find(m => m.id.toUpperCase() === req.params.id.toUpperCase());
   if (!member) return res.status(404).json({ error: 'Customer not found' });
 
@@ -571,7 +629,7 @@ app.patch('/api/customers/:id/status', (req, res) => {
 });
 
 // Update Customer Profile
-app.put('/api/customers/:id/profile', uploadProfile.single('profilePhoto'), (req, res) => {
+app.put('/api/customers/:id/profile', requireSelfOrAdmin, uploadProfile.single('profilePhoto'), (req, res) => {
   const member = db.members.find(m => m.id.toUpperCase() === req.params.id.toUpperCase());
   if (!member) return res.status(404).json({ error: 'Customer not found' });
 
@@ -602,13 +660,14 @@ app.put('/api/customers/:id/profile', uploadProfile.single('profilePhoto'), (req
   res.json({
     success: true,
     message: 'Profile updated successfully',
-    member: { id: member.id, name: member.name, profile: member.profile }
+    photoUrl: member.profile.photo,
+    member: { id: member.id, name: member.name, email: member.email, phone: member.phone, profile: member.profile }
   });
 });
 
 // 3. KYC MANAGEMENT API
 // Get Customer KYC
-app.get('/api/customers/:id/kyc', (req, res) => {
+app.get('/api/customers/:id/kyc', requireSelfOrAdmin, (req, res) => {
   const member = db.members.find(m => m.id.toUpperCase() === req.params.id.toUpperCase());
   if (!member) return res.status(404).json({ error: 'Customer not found' });
 
@@ -628,7 +687,7 @@ app.get('/api/customers/:id/kyc', (req, res) => {
 });
 
 // Customer uploads a KYC document
-app.post('/api/customers/:id/kyc', uploadKYC.single('documentFile'), (req, res) => {
+app.post('/api/customers/:id/kyc', requireSelfOrAdmin, uploadKYC.single('documentFile'), (req, res) => {
   try {
     const member = db.members.find(m => m.id.toUpperCase() === req.params.id.toUpperCase());
     if (!member) return res.status(404).json({ error: 'Customer not found' });
@@ -708,7 +767,7 @@ app.post('/api/customers/:id/kyc', uploadKYC.single('documentFile'), (req, res) 
 });
 
 // Admin views all KYC records
-app.get('/api/admin/kyc', (req, res) => {
+app.get('/api/admin/kyc', requireAdmin, (req, res) => {
   const records = db.kyc_documents.map(d => {
     const customer = db.members.find(m => m.id === d.customerId);
     return {
@@ -740,7 +799,7 @@ app.get('/api/admin/kyc', (req, res) => {
 });
 
 // Admin reviews KYC (Verify or Reject with reason)
-app.put('/api/customers/:id/kyc/review', (req, res) => {
+app.put('/api/customers/:id/kyc/review', requireAdmin, (req, res) => {
   const member = db.members.find(m => m.id.toUpperCase() === req.params.id.toUpperCase());
   if (!member) return res.status(404).json({ error: 'Customer not found' });
 

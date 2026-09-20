@@ -407,6 +407,12 @@ const APP = {
     const notifs = this.getNotifications();
     const n = notifs.find(item => item.id === notifId);
     if (n) { n.read = true; this.saveNotifications(notifs); }
+    if (typeof API !== 'undefined') {
+      API.patch('/api/notifications/' + encodeURIComponent(notifId) + '/read').catch(()=>{});
+    }
+  },
+  markNotificationAsRead(notifId) {
+    return this.markNotificationRead(notifId);
   },
   markOrderNotificationsRead(orderId) {
     const notifs = this.getNotifications();
@@ -415,6 +421,12 @@ const APP = {
   },
   clearNotifications() {
     this.saveNotifications([]);
+    if (typeof API !== 'undefined') {
+      API.post('/api/notifications/read-all').catch(()=>{});
+    }
+  },
+  markAllNotificationsAsRead() {
+    return this.clearNotifications();
   },
 
   // ─── Binary Tree BV Propagation ────────────────────────────────────────────
@@ -785,7 +797,16 @@ const APP = {
     const s = this.getCurrentSession();
     if (!s) return null;
     if (s.isAdmin) return { id:'admin', name:'Administrator', isAdmin:true };
-    return this.getMemberById(s.id);
+    const m = this.getMemberById(s.id);
+    if (m) return m;
+    return {
+      id: s.id,
+      name: s.name || s.id,
+      status: 'active',
+      kycStatus: 'NOT_SUBMITTED',
+      profile: { photo: '' },
+      kycDocuments: []
+    };
   },
 
   isLoggedIn()   { return !!this.getCurrentSession(); },
@@ -809,7 +830,7 @@ const APP = {
     if (!s) { window.location.href = redirectTo; return false; }
     if (s.isAdmin) return true;
     const m = this.getMemberById(s.id);
-    if (!m || m.status !== 'active') {
+    if (m && m.status === 'inactive') {
       this.logout();
       window.location.href = redirectTo;
       return false;

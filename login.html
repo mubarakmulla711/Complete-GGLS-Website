@@ -60,6 +60,7 @@
   </div>
 </div>
 
+<script src="assets/js/api.js"></script>
 <script src="assets/js/app.js"></script>
 <script>
 function showToast(msg, type='success'){
@@ -92,41 +93,85 @@ function switchTab(tab){
   }
 }
 
-function doLogin(){
+async function doLogin(){
   const id=document.getElementById('loginId').value.trim();
   const pass=document.getElementById('loginPass').value;
   const errEl=document.getElementById('loginError');
+  const btn=document.querySelector('#loginForm button.btn-primary');
   errEl.innerHTML='';
+
   if(!id||!pass){
     errEl.innerHTML='<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Please enter Member ID and Password.</div>';
     return;
   }
-  const result=APP.login(id,pass);
-  if(result.success){
-    showToast('Login successful! Redirecting...');
-    setTimeout(()=>{
-      if(result.isAdmin) window.location.href='admin/admin-dashboard.html';
-      else window.location.href='dashboard.html';
-    },800);
-  } else {
-    if (result.pending) {
-      errEl.innerHTML=`<div class="alert alert-warning" style="background:#fef3c7;color:#92400e;border:1.5px solid #f59e0b;padding:0.9rem 1rem;line-height:1.5;border-radius:8px;">
-        <div style="display:flex;align-items:flex-start;gap:0.6rem;">
-          <i class="fas fa-user-clock" style="font-size:1.25rem;color:#d97706;margin-top:2px;"></i>
-          <div>
-            <strong style="display:block;font-size:0.95rem;margin-bottom:3px;color:#78350f;">Account Pending Approval</strong>
-            <span style="font-size:0.86rem;">Your account has been registered successfully and is currently waiting for administrator approval. You will be able to access your account after the administrator activates it.</span>
-          </div>
-        </div>
-      </div>`;
-    } else if (result.inactive) {
-      errEl.innerHTML=`<div class="alert alert-error" style="background:#fee2e2;color:#991b1b;border:1.5px solid #f87171;padding:0.9rem 1rem;line-height:1.45;border-radius:8px;">
-        <i class="fas fa-ban" style="font-size:1.1rem;margin-right:0.4rem;color:#dc2626;"></i>
-        <strong>Account Deactivated:</strong> ${result.msg}
-      </div>`;
+
+  const origBtnHtml = btn ? btn.innerHTML : '';
+  if(btn){
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+  }
+
+  try {
+    const res = await API.post('/api/auth/login', { id, password: pass });
+
+    if(res && res.success){
+      if(res.token) API.setToken(res.token);
+
+      const sessionObj = {
+        id: res.user ? res.user.id : (res.isAdmin ? 'admin' : id),
+        isAdmin: !!res.isAdmin
+      };
+      localStorage.setItem('gg_current_user', JSON.stringify(sessionObj));
+
+      if(res.user && !res.isAdmin){
+        const mems = APP.getMembers();
+        const idx = mems.findIndex(m => m.id.toUpperCase() === res.user.id.toUpperCase());
+        if(idx !== -1){
+          mems[idx] = Object.assign(mems[idx], res.user);
+        } else {
+          mems.push(res.user);
+        }
+        APP.saveMembers(mems);
+      }
+
+      showToast('Login successful! Redirecting...', 'success');
+      setTimeout(()=>{
+        if(res.isAdmin) window.location.href='admin/admin-dashboard.html';
+        else window.location.href='dashboard.html';
+      }, 700);
     } else {
-      errEl.innerHTML=`<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${result.msg}</div>`;
+      if(btn){
+        btn.disabled = false;
+        btn.innerHTML = origBtnHtml;
+      }
+      const isPending = res.pending || (res.message && res.message.toLowerCase().includes('pending')) || (res.error && res.error.toLowerCase().includes('pending'));
+      const isInactive = res.inactive || (res.message && res.message.toLowerCase().includes('inactive')) || (res.error && res.error.toLowerCase().includes('inactive'));
+
+      if(isPending){
+        errEl.innerHTML=`<div class="alert alert-warning" style="background:#fef3c7;color:#92400e;border:1.5px solid #f59e0b;padding:0.9rem 1rem;line-height:1.5;border-radius:8px;">
+          <div style="display:flex;align-items:flex-start;gap:0.6rem;">
+            <i class="fas fa-user-clock" style="font-size:1.25rem;color:#d97706;margin-top:2px;"></i>
+            <div>
+              <strong style="display:block;font-size:0.95rem;margin-bottom:3px;color:#78350f;">Account Pending Approval</strong>
+              <span style="font-size:0.86rem;">${res.msg || res.message || res.error || 'Your account has been registered successfully and is currently waiting for administrator approval. You will be able to access your account after the administrator activates it.'}</span>
+            </div>
+          </div>
+        </div>`;
+      } else if(isInactive){
+        errEl.innerHTML=`<div class="alert alert-error" style="background:#fee2e2;color:#991b1b;border:1.5px solid #f87171;padding:0.9rem 1rem;line-height:1.45;border-radius:8px;">
+          <i class="fas fa-ban" style="font-size:1.1rem;margin-right:0.4rem;color:#dc2626;"></i>
+          <strong>Account Deactivated:</strong> ${res.msg || res.message || res.error || 'Your account is deactivated.'}
+        </div>`;
+      } else {
+        errEl.innerHTML=`<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${res.msg || res.error || res.message || 'Invalid credentials. Please try again.'}</div>`;
+      }
     }
+  } catch(err){
+    if(btn){
+      btn.disabled = false;
+      btn.innerHTML = origBtnHtml;
+    }
+    errEl.innerHTML=`<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Login failed: ${err.message}</div>`;
   }
 }
 

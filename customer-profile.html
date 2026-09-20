@@ -369,25 +369,32 @@ function showToast(msg, type='success'){
 if(!APP.requireMember('login.html')){ throw new Error('redirect'); }
 
 let session = APP.getCurrentSession();
-let user = APP.getMemberById(session.id);
-if (!user) { APP.logout(); window.location.href='login.html'; }
+if (!session) { window.location.href='login.html'; }
+
+let user = APP.getMemberById(session.id) || { id: session.id, name: 'Customer', status: 'active', profile: {} };
+let selectedPhotoFile = null;
 
 function populateProfile(){
-  user = APP.getMemberById(session.id);
   const profile = user.profile || {};
 
   // Topbar
   const initials = (user.name||'GG').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-  document.getElementById('topAvatar').textContent = initials;
-  document.getElementById('topName').textContent = user.name;
-  document.getElementById('sidebarUser').innerHTML = `
-    <div class="sidebar-user-id">${user.id}</div>
-    <div class="sidebar-user-name">${user.name}</div>
-    <span class="sidebar-status">${user.status}</span>
-  `;
+  const topAvatar = document.getElementById('topAvatar');
+  if (topAvatar) topAvatar.textContent = initials;
+  const topName = document.getElementById('topName');
+  if (topName) topName.textContent = user.name;
+  
+  const sidebarUser = document.getElementById('sidebarUser');
+  if (sidebarUser) {
+    sidebarUser.innerHTML = `
+      <div class="sidebar-user-id">${user.id}</div>
+      <div class="sidebar-user-name">${user.name}</div>
+      <span class="sidebar-status">${user.status || 'active'}</span>
+    `;
+  }
 
   // Banner
-  document.getElementById('bannerName').textContent = user.name;
+  document.getElementById('bannerName').textContent = user.name || 'Member';
   document.getElementById('bannerId').textContent = user.id;
   document.getElementById('bannerJoined').textContent = user.joinedAt ? new Date(user.joinedAt).toLocaleDateString('en-IN') : '—';
 
@@ -425,7 +432,10 @@ function populateProfile(){
   // Avatar display
   const avatarWrap = document.getElementById('avatarWrap');
   if (profile.photo) {
-    avatarWrap.innerHTML = `<img src="${profile.photo}" alt="Profile Photo" />`;
+    const photoSrc = profile.photo.startsWith('http') || profile.photo.startsWith('data:') || profile.photo.startsWith('/') 
+      ? profile.photo 
+      : '/' + profile.photo;
+    avatarWrap.innerHTML = `<img src="${photoSrc}" alt="Profile Photo" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
     document.getElementById('photoBase64').value = profile.photo;
   } else {
     avatarWrap.innerHTML = `<div class="avatar-placeholder">${initials}</div>`;
@@ -449,30 +459,48 @@ function populateProfile(){
   document.getElementById('infoPosition').textContent = user.position || '—';
   document.getElementById('infoRank').textContent = user.rank || 'Starter';
   const pkg = APP.getProductById(user.packageId);
-  document.getElementById('infoPackage').textContent = pkg ? pkg.name : 'None';
+  document.getElementById('infoPackage').textContent = pkg ? pkg.name : (user.packageId || 'None');
   document.getElementById('infoAccStatus').textContent = (user.status || 'Active').toUpperCase();
   document.getElementById('infoKycStatus').textContent = kyc;
+}
+
+async function loadProfileFromBackend(){
+  try {
+    const res = await API.get('/api/customers/' + encodeURIComponent(session.id));
+    const memberData = (res && res.id) ? res : (res && res.data ? res.data : null);
+    if (memberData && memberData.id) {
+      user = Object.assign(user, memberData);
+      // Synchronize in local storage cache
+      const mems = APP.getMembers();
+      const idx = mems.findIndex(m => m.id.toUpperCase() === user.id.toUpperCase());
+      if (idx !== -1) mems[idx] = Object.assign(mems[idx], user);
+      else mems.push(user);
+      APP.saveMembers(mems);
+      populateProfile();
+    }
+  } catch (err) {
+    console.warn('Could not sync user profile from server:', err);
+  }
 }
 
 function handlePhotoUpload(e){
   const file = e.target.files[0];
   if (!file) return;
-  if (file.size > 2 * 1024 * 1024) {
-    showToast('Photo file size must be less than 2MB', 'error');
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('Photo file size must be less than 5MB', 'error');
     e.target.value = '';
     return;
   }
+  selectedPhotoFile = file;
   const reader = new FileReader();
   reader.onload = function(evt) {
-    const b64 = evt.target.result;
-    document.getElementById('photoBase64').value = b64;
-    document.getElementById('avatarWrap').innerHTML = `<img src="${b64}" alt="Profile Photo" />`;
-    showToast('Photo uploaded! Click Save Profile to apply changes.');
+    document.getElementById('avatarWrap').innerHTML = `<img src="${evt.target.result}" alt="Profile Photo" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+    showToast('Photo selected! Click "Save Profile Details" to save persistently.', 'success');
   };
   reader.readAsDataURL(file);
 }
 
-function saveProfile(e){
+async function saveProfile(e){
   e.preventDefault();
   const name = document.getElementById('profName').value.trim();
   const email = document.getElementById('profEmail').value.trim();
@@ -484,7 +512,6 @@ function saveProfile(e){
   const city = document.getElementById('profCity').value.trim();
   const pincode = document.getElementById('profPincode').value.trim();
   const address = document.getElementById('profAddress').value.trim();
-  const photo = document.getElementById('photoBase64').value;
 
   if (!name) { showToast('Name is required', 'error'); return; }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -494,20 +521,66 @@ function saveProfile(e){
     showToast('Valid 10-digit mobile number is required', 'error'); return;
   }
 
-  const updateData = {
-    name, email, phone, dob, gender, country, state, city, pincode, address, photo
-  };
+  const submitBtn = document.querySelector('form button.btn-save-profile');
+  const origBtnText = submitBtn ? submitBtn.innerHTML : '';
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving to Database...';
+  }
 
-  const res = APP.updateCustomerProfile(user.id, updateData);
-  if (res.success) {
-    showToast('Profile updated successfully!');
-    populateProfile();
-  } else {
-    showToast(res.msg || 'Failed to update profile', 'error');
+  try {
+    const fd = new FormData();
+    fd.append('name', name);
+    fd.append('email', email);
+    fd.append('phone', phone);
+    fd.append('dob', dob);
+    fd.append('gender', gender);
+    fd.append('country', country);
+    fd.append('state', state);
+    fd.append('city', city);
+    fd.append('pincode', pincode);
+    fd.append('address', address);
+    if (selectedPhotoFile) {
+      fd.append('profilePhoto', selectedPhotoFile);
+    } else {
+      const existingPhoto = document.getElementById('photoBase64').value;
+      if (existingPhoto) fd.append('photo', existingPhoto);
+    }
+
+    const res = await API.put('/api/customers/' + encodeURIComponent(user.id) + '/profile', fd);
+
+    if (res && res.success) {
+      selectedPhotoFile = null;
+      if (res.member) {
+        user = Object.assign(user, res.member);
+      } else if (res.photoUrl) {
+        user.profile = user.profile || {};
+        user.profile.photo = res.photoUrl;
+      }
+      // Update localStorage cache
+      const mems = APP.getMembers();
+      const idx = mems.findIndex(m => m.id.toUpperCase() === user.id.toUpperCase());
+      if (idx !== -1) mems[idx] = Object.assign(mems[idx], user);
+      else mems.push(user);
+      APP.saveMembers(mems);
+
+      showToast('Profile updated and saved successfully!', 'success');
+      populateProfile();
+    } else {
+      showToast(res.error || res.message || 'Failed to update profile', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while saving profile: ' + err.message, 'error');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = origBtnText;
+    }
   }
 }
 
 populateProfile();
+loadProfileFromBackend();
 </script>
 </body>
 </html>

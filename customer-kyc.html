@@ -270,8 +270,8 @@ function showToast(msg, type='success'){
 if(!APP.requireMember('login.html')){ throw new Error('redirect'); }
 
 let session = APP.getCurrentSession();
-let user = APP.getMemberById(session.id);
-if (!user) { APP.logout(); window.location.href='login.html'; }
+if (!session) { window.location.href='login.html'; }
+let user = APP.getMemberById(session.id) || { id: session.id, name: 'Member', status: 'active', kycDocuments: [] };
 
 let selectedDocFile = null;
 
