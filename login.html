@@ -109,8 +109,18 @@ function doLogin(){
       else window.location.href='dashboard.html';
     },800);
   } else {
-    if (result.inactive) {
-      errEl.innerHTML=`<div class="alert alert-error" style="background:#fee2e2;color:#991b1b;border:1.5px solid #f87171;padding:0.9rem 1rem;line-height:1.45;">
+    if (result.pending) {
+      errEl.innerHTML=`<div class="alert alert-warning" style="background:#fef3c7;color:#92400e;border:1.5px solid #f59e0b;padding:0.9rem 1rem;line-height:1.5;border-radius:8px;">
+        <div style="display:flex;align-items:flex-start;gap:0.6rem;">
+          <i class="fas fa-user-clock" style="font-size:1.25rem;color:#d97706;margin-top:2px;"></i>
+          <div>
+            <strong style="display:block;font-size:0.95rem;margin-bottom:3px;color:#78350f;">Account Pending Approval</strong>
+            <span style="font-size:0.86rem;">Your account has been registered successfully and is currently waiting for administrator approval. You will be able to access your account after the administrator activates it.</span>
+          </div>
+        </div>
+      </div>`;
+    } else if (result.inactive) {
+      errEl.innerHTML=`<div class="alert alert-error" style="background:#fee2e2;color:#991b1b;border:1.5px solid #f87171;padding:0.9rem 1rem;line-height:1.45;border-radius:8px;">
         <i class="fas fa-ban" style="font-size:1.1rem;margin-right:0.4rem;color:#dc2626;"></i>
         <strong>Account Deactivated:</strong> ${result.msg}
       </div>`;

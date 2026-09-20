@@ -52,6 +52,10 @@
         <input type="text" class="form-control" id="memberName" placeholder="Enter your full name">
       </div>
       <div class="form-group">
+        <label><i class="fas fa-envelope"></i> Email Address <span style="color:var(--red)">*</span></label>
+        <input type="email" class="form-control" id="email" placeholder="Enter your email address">
+      </div>
+      <div class="form-group">
         <label><i class="fas fa-phone"></i> Phone Number <span style="color:var(--red)">*</span></label>
         <input type="tel" class="form-control" id="phone" placeholder="Enter 10-digit phone number" maxlength="10">
       </div>
@@ -77,10 +81,25 @@
     </div>
 
     <div id="formSuccess" style="display:none;text-align:center;padding:1rem 0;">
-      <div style="font-size:3rem;margin-bottom:1rem;">🎉</div>
-      <h3 style="color:var(--green);font-size:1.3rem;font-weight:700;">Registration Successful!</h3>
-      <p style="color:var(--gray);margin:.5rem 0 1rem;">Your Member ID: <strong id="newMemberId" style="color:var(--primary);font-size:1.1rem;"></strong></p>
-      <p style="font-size:.85rem;color:var(--gray);">Redirecting to login in <strong id="countdown">3</strong> seconds...</p>
+      <div style="width:64px;height:64px;border-radius:50%;background:#dbeafe;color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1rem;">
+        <i class="fas fa-user-clock"></i>
+      </div>
+      <h3 style="color:var(--primary);font-size:1.3rem;font-weight:700;">Registration Submitted!</h3>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:1rem;margin:1rem 0;text-align:left;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+          <span style="color:var(--gray);font-size:0.85rem;">Member ID:</span>
+          <strong id="newMemberId" style="color:var(--primary);font-size:1.05rem;"></strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+          <span style="color:var(--gray);font-size:0.85rem;">Account Status:</span>
+          <span class="badge badge-warning" style="background:#fef3c7;color:#92400e;font-weight:700;padding:2px 8px;border-radius:4px;font-size:0.78rem;">PENDING APPROVAL</span>
+        </div>
+        <p style="font-size:0.83rem;color:#475569;margin-top:0.6rem;line-height:1.45;">
+          Your account has been registered successfully and is currently waiting for administrator approval. You will be able to access your account once the administrator activates it.
+        </p>
+      </div>
+      <a href="login.html" class="btn btn-primary w-100" style="margin-top:0.5rem;"><i class="fas fa-sign-in-alt"></i> Proceed to Login</a>
+      <p style="font-size:.82rem;color:var(--gray);margin-top:0.8rem;">Auto-redirecting in <strong id="countdown">5</strong> seconds...</p>
     </div>
 
     <div style="text-align:center;margin-top:1.25rem;font-size:.85rem;color:var(--gray);">
@@ -163,6 +182,7 @@ function doRegister(){
   const sponsorId=document.getElementById('sponsorId').value.trim().toUpperCase();
   const position=document.getElementById('position').value;
   const name=document.getElementById('memberName').value.trim();
+  const email=document.getElementById('email').value.trim();
   const phone=document.getElementById('phone').value.trim();
   const password=document.getElementById('regPass').value;
   const productId=document.getElementById('packageId').value;
@@ -170,12 +190,16 @@ function doRegister(){
   const errEl=document.getElementById('regError');
   errEl.innerHTML='';
 
-  if(!sponsorId||!position||!name||!phone||!password||!productId){
+  if(!sponsorId||!position||!name||!email||!phone||!password||!productId){
     errEl.innerHTML='<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Please fill all required fields.</div>';
     return;
   }
   if(!sponsorValid){
     errEl.innerHTML='<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Invalid Sponsor ID.</div>';
+    return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    errEl.innerHTML='<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Please enter a valid email address.</div>';
     return;
   }
   if(phone.length!==10||!/^\d+$/.test(phone)){
@@ -191,15 +215,16 @@ function doRegister(){
     return;
   }
 
-  const result=APP.registerMember({sponsorId,position,name,phone,password,productId});
+  const result=APP.registerMember({sponsorId,position,name,email,phone,password,productId});
   if(result.success){
     document.getElementById('formStep1').style.display='none';
     document.getElementById('formSuccess').style.display='block';
     document.getElementById('newMemberId').textContent=result.memberId;
-    let c=3;
+    let c=5;
     const timer=setInterval(()=>{
       c--;
-      document.getElementById('countdown').textContent=c;
+      const cdEl=document.getElementById('countdown');
+      if(cdEl) cdEl.textContent=c;
       if(c<=0){ clearInterval(timer); window.location.href='login.html'; }
     },1000);
   } else {

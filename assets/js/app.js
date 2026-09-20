@@ -130,20 +130,24 @@ const APP = {
         grossReferral:600, serviceTax:90, referralIncome:510,
         image:'assets/images/p2_5000.jpg',
         badge:'STARTER CHOICE',
+        category:'Textiles & Packages',
+        stock:100,
         description:'600 BV (1 RP) package with textile products and travel vouchers.',
         items:[
           '1× Banarasi Saree OR 1× Suite Length',
           '3× Compact Tour Discount Voucher (CTDV) @ ₹6,000 printed value',
           '1× Business ID & Business Password'
         ],
-        active:true
+        active:true,
+        createdAt:new Date().toISOString(),
+        updatedAt:new Date().toISOString()
       }
     ];
   },
 
-  _blankMember(id, name, phone, hashedPwd, sponsorId, position) {
+  _blankMember(id, name, phone, hashedPwd, sponsorId, position, email = '', status = 'pending') {
     return {
-      id, name, phone, password: hashedPwd,
+      id, name, phone, email: email || '', password: hashedPwd,
       sponsorId, position, parentId: sponsorId,
       leftMemberId: null, rightMemberId: null,
       leftBV: 0, rightBV: 0, leftRP: 0, rightRP: 0,
@@ -153,9 +157,27 @@ const APP = {
       incomeWallet: 0, activationWallet: 0,
       successWithdrawals: 0, matchedPairs: 0,
       rank: null, achievementIds: [],
-      status: 'active', isAdmin: false,
+      status: status, // 'pending' | 'active' | 'inactive'
+      kycStatus: 'NOT_SUBMITTED', // 'NOT_SUBMITTED' | 'SUBMITTED' | 'UNDER_REVIEW' | 'VERIFIED' | 'REJECTED'
+      kycRejectionReason: '',
+      kycSubmittedAt: null,
+      kycReviewedAt: null,
+      kycDocuments: [], // [{ id, type, number, fileName, fileData, uploadDate, status }]
+      profile: {
+        dob: '',
+        gender: '',
+        address: '',
+        city: '',
+        state: '',
+        pincode: '',
+        country: 'India',
+        photo: ''
+      },
+      isAdmin: false,
       packageId: null,
-      joinedAt: new Date().toISOString()
+      joinedAt: new Date().toISOString(),
+      activatedAt: status === 'active' ? new Date().toISOString() : null,
+      updatedAt: new Date().toISOString()
     };
   },
 
@@ -170,7 +192,11 @@ const APP = {
   updateMember(updated) {
     const arr = this.getMembers();
     const i = arr.findIndex(m => m.id.toUpperCase() === updated.id.toUpperCase());
-    if (i !== -1) { arr[i] = updated; this.saveMembers(arr); }
+    if (i !== -1) { 
+      updated.updatedAt = new Date().toISOString();
+      arr[i] = updated; 
+      this.saveMembers(arr); 
+    }
   },
 
   deleteMember(id) {
@@ -184,7 +210,11 @@ const APP = {
 
   addProduct(product) {
     const arr = this.getProducts();
-    product.id = 'P' + Date.now();
+    if (!product.id) product.id = 'P' + Date.now().toString(36).toUpperCase();
+    product.category = product.category || 'General Packages';
+    product.stock = parseInt(product.stock) >= 0 ? parseInt(product.stock) : 100;
+    product.createdAt = new Date().toISOString();
+    product.updatedAt = new Date().toISOString();
     arr.push(product);
     this.saveProducts(arr);
     return product;
@@ -193,7 +223,13 @@ const APP = {
   updateProduct(updated) {
     const arr = this.getProducts();
     const i = arr.findIndex(p => p.id === updated.id);
-    if (i !== -1) { arr[i] = updated; this.saveProducts(arr); }
+    if (i !== -1) { 
+      updated.stock = parseInt(updated.stock) >= 0 ? parseInt(updated.stock) : (arr[i].stock || 100);
+      updated.category = updated.category || arr[i].category || 'General Packages';
+      updated.updatedAt = new Date().toISOString();
+      arr[i] = Object.assign({}, arr[i], updated);
+      this.saveProducts(arr); 
+    }
   },
 
   deleteProduct(id) {
@@ -414,7 +450,7 @@ const APP = {
   },
 
   // ─── Registration ──────────────────────────────────────────────────────────
-  registerMember({ sponsorId, position, name, phone, password, productId }) {
+  registerMember({ sponsorId, position, name, phone, email, password, productId }) {
     const members = this.getMembers();
     const sponsor = members.find(m => m.id.toUpperCase() === sponsorId.toUpperCase());
     if (!sponsor) return { success:false, msg:'Sponsor ID not found. Check your Sponsor ID.' };
@@ -426,7 +462,8 @@ const APP = {
       return { success:false, msg:'Right position is already filled under this sponsor.' };
 
     const newId     = this.generateId();
-    const newMember = this._blankMember(newId, name, phone, this.hashPwd(password), sponsor.id, cleanPos);
+    // Default status for new registrations is PENDING waiting for Admin approval
+    const newMember = this._blankMember(newId, name, phone, this.hashPwd(password), sponsor.id, cleanPos, email, 'pending');
     if (productId) newMember.packageId = productId;
 
     // Strictly update sponsor's slot based on chosen position
@@ -439,8 +476,9 @@ const APP = {
     // Referral income for sponsor after deducting service charge & tax:
     // ₹10,000 package -> ₹1,020 (₹180 tax/service charge deducted from ₹1,200)
     // ₹5,000 package -> ₹510 (₹90 tax/service charge deducted from ₹600)
+    let product = null;
     if (productId) {
-      const product = this.getProductById(productId) ||
+      product = this.getProductById(productId) ||
         this.getProducts().find(p => p.id === productId);
       if (product) {
         const ref = product.referralIncome || (product.price >= 10000 ? 1020 : (product.price >= 5000 ? 510 : Math.round(product.price * 0.102)));
@@ -454,25 +492,131 @@ const APP = {
     members.push(newMember);
     this.saveMembers(members);
 
+    // Create Admin Notification for pending approval
+    this.addNotification({
+      type: 'customer_registration',
+      title: 'New Customer Registration',
+      message: `A new customer has registered and is waiting for approval.\nCustomer: ${name} (${newId})\nEmail: ${email || phone}\nStatus: Pending`,
+      memberId: newId,
+      customerName: name,
+      customerEmail: email || phone,
+      createdAt: new Date().toISOString(),
+      read: false
+    });
+
     // Place order + propagate BV
-    if (productId) {
-      const product = this.getProductById(productId) ||
-        this.getProducts().find(p => p.id === productId);
-      if (product) {
-        const order = {
-          id:'ORD'+Date.now(), memberId:newId, memberName:name,
-          productId, productName:product.name, price:product.price,
-          bv:product.bv, rp:product.rp,
-          status:'completed', createdAt:new Date().toISOString(), completedAt:new Date().toISOString()
-        };
-        const orders = this.getOrders();
-        orders.push(order);
-        this.saveOrders(orders);
-        this._propagateBV(newId, product.bv, product.rp);
-      }
+    if (productId && product) {
+      const order = {
+        id:'ORD'+Date.now(), memberId:newId, memberName:name,
+        productId, productName:product.name, price:product.price,
+        bv:product.bv, rp:product.rp,
+        status:'completed', createdAt:new Date().toISOString(), completedAt:new Date().toISOString()
+      };
+      const orders = this.getOrders();
+      orders.push(order);
+      this.saveOrders(orders);
+      this._propagateBV(newId, product.bv, product.rp);
     }
 
-    return { success:true, memberId:newId };
+    return { success:true, memberId:newId, status:'pending' };
+  },
+
+  // ─── Customer Activation & KYC Management ──────────────────────────────────
+  activateMember(memberId) {
+    const member = this.getMemberById(memberId);
+    if (!member) return { success:false, msg:'Member not found' };
+    member.status = 'active';
+    member.activatedAt = new Date().toISOString();
+    this.updateMember(member);
+
+    // Mark pending notification for this member as resolved
+    const notifs = this.getNotifications();
+    notifs.forEach(n => {
+      if (n.memberId === memberId && n.type === 'customer_registration') n.read = true;
+    });
+    this.saveNotifications(notifs);
+
+    return { success:true, member };
+  },
+
+  deactivateMember(memberId) {
+    const member = this.getMemberById(memberId);
+    if (!member) return { success:false, msg:'Member not found' };
+    member.status = 'inactive';
+    this.updateMember(member);
+    return { success:true, member };
+  },
+
+  updateCustomerProfile(memberId, data) {
+    const member = this.getMemberById(memberId);
+    if (!member) return { success:false, msg:'Member not found' };
+    if (data.name) member.name = data.name.trim();
+    if (data.phone) member.phone = data.phone.trim();
+    if (data.email !== undefined) member.email = data.email.trim();
+    member.profile = Object.assign({}, member.profile || {}, {
+      dob: data.dob !== undefined ? data.dob : (member.profile && member.profile.dob || ''),
+      gender: data.gender !== undefined ? data.gender : (member.profile && member.profile.gender || ''),
+      address: data.address !== undefined ? data.address : (member.profile && member.profile.address || ''),
+      city: data.city !== undefined ? data.city : (member.profile && member.profile.city || ''),
+      state: data.state !== undefined ? data.state : (member.profile && member.profile.state || ''),
+      pincode: data.pincode !== undefined ? data.pincode : (member.profile && member.profile.pincode || ''),
+      country: data.country !== undefined ? data.country : (member.profile && member.profile.country || 'India'),
+      photo: data.photo !== undefined ? data.photo : (member.profile && member.profile.photo || '')
+    });
+    member.updatedAt = new Date().toISOString();
+    this.updateMember(member);
+    return { success:true, member };
+  },
+
+  submitCustomerKYC(memberId, documents) {
+    const member = this.getMemberById(memberId);
+    if (!member) return { success:false, msg:'Member not found' };
+    member.kycDocuments = documents || [];
+    member.kycStatus = 'UNDER_REVIEW';
+    member.kycSubmittedAt = new Date().toISOString();
+    member.kycRejectionReason = '';
+    this.updateMember(member);
+
+    // Notify Admin of KYC Submission
+    this.addNotification({
+      type: 'kyc_submission',
+      title: 'New KYC Submission',
+      message: `New KYC documents submitted for review.\nCustomer: ${member.name} (${member.id})\nDocuments: ${member.kycDocuments.length} Document(s)\nStatus: Under Review`,
+      memberId: member.id,
+      customerName: member.name,
+      createdAt: new Date().toISOString(),
+      read: false
+    });
+
+    return { success:true, member };
+  },
+
+  reviewCustomerKYC(memberId, status, rejectReason = '') {
+    const member = this.getMemberById(memberId);
+    if (!member) return { success:false, msg:'Member not found' };
+    member.kycStatus = status; // 'VERIFIED' | 'REJECTED'
+    member.kycReviewedAt = new Date().toISOString();
+    if (status === 'REJECTED') {
+      member.kycRejectionReason = rejectReason || 'Documents could not be verified. Please upload clear, valid documents.';
+      if (Array.isArray(member.kycDocuments)) {
+        member.kycDocuments.forEach(doc => { doc.status = 'rejected'; });
+      }
+    } else if (status === 'VERIFIED') {
+      member.kycRejectionReason = '';
+      if (Array.isArray(member.kycDocuments)) {
+        member.kycDocuments.forEach(doc => { doc.status = 'verified'; });
+      }
+    }
+    this.updateMember(member);
+
+    // Mark KYC notification read
+    const notifs = this.getNotifications();
+    notifs.forEach(n => {
+      if (n.memberId === memberId && n.type === 'kyc_submission') n.read = true;
+    });
+    this.saveNotifications(notifs);
+
+    return { success:true, member };
   },
 
   // ─── Withdrawals ───────────────────────────────────────────────────────────
@@ -532,7 +676,14 @@ const APP = {
     const member = this.getMemberById(id.toUpperCase());
     if (!member)                           return { success:false, msg:'Member ID not found' };
     if (!this.verifyPwd(password, member.password))
-                                           return { success:false, msg:'Incorrect password' };
+      return { success:false, msg:'Incorrect password' };
+    if (member.status === 'pending') {
+      return {
+        success:false,
+        pending:true,
+        msg:'Account Pending Approval: Your account has been registered successfully and is currently waiting for administrator approval. You will be able to access your account after the administrator activates it.'
+      };
+    }
     if (member.status === 'inactive') {
       return {
         success:false,
@@ -586,6 +737,13 @@ const APP = {
   requireMember(redirectTo = 'login.html') {
     const s = this.getCurrentSession();
     if (!s) { window.location.href = redirectTo; return false; }
+    if (s.isAdmin) return true;
+    const m = this.getMemberById(s.id);
+    if (!m || m.status !== 'active') {
+      this.logout();
+      window.location.href = redirectTo;
+      return false;
+    }
     return true;
   },
 
@@ -631,7 +789,9 @@ const APP = {
     return {
       totalMembers:       members.length,
       activeMembers:      members.filter(m => m.status === 'active').length,
+      pendingMembers:     members.filter(m => m.status === 'pending').length,
       inactiveMembers:    members.filter(m => m.status === 'inactive').length,
+      kycPending:         members.filter(m => m.kycStatus === 'UNDER_REVIEW').length,
       orderedMembers:     orderedMembers.length,
       notOrderedMembers:  notOrderedMembers.length,
       totalOrders:        orders.length,

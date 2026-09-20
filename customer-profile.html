@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile — Great Goals Lifestyle</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+.profile-card {
+  background:#fff;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  margin-bottom:1.5rem;
+}
+.profile-banner {
+  background:linear-gradient(135deg,#071a82,#0b2ac9);
+  border-bottom:2px solid var(--gold);
+  padding:2rem 1.75rem;
+  color:#fff;
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:1.5rem;
+  flex-wrap:wrap;
+}
+.avatar-upload-wrap {
+  position:relative;
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  border:3px solid var(--gold);
+  box-shadow:0 0 16px rgba(245,184,0,0.5);
+  background:#fff;
+  cursor:pointer;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.avatar-upload-wrap img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.avatar-placeholder {
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#071a82,#0b2ac9);
+  color:#fff;
+  font-size:2.2rem;
+  font-weight:800;
+}
+.avatar-upload-overlay {
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.45);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  opacity:0;
+  transition:opacity 0.2s;
+}
+.avatar-upload-wrap:hover .avatar-upload-overlay {
+  opacity:1;
+}
+.avatar-upload-overlay i {
+  font-size:1.3rem;
+  margin-bottom:2px;
+}
+.avatar-upload-overlay span {
+  font-size:0.65rem;
+  font-weight:700;
+}
+.banner-info {
+  flex:1;
+  min-width:200px;
+}
+.banner-info h2 {
+  font-size:1.5rem;
+  font-weight:800;
+  margin-bottom:0.25rem;
+}
+.banner-info .sub {
+  font-size:0.88rem;
+  opacity:0.9;
+}
+.banner-badges {
+  display:flex;
+  gap:0.5rem;
+  margin-top:0.6rem;
+  flex-wrap:wrap;
+}
+.badge-pill {
+  font-size:0.75rem;
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:50px;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+.badge-status-active { background:#dcfce7; color:#166534; }
+.badge-status-pending { background:#fef3c7; color:#92400e; }
+.badge-kyc-verified { background:#dcfce7; color:#15803d; border:1px solid #86efac; }
+.badge-kyc-review { background:#fef3c7; color:#b45309; border:1px solid #fde047; }
+.badge-kyc-rejected { background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; }
+.badge-kyc-none { background:#f1f5f9; color:#64748b; }
+
+.profile-body {
+  padding:1.75rem;
+}
+.form-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+  gap:1.25rem;
+}
+.form-full {
+  grid-column:1/-1;
+}
+.form-group {
+  display:flex;
+  flex-direction:column;
+  gap:0.35rem;
+}
+.form-group label {
+  font-size:0.8rem;
+  font-weight:700;
+  color:#475569;
+}
+.form-group label span {
+  color:#ef4444;
+}
+.form-group input, .form-group select, .form-group textarea {
+  padding:0.65rem 0.85rem;
+  border:1.5px solid #cbd5e1;
+  border-radius:10px;
+  font-size:0.88rem;
+  outline:none;
+  transition:border-color 0.18s;
+  font-family:inherit;
+  color:#1e293b;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color:var(--primary);
+}
+.form-group input[readonly] {
+  background:#f8fafc;
+  color:#64748b;
+  cursor:not-allowed;
+}
+.btn-save-profile {
+  background:linear-gradient(135deg,var(--primary),#ea580c);
+  color:#fff;
+  border:none;
+  padding:0.75rem 2rem;
+  border-radius:10px;
+  font-weight:700;
+  font-size:0.95rem;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:inline-flex;
+  align-items:center;
+  gap:0.5rem;
+}
+.btn-save-profile:hover {
+  opacity:0.95;
+  transform:translateY(-1px);
+}
+.side-card {
+  background:#fff;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:1.5rem;
+  margin-bottom:1.5rem;
+}
+.side-card h3 {
+  font-size:1rem;
+  font-weight:700;
+  color:#1e293b;
+  margin-bottom:1rem;
+  border-bottom:2px solid #f1f5f9;
+  padding-bottom:0.5rem;
+  display:flex;
+  align-items:center;
+  gap:0.4rem;
+}
+.info-pair {
+  display:flex;
+  justify-content:space-between;
+  padding:0.5rem 0;
+  border-bottom:1px solid #f8fafc;
+  font-size:0.85rem;
+}
+.info-pair:last-child {
+  border-bottom:none;
+}
+.info-pair .lbl { color:#64748b; font-weight:600; }
+.info-pair .val { font-weight:700; color:#1e293b; }
+</style>
+</head>
+<body>
+<div class="toast-container" id="toast-container"></div>
+<div class="dash-layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/images/logo.png" alt="Great Goals Lifestyle" style="width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);box-shadow:0 0 10px rgba(245,184,0,0.4);object-fit:cover;">
+      <div class="sidebar-logo-text">Great Goals<br><span>Lifestyle</span></div>
+    </div>
+    <div class="sidebar-user" id="sidebarUser"></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-label">Main</div>
+      <a href="dashboard.html" class="sidebar-nav-item"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="customer-tree.html" class="sidebar-nav-item"><i class="fas fa-sitemap"></i> My Tree</a>
+      <a href="customer-orders.html" class="sidebar-nav-item"><i class="fas fa-shopping-cart"></i> Order Product</a>
+      <a href="customer-wallet.html" class="sidebar-nav-item"><i class="fas fa-wallet"></i> Wallet and Withdraw</a>
+      <a href="customer-achievements.html" class="sidebar-nav-item"><i class="fas fa-trophy"></i> Achievements</a>
+      <a href="customer-profile.html" class="sidebar-nav-item active"><i class="fas fa-user-circle"></i> My Profile</a>
+      <a href="customer-kyc.html" class="sidebar-nav-item"><i class="fas fa-shield-alt"></i> KYC Verification</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="APP.logout();window.location.href='login.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </nav>
+
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--dark);" id="menuBtn"><i class="fas fa-bars"></i></button>
+        <h1>My Profile</h1>
+      </div>
+      <div class="topbar-user">
+        <div class="topbar-avatar" id="topAvatar">?</div>
+        <span class="topbar-name" id="topName">Loading...</span>
+      </div>
+    </div>
+
+    <div class="dash-content">
+      <div class="profile-card">
+        <div class="profile-banner">
+          <input type="file" id="photoFileInput" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)" />
+          <div class="avatar-upload-wrap" onclick="document.getElementById('photoFileInput').click()" title="Click to upload profile photo">
+            <div id="avatarWrap"></div>
+            <div class="avatar-upload-overlay">
+              <i class="fas fa-camera"></i>
+              <span>CHANGE</span>
+            </div>
+          </div>
+          <div class="banner-info">
+            <h2 id="bannerName">Customer Name</h2>
+            <div class="sub">
+              Member ID: <strong id="bannerId" style="color:var(--gold);">GG00000</strong> &bull;
+              Joined: <span id="bannerJoined">—</span>
+            </div>
+            <div class="banner-badges">
+              <span id="bannerStatus" class="badge-pill badge-status-active"><i class="fas fa-check-circle"></i> ACTIVE</span>
+              <span id="bannerKyc" class="badge-pill badge-kyc-none">KYC Not Submitted</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-body">
+          <form id="profileForm" onsubmit="saveProfile(event)">
+            <input type="hidden" id="photoBase64" />
+            <h3 style="font-size:1.05rem;font-weight:700;color:#1e293b;margin-bottom:1.25rem;border-bottom:2px solid #f1f5f9;padding-bottom:0.5rem;">
+              <i class="fas fa-user-edit text-primary"></i> Personal Information
+            </h3>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Full Name <span>*</span></label>
+                <input type="text" id="profName" required placeholder="Enter full name" />
+              </div>
+              <div class="form-group">
+                <label>Email Address <span>*</span></label>
+                <input type="email" id="profEmail" required placeholder="Enter email address" />
+              </div>
+              <div class="form-group">
+                <label>Phone Number <span>*</span></label>
+                <input type="tel" id="profPhone" required maxlength="10" placeholder="10-digit mobile number" />
+              </div>
+              <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="date" id="profDob" />
+              </div>
+              <div class="form-group">
+                <label>Gender</label>
+                <select id="profGender">
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Country</label>
+                <input type="text" id="profCountry" value="India" />
+              </div>
+              <div class="form-group">
+                <label>State</label>
+                <input type="text" id="profState" placeholder="e.g. Karnataka" />
+              </div>
+              <div class="form-group">
+                <label>City / District</label>
+                <input type="text" id="profCity" placeholder="e.g. Gadag" />
+              </div>
+              <div class="form-group">
+                <label>Pincode</label>
+                <input type="text" id="profPincode" maxlength="6" placeholder="e.g. 582207" />
+              </div>
+              <div class="form-group form-full">
+                <label>Residential Address</label>
+                <textarea id="profAddress" rows="3" placeholder="Flat / House No., Street, Landmark..."></textarea>
+              </div>
+              <div class="form-group form-full" style="margin-top:0.5rem;">
+                <button type="submit" class="btn-save-profile">
+                  <i class="fas fa-save"></i> Save Profile Details
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Account & Sponsor Details -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:1.5rem;">
+        <div class="side-card">
+          <h3><i class="fas fa-sitemap text-primary"></i> Membership & Sponsor Details</h3>
+          <div class="info-pair"><span class="lbl">Member ID:</span><span class="val" id="infoMemberId">—</span></div>
+          <div class="info-pair"><span class="lbl">Sponsor ID:</span><span class="val" id="infoSponsorId">—</span></div>
+          <div class="info-pair"><span class="lbl">Tree Placement:</span><span class="val" id="infoPosition" style="text-transform:capitalize;">—</span></div>
+          <div class="info-pair"><span class="lbl">Current Rank:</span><span class="val" id="infoRank">—</span></div>
+          <div class="info-pair"><span class="lbl">Package Active:</span><span class="val" id="infoPackage">—</span></div>
+        </div>
+
+        <div class="side-card">
+          <h3><i class="fas fa-shield-alt text-primary"></i> Verification & Security</h3>
+          <div class="info-pair"><span class="lbl">Account Status:</span><span class="val" id="infoAccStatus">—</span></div>
+          <div class="info-pair"><span class="lbl">KYC Status:</span><span class="val" id="infoKycStatus">—</span></div>
+          <div style="margin-top:1rem;background:#f8fafc;padding:0.85rem;border-radius:8px;font-size:0.82rem;color:#475569;line-height:1.45;">
+            <i class="fas fa-info-circle text-primary"></i> Complete your KYC verification to ensure uninterrupted withdrawal payouts directly to your bank account.
+            <div style="margin-top:0.5rem;">
+              <a href="customer-kyc.html" class="btn btn-sm btn-primary" style="display:inline-block;text-decoration:none;"><i class="fas fa-id-card"></i> Go to KYC Verification</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+<script>
+function showToast(msg, type='success'){
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;
+  tc.appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+
+if(!APP.requireMember('login.html')){ throw new Error('redirect'); }
+
+let session = APP.getCurrentSession();
+let user = APP.getMemberById(session.id);
+if (!user) { APP.logout(); window.location.href='login.html'; }
+
+function populateProfile(){
+  user = APP.getMemberById(session.id);
+  const profile = user.profile || {};
+
+  // Topbar
+  const initials = (user.name||'GG').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('topAvatar').textContent = initials;
+  document.getElementById('topName').textContent = user.name;
+  document.getElementById('sidebarUser').innerHTML = `
+    <div class="sidebar-user-id">${user.id}</div>
+    <div class="sidebar-user-name">${user.name}</div>
+    <span class="sidebar-status">${user.status}</span>
+  `;
+
+  // Banner
+  document.getElementById('bannerName').textContent = user.name;
+  document.getElementById('bannerId').textContent = user.id;
+  document.getElementById('bannerJoined').textContent = user.joinedAt ? new Date(user.joinedAt).toLocaleDateString('en-IN') : '—';
+
+  // Status
+  const statusEl = document.getElementById('bannerStatus');
+  if (user.status === 'active') {
+    statusEl.className = 'badge-pill badge-status-active';
+    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> ACTIVE';
+  } else if (user.status === 'pending') {
+    statusEl.className = 'badge-pill badge-status-pending';
+    statusEl.innerHTML = '<i class="fas fa-clock"></i> PENDING';
+  } else {
+    statusEl.className = 'badge-pill';
+    statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
+    statusEl.innerHTML = '<i class="fas fa-ban"></i> INACTIVE';
+  }
+
+  // KYC Badge
+  const kycEl = document.getElementById('bannerKyc');
+  const kyc = user.kycStatus || 'NOT_SUBMITTED';
+  if (kyc === 'VERIFIED') {
+    kycEl.className = 'badge-pill badge-kyc-verified';
+    kycEl.innerHTML = '<i class="fas fa-shield-alt"></i> KYC Verified';
+  } else if (kyc === 'UNDER_REVIEW') {
+    kycEl.className = 'badge-pill badge-kyc-review';
+    kycEl.innerHTML = '<i class="fas fa-hourglass-half"></i> KYC Under Review';
+  } else if (kyc === 'REJECTED') {
+    kycEl.className = 'badge-pill badge-kyc-rejected';
+    kycEl.innerHTML = '<i class="fas fa-times-circle"></i> KYC Rejected';
+  } else {
+    kycEl.className = 'badge-pill badge-kyc-none';
+    kycEl.innerHTML = 'KYC Not Submitted';
+  }
+
+  // Avatar display
+  const avatarWrap = document.getElementById('avatarWrap');
+  if (profile.photo) {
+    avatarWrap.innerHTML = `<img src="${profile.photo}" alt="Profile Photo" />`;
+    document.getElementById('photoBase64').value = profile.photo;
+  } else {
+    avatarWrap.innerHTML = `<div class="avatar-placeholder">${initials}</div>`;
+  }
+
+  // Form Fields
+  document.getElementById('profName').value = user.name || '';
+  document.getElementById('profEmail').value = user.email || '';
+  document.getElementById('profPhone').value = user.phone || '';
+  document.getElementById('profDob').value = profile.dob || '';
+  document.getElementById('profGender').value = profile.gender || '';
+  document.getElementById('profCountry').value = profile.country || 'India';
+  document.getElementById('profState').value = profile.state || '';
+  document.getElementById('profCity').value = profile.city || '';
+  document.getElementById('profPincode').value = profile.pincode || '';
+  document.getElementById('profAddress').value = profile.address || '';
+
+  // Side Cards
+  document.getElementById('infoMemberId').textContent = user.id;
+  document.getElementById('infoSponsorId').textContent = user.sponsorId || 'Root';
+  document.getElementById('infoPosition').textContent = user.position || '—';
+  document.getElementById('infoRank').textContent = user.rank || 'Starter';
+  const pkg = APP.getProductById(user.packageId);
+  document.getElementById('infoPackage').textContent = pkg ? pkg.name : 'None';
+  document.getElementById('infoAccStatus').textContent = (user.status || 'Active').toUpperCase();
+  document.getElementById('infoKycStatus').textContent = kyc;
+}
+
+function handlePhotoUpload(e){
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    showToast('Photo file size must be less than 2MB', 'error');
+    e.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const b64 = evt.target.result;
+    document.getElementById('photoBase64').value = b64;
+    document.getElementById('avatarWrap').innerHTML = `<img src="${b64}" alt="Profile Photo" />`;
+    showToast('Photo uploaded! Click Save Profile to apply changes.');
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveProfile(e){
+  e.preventDefault();
+  const name = document.getElementById('profName').value.trim();
+  const email = document.getElementById('profEmail').value.trim();
+  const phone = document.getElementById('profPhone').value.trim();
+  const dob = document.getElementById('profDob').value;
+  const gender = document.getElementById('profGender').value;
+  const country = document.getElementById('profCountry').value.trim();
+  const state = document.getElementById('profState').value.trim();
+  const city = document.getElementById('profCity').value.trim();
+  const pincode = document.getElementById('profPincode').value.trim();
+  const address = document.getElementById('profAddress').value.trim();
+  const photo = document.getElementById('photoBase64').value;
+
+  if (!name) { showToast('Name is required', 'error'); return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('Valid email address is required', 'error'); return;
+  }
+  if (!phone || phone.length !== 10) {
+    showToast('Valid 10-digit mobile number is required', 'error'); return;
+  }
+
+  const updateData = {
+    name, email, phone, dob, gender, country, state, city, pincode, address, photo
+  };
+
+  const res = APP.updateCustomerProfile(user.id, updateData);
+  if (res.success) {
+    showToast('Profile updated successfully!');
+    populateProfile();
+  } else {
+    showToast(res.msg || 'Failed to update profile', 'error');
+  }
+}
+
+populateProfile();
+</script>
+</body>
+</html>

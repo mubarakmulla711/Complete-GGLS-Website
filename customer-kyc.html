@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KYC Verification — Great Goals Lifestyle</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+.kyc-status-banner {
+  border-radius:var(--radius);
+  padding:1.5rem 1.75rem;
+  margin-bottom:1.75rem;
+  display:flex;
+  align-items:center;
+  gap:1.25rem;
+  box-shadow:var(--shadow);
+}
+.banner-verified {
+  background:#f0fdf4;
+  border:1.5px solid #86efac;
+  color:#166534;
+}
+.banner-review {
+  background:#fefce8;
+  border:1.5px solid #fde047;
+  color:#854d0e;
+}
+.banner-rejected {
+  background:#fef2f2;
+  border:1.5px solid #fca5a5;
+  color:#991b1b;
+}
+.banner-none {
+  background:#f8fafc;
+  border:1.5px solid #cbd5e1;
+  color:#334155;
+}
+.status-icon {
+  font-size:2.4rem;
+  flex-shrink:0;
+}
+.kyc-card {
+  background:#fff;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:1.75rem;
+  margin-bottom:1.75rem;
+}
+.kyc-card h2 {
+  font-size:1.15rem;
+  font-weight:800;
+  color:#1e293b;
+  margin-bottom:1.25rem;
+  border-bottom:2px solid #f1f5f9;
+  padding-bottom:0.6rem;
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+}
+.form-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:1.2rem;
+}
+.form-group {
+  display:flex;
+  flex-direction:column;
+  gap:0.35rem;
+}
+.form-group label {
+  font-size:0.8rem;
+  font-weight:700;
+  color:#475569;
+}
+.form-group label span {
+  color:#ef4444;
+}
+.form-group input, .form-group select {
+  padding:0.65rem 0.85rem;
+  border:1.5px solid #cbd5e1;
+  border-radius:10px;
+  font-size:0.88rem;
+  outline:none;
+  transition:border-color 0.18s;
+  font-family:inherit;
+}
+.form-group input:focus, .form-group select:focus {
+  border-color:var(--primary);
+}
+.doc-file-box {
+  border:2px dashed #cbd5e1;
+  border-radius:10px;
+  padding:1rem;
+  text-align:center;
+  background:#f8fafc;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.doc-file-box:hover {
+  border-color:var(--primary);
+  background:#fff7ed;
+}
+.btn-add-doc {
+  background:#071a82;
+  color:#fff;
+  border:none;
+  padding:0.65rem 1.4rem;
+  border-radius:8px;
+  font-weight:700;
+  font-size:0.88rem;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:inline-flex;
+  align-items:center;
+  gap:0.4rem;
+}
+.btn-add-doc:hover {
+  background:#0b2ac9;
+}
+.doc-item-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0.85rem 1rem;
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  border-radius:10px;
+  margin-bottom:0.65rem;
+  gap:0.75rem;
+  flex-wrap:wrap;
+}
+.btn-submit-kyc {
+  background:linear-gradient(135deg,var(--primary),#ea580c);
+  color:#fff;
+  border:none;
+  padding:0.85rem 2.2rem;
+  border-radius:10px;
+  font-weight:700;
+  font-size:1rem;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:inline-flex;
+  align-items:center;
+  gap:0.5rem;
+}
+.btn-submit-kyc:hover {
+  opacity:0.95;
+  transform:translateY(-1px);
+}
+.btn-xs {
+  font-size:0.72rem;
+  padding:0.3rem 0.6rem;
+  border-radius:6px;
+  border:none;
+  cursor:pointer;
+  font-weight:600;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+}
+.btn-del-doc { background:#fee2e2; color:#991b1b; }
+.btn-del-doc:hover { background:#fecaca; }
+.btn-view-doc { background:#dbeafe; color:#1d4ed8; }
+.btn-view-doc:hover { background:#bfdbfe; }
+</style>
+</head>
+<body>
+<div class="toast-container" id="toast-container"></div>
+<div class="dash-layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/images/logo.png" alt="Great Goals Lifestyle" style="width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);box-shadow:0 0 10px rgba(245,184,0,0.4);object-fit:cover;">
+      <div class="sidebar-logo-text">Great Goals<br><span>Lifestyle</span></div>
+    </div>
+    <div class="sidebar-user" id="sidebarUser"></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-label">Main</div>
+      <a href="dashboard.html" class="sidebar-nav-item"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="customer-tree.html" class="sidebar-nav-item"><i class="fas fa-sitemap"></i> My Tree</a>
+      <a href="customer-orders.html" class="sidebar-nav-item"><i class="fas fa-shopping-cart"></i> Order Product</a>
+      <a href="customer-wallet.html" class="sidebar-nav-item"><i class="fas fa-wallet"></i> Wallet and Withdraw</a>
+      <a href="customer-achievements.html" class="sidebar-nav-item"><i class="fas fa-trophy"></i> Achievements</a>
+      <a href="customer-profile.html" class="sidebar-nav-item"><i class="fas fa-user-circle"></i> My Profile</a>
+      <a href="customer-kyc.html" class="sidebar-nav-item active"><i class="fas fa-shield-alt"></i> KYC Verification</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="APP.logout();window.location.href='login.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </nav>
+
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--dark);" id="menuBtn"><i class="fas fa-bars"></i></button>
+        <h1>KYC Verification</h1>
+      </div>
+      <div class="topbar-user">
+        <div class="topbar-avatar" id="topAvatar">?</div>
+        <span class="topbar-name" id="topName">Loading...</span>
+      </div>
+    </div>
+
+    <div class="dash-content">
+      <!-- KYC STATUS BANNER -->
+      <div id="kycStatusBanner" class="kyc-status-banner banner-none"></div>
+
+      <!-- DOCUMENT UPLOAD FORM (Shown when NOT_SUBMITTED or REJECTED) -->
+      <div class="kyc-card" id="uploadCard">
+        <h2><i class="fas fa-cloud-upload-alt text-primary"></i> Upload Verification Documents</h2>
+        <p style="font-size:0.85rem;color:#64748b;margin-bottom:1.25rem;">
+          Please upload valid government-issued identity documents (Aadhaar Card, PAN Card, Voter ID, or Bank Passbook). Ensure text and photos are clearly visible.
+        </p>
+
+        <form id="addDocForm" onsubmit="addDocumentToQueue(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Document Type <span>*</span></label>
+              <select id="docType" required>
+                <option value="">Select Document Type</option>
+                <option value="Aadhaar Card">Aadhaar Card (Front/Back)</option>
+                <option value="PAN Card">PAN Card</option>
+                <option value="Voter ID Card">Voter ID Card</option>
+                <option value="Passport">Passport</option>
+                <option value="Bank Passbook / Cheque">Bank Passbook / Cancelled Cheque</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Document Number / ID <span>*</span></label>
+              <input type="text" id="docNumber" required placeholder="e.g. 1234 5678 9012 or ABCDE1234F" />
+            </div>
+
+            <div class="form-group">
+              <label>Choose File (Max 3MB) <span>*</span></label>
+              <input type="file" id="docFile" accept="image/*,application/pdf" required onchange="handleDocFile(event)" />
+              <input type="hidden" id="docFileData" />
+              <input type="hidden" id="docFileName" />
+            </div>
+          </div>
+
+          <div style="margin-top:1rem;display:flex;justify-content:flex-end;">
+            <button type="submit" class="btn-add-doc">
+              <i class="fas fa-plus"></i> Add Document to List
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- SUBMITTED / QUEUED DOCUMENTS LIST -->
+      <div class="kyc-card">
+        <h2><i class="fas fa-folder-open text-primary"></i> Verification Documents</h2>
+        <div id="docsList"></div>
+
+        <div id="submitSection" style="margin-top:1.5rem;text-align:right;">
+          <button type="button" class="btn-submit-kyc" onclick="submitKYC()">
+            <i class="fas fa-paper-plane"></i> Submit KYC for Administrator Verification
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+<script>
+function showToast(msg, type='success'){
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;
+  tc.appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+
+if(!APP.requireMember('login.html')){ throw new Error('redirect'); }
+
+let session = APP.getCurrentSession();
+let user = APP.getMemberById(session.id);
+if (!user) { APP.logout(); window.location.href='login.html'; }
+
+// In-memory document staging list
+let stagedDocs = [];
+
+function initKYCPage(){
+  user = APP.getMemberById(session.id);
+
+  // Topbar
+  const initials = (user.name||'GG').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('topAvatar').textContent = initials;
+  document.getElementById('topName').textContent = user.name;
+  document.getElementById('sidebarUser').innerHTML = `
+    <div class="sidebar-user-id">${user.id}</div>
+    <div class="sidebar-user-name">${user.name}</div>
+    <span class="sidebar-status">${user.status}</span>
+  `;
+
+  const kycStatus = user.kycStatus || 'NOT_SUBMITTED';
+  const banner = document.getElementById('kycStatusBanner');
+  const uploadCard = document.getElementById('uploadCard');
+  const submitSection = document.getElementById('submitSection');
+
+  // Copy existing submitted documents if stage is empty
+  if (stagedDocs.length === 0 && user.kycDocuments && user.kycDocuments.length > 0) {
+    stagedDocs = [...user.kycDocuments];
+  }
+
+  if (kycStatus === 'VERIFIED') {
+    banner.className = 'kyc-status-banner banner-verified';
+    banner.innerHTML = `
+      <div class="status-icon"><i class="fas fa-shield-alt text-green"></i></div>
+      <div>
+        <strong style="font-size:1.15rem;display:block;margin-bottom:3px;">KYC Status: VERIFIED</strong>
+        <p style="font-size:0.85rem;margin:0;">
+          Congratulations! Your identity and address documents have been reviewed and approved by the Great Goals administrator. Full wallet withdrawal services are unlocked.
+        </p>
+      </div>
+    `;
+    uploadCard.style.display = 'none';
+    submitSection.style.display = 'none';
+  } else if (kycStatus === 'UNDER_REVIEW') {
+    banner.className = 'kyc-status-banner banner-review';
+    banner.innerHTML = `
+      <div class="status-icon"><i class="fas fa-hourglass-half" style="color:#d97706;"></i></div>
+      <div>
+        <strong style="font-size:1.15rem;display:block;margin-bottom:3px;">KYC Status: UNDER REVIEW</strong>
+        <p style="font-size:0.85rem;margin:0;">
+          Your submitted documents are currently waiting for administrator review. Reviews are typically processed within 24 to 48 hours.
+        </p>
+      </div>
+    `;
+    uploadCard.style.display = 'none';
+    submitSection.style.display = 'none';
+  } else if (kycStatus === 'REJECTED') {
+    banner.className = 'kyc-status-banner banner-rejected';
+    banner.innerHTML = `
+      <div class="status-icon"><i class="fas fa-times-circle" style="color:#dc2626;"></i></div>
+      <div>
+        <strong style="font-size:1.15rem;display:block;margin-bottom:3px;">KYC Status: REJECTED</strong>
+        <p style="font-size:0.85rem;margin:0 0 6px 0;">
+          Reason: <strong>${user.kycRejectionReason || 'Documents blurred or details mismatched.'}</strong>
+        </p>
+        <span style="font-size:0.8rem;opacity:0.9;">Please review the issues above, remove the invalid documents, attach corrected files, and re-submit for verification.</span>
+      </div>
+    `;
+    uploadCard.style.display = 'block';
+    submitSection.style.display = 'block';
+  } else {
+    banner.className = 'kyc-status-banner banner-none';
+    banner.innerHTML = `
+      <div class="status-icon"><i class="fas fa-id-card" style="color:#64748b;"></i></div>
+      <div>
+        <strong style="font-size:1.15rem;display:block;margin-bottom:3px;">KYC Status: NOT SUBMITTED</strong>
+        <p style="font-size:0.85rem;margin:0;">
+          Your KYC is not yet submitted. Please upload your identification documents below to activate full payout benefits.
+        </p>
+      </div>
+    `;
+    uploadCard.style.display = 'block';
+    submitSection.style.display = 'block';
+  }
+
+  renderDocsList();
+}
+
+function handleDocFile(e){
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 3 * 1024 * 1024) {
+    showToast('Document file size must be less than 3MB', 'error');
+    e.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    document.getElementById('docFileData').value = evt.target.result;
+    document.getElementById('docFileName').value = file.name;
+  };
+  reader.readAsDataURL(file);
+}
+
+function addDocumentToQueue(e){
+  e.preventDefault();
+  const docType = document.getElementById('docType').value;
+  const docNumber = document.getElementById('docNumber').value.trim();
+  const fileData = document.getElementById('docFileData').value;
+  const fileName = document.getElementById('docFileName').value;
+
+  if (!docType || !docNumber || !fileData) {
+    showToast('Please fill all fields and select a valid document file', 'error');
+    return;
+  }
+
+  stagedDocs.push({
+    docType,
+    docNumber,
+    fileName,
+    fileData,
+    uploadedAt: new Date().toISOString()
+  });
+
+  showToast(`Added ${docType} to list!`);
+  document.getElementById('addDocForm').reset();
+  document.getElementById('docFileData').value = '';
+  document.getElementById('docFileName').value = '';
+  renderDocsList();
+}
+
+function removeDoc(idx){
+  stagedDocs.splice(idx, 1);
+  renderDocsList();
+}
+
+function renderDocsList(){
+  const listEl = document.getElementById('docsList');
+  const kycStatus = user.kycStatus || 'NOT_SUBMITTED';
+  const canEdit = (kycStatus === 'NOT_SUBMITTED' || kycStatus === 'REJECTED');
+
+  if (stagedDocs.length === 0) {
+    listEl.innerHTML = `<div style="text-align:center;padding:2rem;color:#94a3b8;font-size:0.88rem;"><i class="fas fa-file-upload" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>No documents added yet.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = stagedDocs.map((doc, idx) => `
+    <div class="doc-item-row">
+      <div>
+        <strong style="color:#1e293b;">${doc.docType}</strong>
+        <span style="font-family:monospace;font-size:0.83rem;color:#2563eb;margin-left:0.4rem;">(${doc.docNumber})</span>
+        <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">
+          File: <strong>${doc.fileName}</strong> &bull; Uploaded: ${doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString('en-IN') : 'Just now'}
+        </div>
+      </div>
+      <div style="display:flex;gap:0.4rem;align-items:center;">
+        ${doc.fileData ? `<a href="${doc.fileData}" target="_blank" class="btn-xs btn-view-doc"><i class="fas fa-external-link-alt"></i> View</a>` : ''}
+        ${canEdit ? `<button class="btn-xs btn-del-doc" onclick="removeDoc(${idx})"><i class="fas fa-trash"></i> Remove</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function submitKYC(){
+  if (stagedDocs.length === 0) {
+    showToast('Please upload at least one document before submitting', 'error');
+    return;
+  }
+
+  if (!confirm('Submit these documents for Administrator KYC verification?')) return;
+
+  const res = APP.submitCustomerKYC(user.id, stagedDocs);
+  if (res.success) {
+    showToast('KYC submitted successfully! Administrator notified.');
+    initKYCPage();
+  } else {
+    showToast(res.msg || 'Failed to submit KYC', 'error');
+  }
+}
+
+initKYCPage();
+</script>
+</body>
+</html>

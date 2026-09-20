@@ -12,28 +12,32 @@
     .dash-content{padding:1.75rem;overflow-y:auto;}
     .btn-add{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border:none;padding:.6rem 1.2rem;border-radius:10px;font-weight:700;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:all .2s;}
     .btn-add:hover{opacity:.9;transform:translateY(-1px);}
-    .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1.5rem;}
-    .product-card{background:#fff;border-radius:18px;box-shadow:0 2px 14px rgba(0,0,0,.08);overflow:hidden;transition:all .22s;border:2px solid transparent;}
+    .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;}
+    .product-card{background:#fff;border-radius:18px;box-shadow:0 2px 14px rgba(0,0,0,.08);overflow:hidden;transition:all .22s;border:2px solid transparent;display:flex;flex-direction:column;}
     .product-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.13);}
     .product-card.inactive-card{opacity:.72;border-color:#fca5a5;}
-    .product-card-header{background:linear-gradient(135deg,#f97316,#ea580c);padding:1.25rem 1.5rem;color:#fff;position:relative;}
-    .prod-name{font-size:1.1rem;font-weight:800;}
-    .prod-price{font-size:1.6rem;font-weight:800;margin-top:.15rem;}
+    .product-card-header{background:linear-gradient(135deg,#f97316,#ea580c);padding:1.1rem 1.4rem;color:#fff;position:relative;}
+    .prod-name{font-size:1.05rem;font-weight:800;line-height:1.3;}
+    .prod-price{font-size:1.5rem;font-weight:800;margin-top:.15rem;}
     .status-pill{position:absolute;top:.85rem;right:.85rem;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:50px;}
     .pill-active{background:#dcfce7;color:#166534;}
     .pill-inactive{background:#fee2e2;color:#991b1b;}
-    .product-card-body{padding:1.25rem 1.5rem;}
-    .prod-stats{display:flex;gap:.75rem;margin-bottom:1rem;}
-    .prod-stat{flex:1;text-align:center;background:#f8fafc;border-radius:10px;padding:.5rem;}
-    .prod-stat .sv{font-size:1.1rem;font-weight:800;color:#1e293b;}
-    .prod-stat .sl{font-size:.65rem;color:#94a3b8;font-weight:700;text-transform:uppercase;}
-    .prod-items{margin-bottom:1rem;}
+    .product-card-body{padding:1.25rem 1.4rem;flex:1;display:flex;flex-direction:column;}
+    .prod-badges{display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.75rem;}
+    .cat-badge{font-size:0.7rem;font-weight:700;background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:4px;}
+    .stock-badge{font-size:0.7rem;font-weight:700;background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:4px;}
+    .stock-badge.low-stock{background:#fee2e2;color:#b91c1c;}
+    .prod-stats{display:flex;gap:.6rem;margin-bottom:1rem;}
+    .prod-stat{flex:1;text-align:center;background:#f8fafc;border-radius:10px;padding:.5rem .25rem;}
+    .prod-stat .sv{font-size:1.05rem;font-weight:800;color:#1e293b;}
+    .prod-stat .sl{font-size:.63rem;color:#94a3b8;font-weight:700;text-transform:uppercase;}
+    .prod-items{margin-bottom:1rem;flex:1;}
     .prod-items-title{font-size:.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem;}
     .prod-items ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.2rem;}
     .prod-items ul li{font-size:.82rem;color:#475569;}
     .prod-items ul li::before{content:"• ";color:#f97316;font-weight:900;}
-    .prod-desc{font-size:.82rem;color:#64748b;margin-bottom:.85rem;line-height:1.5;}
-    .card-actions{display:flex;gap:.5rem;border-top:1px solid #f1f5f9;padding-top:.85rem;}
+    .prod-desc{font-size:.82rem;color:#64748b;margin-bottom:.85rem;line-height:1.45;}
+    .card-actions{display:flex;gap:.5rem;border-top:1px solid #f1f5f9;padding-top:.85rem;margin-top:auto;}
     .btn-card{flex:1;padding:.5rem;border-radius:8px;border:none;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:.35rem;}
     .btn-edit{background:#dbeafe;color:#1d4ed8;}
     .btn-edit:hover{background:#bfdbfe;}
@@ -47,7 +51,7 @@
     .empty-state i{font-size:3.5rem;display:block;margin-bottom:1rem;color:#e2e8f0;}
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;}
     .modal-overlay.open{display:flex;}
-    .modal-box{background:#fff;border-radius:20px;padding:2rem;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+    .modal-box{background:#fff;border-radius:20px;padding:2rem;width:100%;max-width:620px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.2);}
     .modal-box h2{font-size:1.15rem;font-weight:800;color:#1e293b;margin-bottom:1.25rem;}
     .modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#94a3b8;}
     .modal-close:hover{color:#1e293b;}
@@ -57,8 +61,11 @@
     .form-group input,.form-group select,.form-group textarea{padding:.6rem .85rem;border:1.5px solid #e2e8f0;border-radius:10px;font-size:.88rem;outline:none;transition:border-color .18s;width:100%;box-sizing:border-box;font-family:inherit;}
     .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#f97316;}
     .form-full{grid-column:1/-1;}
-    .btn-submit{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border:none;padding:.7rem 2rem;border-radius:10px;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .2s;width:100%;}
+    .btn-modal-row{display:flex;gap:.75rem;margin-top:.75rem;}
+    .btn-submit{flex:2;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border:none;padding:.7rem 1.5rem;border-radius:10px;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .2s;}
     .btn-submit:hover{opacity:.9;}
+    .btn-cancel{flex:1;background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;padding:.7rem 1.2rem;border-radius:10px;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .2s;}
+    .btn-cancel:hover{background:#e2e8f0;}
     .toggle-row{display:flex;align-items:center;gap:.75rem;}
     .toggle-switch{position:relative;display:inline-block;width:46px;height:24px;}
     .toggle-switch input{opacity:0;width:0;height:0;}
@@ -66,6 +73,9 @@
     .toggle-slider::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.3s;}
     .toggle-switch input:checked+.toggle-slider{background:#22c55e;}
     .toggle-switch input:checked+.toggle-slider::before{transform:translateX(22px);}
+    .img-upload-box{border:2px dashed #cbd5e1;border-radius:12px;padding:1rem;text-align:center;background:#f8fafc;cursor:pointer;position:relative;}
+    .img-upload-box:hover{border-color:#f97316;}
+    .img-preview{max-height:120px;border-radius:8px;object-fit:contain;margin-top:0.5rem;display:none;margin-left:auto;margin-right:auto;}
     .mobile-toggle{display:none;background:none;border:none;font-size:1.4rem;color:#1e293b;cursor:pointer;}
     @media(max-width:768px){.mobile-toggle{display:block;}.form-grid{grid-template-columns:1fr;}}
   </style>
@@ -85,10 +95,11 @@
     <nav class="sidebar-nav">
       <div class="sidebar-nav-label">Management</div>
       <a href="admin-dashboard.html" class="sidebar-nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-      <a href="admin-members.html" class="sidebar-nav-item"><i class="fas fa-users"></i> Members</a>
+      <a href="admin-members.html" class="sidebar-nav-item"><i class="fas fa-users"></i> Customers</a>
       <a href="admin-products.html" class="sidebar-nav-item active"><i class="fas fa-box"></i> Products</a>
       <a href="admin-orders.html" class="sidebar-nav-item"><i class="fas fa-shopping-bag"></i> Orders</a>
       <a href="admin-withdrawals.html" class="sidebar-nav-item"><i class="fas fa-money-bill-wave"></i> Withdrawals</a>
+      <a href="../customer-tree.html" class="sidebar-nav-item"><i class="fas fa-sitemap"></i> Genealogy Tree</a>
     </nav>
     <div class="sidebar-footer">
       <button class="btn-logout" onclick="APP.logout();window.location.href='../login.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -100,11 +111,11 @@
       <div style="display:flex;align-items:center;gap:.75rem;">
         <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></button>
         <div>
-          <h1><i class="fas fa-box" style="color:#f97316;margin-right:.4rem;"></i>Products</h1>
-          <div style="font-size:.78rem;color:#94a3b8;margin-top:.1rem;">Manage product catalog</div>
+          <h1><i class="fas fa-box" style="color:#f97316;margin-right:.4rem;"></i>Products Catalog</h1>
+          <div style="font-size:.78rem;color:#94a3b8;margin-top:.1rem;">Add, edit and manage products with real-time updates</div>
         </div>
       </div>
-      <button class="btn-add" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Product</button>
+      <button class="btn-add" onclick="openAddModal()"><i class="fas fa-plus"></i> Add New Product</button>
     </div>
     <div class="dash-content">
       <div id="productsGrid" class="products-grid"></div>
@@ -116,25 +127,86 @@
 <div class="modal-overlay" id="productModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-    <h2 id="modalTitle"><i class="fas fa-box" style="color:#f97316;"></i> Add Product</h2>
+    <h2 id="modalTitle"><i class="fas fa-plus-circle" style="color:#f97316;"></i> Add New Product</h2>
     <form id="productForm" onsubmit="submitProduct(event)">
       <input type="hidden" id="editProductId" />
+      <input type="hidden" id="fieldImageData" />
       <div class="form-grid">
-        <div class="form-group form-full"><label>Product Name *</label><input type="text" id="fieldName" placeholder="e.g. Starter Pack" required /></div>
-        <div class="form-group"><label>Price (Rs.) *</label><input type="number" id="fieldPrice" placeholder="0" min="0" step="1" required /></div>
-        <div class="form-group"><label>Business Value (BV) *</label><input type="number" id="fieldBV" placeholder="0" min="0" step="1" required /></div>
-        <div class="form-group"><label>Reward Points (RP) *</label><input type="number" id="fieldRP" placeholder="0" min="0" step="0.5" required /></div>
-        <div class="form-group"><label>Referral Income (Rs.) *</label><input type="number" id="fieldReferral" placeholder="e.g. 1200" min="0" step="1" required /></div>
-        <div class="form-group form-full"><label>Description</label><textarea id="fieldDesc" rows="2" placeholder="Short product description"></textarea></div>
-        <div class="form-group form-full"><label>Items Included <span style="color:#94a3b8;font-weight:400;">(one per line)</span></label><textarea id="fieldItems" rows="4" placeholder="Item 1&#10;Item 2&#10;Item 3"></textarea></div>
         <div class="form-group form-full">
-          <label style="margin-bottom:.5rem;display:block;">Active Status</label>
+          <label>Product Name <span style="color:#ef4444">*</span></label>
+          <input type="text" id="fieldName" placeholder="e.g. Wedding Banarasi Saree & Pant Suit" required />
+        </div>
+
+        <div class="form-group">
+          <label>Category <span style="color:#ef4444">*</span></label>
+          <select id="fieldCategory" required>
+            <option value="Package">Package Bundle</option>
+            <option value="Saree">Saree & Ethnic Wear</option>
+            <option value="Clothing">Clothing & Suiting</option>
+            <option value="Health">Health & Wellness</option>
+            <option value="General">General Merchandise</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Available Quantity / Stock <span style="color:#ef4444">*</span></label>
+          <input type="number" id="fieldStock" placeholder="100" min="0" step="1" required />
+        </div>
+
+        <div class="form-group">
+          <label>Price (₹) <span style="color:#ef4444">*</span></label>
+          <input type="number" id="fieldPrice" placeholder="5000" min="0" step="1" required oninput="autoCalculateFields(this.value)" />
+        </div>
+
+        <div class="form-group">
+          <label>Business Value (BV) <span style="color:#ef4444">*</span></label>
+          <input type="number" id="fieldBV" placeholder="300" min="0" step="1" required />
+        </div>
+
+        <div class="form-group">
+          <label>Reward Points (RP) <span style="color:#ef4444">*</span></label>
+          <input type="number" id="fieldRP" placeholder="0.5" min="0" step="0.5" required />
+        </div>
+
+        <div class="form-group">
+          <label>Referral Income (₹) <span style="color:#ef4444">*</span></label>
+          <input type="number" id="fieldReferral" placeholder="510" min="0" step="1" required />
+        </div>
+
+        <!-- Image Upload & Preview -->
+        <div class="form-group form-full">
+          <label>Product Image</label>
+          <div class="img-upload-box" onclick="document.getElementById('fieldImageFile').click()">
+            <i class="fas fa-cloud-upload-alt" style="font-size:1.5rem;color:#f97316;margin-bottom:0.3rem;display:block;"></i>
+            <span style="font-size:0.83rem;color:#64748b;font-weight:600;">Click to upload image file (JPG, PNG, WebP)</span>
+            <input type="file" id="fieldImageFile" accept="image/*" style="display:none;" onchange="handleImageUpload(event)" />
+            <img id="imgPreview" class="img-preview" alt="Preview" />
+          </div>
+          <small style="color:#94a3b8;font-size:0.75rem;margin-top:3px;">Or leave empty to use the default category image.</small>
+        </div>
+
+        <div class="form-group form-full">
+          <label>Product Description</label>
+          <textarea id="fieldDesc" rows="2" placeholder="Detailed product description..."></textarea>
+        </div>
+
+        <div class="form-group form-full">
+          <label>Items Included <span style="color:#94a3b8;font-weight:400;">(one item per line)</span></label>
+          <textarea id="fieldItems" rows="3" placeholder="1x Banarasi Saree&#10;3x CTDV @ ₹6,000&#10;1x Business ID & Password"></textarea>
+        </div>
+
+        <div class="form-group form-full">
+          <label style="margin-bottom:.4rem;display:block;">Product Status</label>
           <div class="toggle-row">
             <label class="toggle-switch"><input type="checkbox" id="fieldActive" checked /><span class="toggle-slider"></span></label>
-            <span style="font-size:.88rem;color:#475569;">Product is active and available</span>
+            <span id="activeStatusLabel" style="font-size:.88rem;font-weight:600;color:#166534;">Active (Available for purchase)</span>
           </div>
         </div>
-        <div class="form-group form-full" style="margin-top:.5rem;"><button type="submit" class="btn-submit"><i class="fas fa-save"></i> Save Product</button></div>
+
+        <div class="form-group form-full btn-modal-row">
+          <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Save Product</button>
+          <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+        </div>
       </div>
     </form>
   </div>
@@ -144,44 +216,126 @@
 <script src="../assets/js/app.js"></script>
 <script>
   APP.requireAdmin('../login.html');
-  function showToast(msg,type='success'){const tc=document.getElementById('toast-container');const t=document.createElement('div');t.className=`toast ${type}`;t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;tc.appendChild(t);setTimeout(()=>t.remove(),3500);}
-  function generateId(){return 'P'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5).toUpperCase();}
+
+  function showToast(msg, type='success'){
+    const tc = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;
+    tc.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+
+  function generateId(){
+    return 'P' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2,5).toUpperCase();
+  }
+
+  // Auto-calculate suggested BV, RP, Referral Income on price change
+  function autoCalculateFields(val){
+    const price = parseFloat(val) || 0;
+    if (price <= 0) return;
+    const isEdit = !!document.getElementById('editProductId').value;
+    if (!isEdit) {
+      if (price >= 10000) {
+        document.getElementById('fieldBV').value = 600;
+        document.getElementById('fieldRP').value = 1;
+        document.getElementById('fieldReferral').value = 1020;
+      } else {
+        document.getElementById('fieldBV').value = 300;
+        document.getElementById('fieldRP').value = 0.5;
+        document.getElementById('fieldReferral').value = 510;
+      }
+    }
+  }
+
+  // Toggle label updater
+  document.getElementById('fieldActive').addEventListener('change', function() {
+    const label = document.getElementById('activeStatusLabel');
+    if (this.checked) {
+      label.textContent = 'Active (Available for purchase)';
+      label.style.color = '#166534';
+    } else {
+      label.textContent = 'Inactive (Hidden / Disabled)';
+      label.style.color = '#991b1b';
+    }
+  });
+
+  // Handle image file upload with base64 conversion & preview
+  function handleImageUpload(e){
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('Image file size must be less than 2MB', 'error');
+      e.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      const b64 = evt.target.result;
+      document.getElementById('fieldImageData').value = b64;
+      const prev = document.getElementById('imgPreview');
+      prev.src = b64;
+      prev.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
 
   function renderProducts(){
-    const products=APP.getProducts();
-    const orders=APP.getOrders();
-    const orderedPids=new Set(orders.map(o=>o.productId));
-    const grid=document.getElementById('productsGrid');grid.innerHTML='';
-    if(!products.length){grid.innerHTML='<div class="empty-state"><i class="fas fa-box-open"></i><p style="font-size:1rem;font-weight:600;">No products yet</p><div style="font-size:.85rem;margin-top:.25rem;">Click Add Product to create your first product.</div></div>';return;}
-    products.forEach(p=>{
-      const isActive=p.active!==false;
-      const hasOrders=orderedPids.has(p.id);
-      const items=Array.isArray(p.items)?p.items:[];
-      const imgSrc = p.image ? '../' + p.image : (p.price >= 10000 ? '../assets/images/p1_10000.jpg' : '../assets/images/p2_5000.jpg');
-      const card=document.createElement('div');
-      card.className=`product-card${!isActive?' inactive-card':''}`;
-      card.innerHTML=`
-        <div class="product-img-wrap" style="height:180px;">
-          <img src="${imgSrc}" alt="${p.name}" loading="lazy">
-          <span class="product-badge-float" style="top:10px;right:10px;font-size:.65rem;">${isActive?'ACTIVE':'INACTIVE'}</span>
+    const products = APP.getProducts();
+    const orders = APP.getOrders();
+    const orderedPids = new Set(orders.map(o => o.productId));
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = '';
+
+    if (!products.length) {
+      grid.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p style="font-size:1rem;font-weight:600;">No products yet</p><div style="font-size:.85rem;margin-top:.25rem;">Click "Add New Product" to create your first product.</div></div>';
+      return;
+    }
+
+    products.forEach(p => {
+      const isActive = p.active !== false;
+      const hasOrders = orderedPids.has(p.id);
+      const items = Array.isArray(p.items) ? p.items : [];
+      let imgSrc = '../assets/images/p2_5000.jpg';
+      if (p.image) {
+        imgSrc = p.image.startsWith('data:') || p.image.startsWith('http') ? p.image : ('../' + p.image);
+      } else if (p.price >= 10000) {
+        imgSrc = '../assets/images/p1_10000.jpg';
+      }
+
+      const stock = typeof p.stock === 'number' ? p.stock : 100;
+      const category = p.category || 'Package';
+
+      const card = document.createElement('div');
+      card.className = `product-card${!isActive ? ' inactive-card' : ''}`;
+      card.innerHTML = `
+        <div class="product-img-wrap" style="height:175px;position:relative;overflow:hidden;background:#f8fafc;">
+          <img src="${imgSrc}" alt="${p.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+          <span class="status-pill ${isActive ? 'pill-active' : 'pill-inactive'}">
+            ${isActive ? 'ACTIVE' : 'INACTIVE'}
+          </span>
         </div>
         <div class="product-card-header">
           <div class="prod-name">${p.name}</div>
           <div class="prod-price">${APP.fmtINR(p.price)}</div>
         </div>
         <div class="product-card-body">
+          <div class="prod-badges">
+            <span class="cat-badge"><i class="fas fa-tag"></i> ${category}</span>
+            <span class="stock-badge ${stock <= 5 ? 'low-stock' : ''}"><i class="fas fa-cubes"></i> Stock: ${stock} units</span>
+          </div>
           <div class="prod-stats">
             <div class="prod-stat"><div class="sv">${APP.fmt(p.bv||0)}</div><div class="sl">BV</div></div>
             <div class="prod-stat"><div class="sv">${APP.fmt(p.rp||0)}</div><div class="sl">RP</div></div>
             <div class="prod-stat"><div class="sv">${APP.fmtINR(p.referralIncome || (p.price>=10000?1020:510))}</div><div class="sl">Net Ref.</div></div>
           </div>
-          ${p.description?`<div class="prod-desc">${p.description}</div>`:''}
-          ${items.length?`<div class="prod-items"><div class="prod-items-title">Includes</div><ul>${items.slice(0,4).map(it=>`<li>${it}</li>`).join('')}${items.length>4?`<li style="color:#94a3b8;">+${items.length-4} more</li>`:''}</ul></div>`:''}
+          ${p.description ? `<div class="prod-desc">${p.description}</div>` : ''}
+          ${items.length ? `<div class="prod-items"><div class="prod-items-title">Includes</div><ul>${items.slice(0,3).map(it => `<li>${it}</li>`).join('')}${items.length > 3 ? `<li style="color:#94a3b8;">+${items.length - 3} more</li>` : ''}</ul></div>` : ''}
           <div class="card-actions">
             <button class="btn-card btn-edit" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i> Edit</button>
-            <button class="btn-card ${isActive?'btn-tog-on':'btn-tog-off'}" onclick="toggleProduct('${p.id}')"><i class="fas fa-${isActive?'eye-slash':'eye'}"></i> ${isActive?'Deactivate':'Activate'}</button>
-            <button class="btn-card btn-del" onclick="deleteProduct('${p.id}',${hasOrders})" ${hasOrders?'title="Has orders"':''}>
-              <i class="fas fa-${hasOrders?'lock':'trash'}"></i> ${hasOrders?'Locked':'Delete'}
+            <button class="btn-card ${isActive ? 'btn-tog-on' : 'btn-tog-off'}" onclick="toggleProduct('${p.id}')"><i class="fas fa-${isActive ? 'eye-slash' : 'eye'}"></i> ${isActive ? 'Deactivate' : 'Activate'}</button>
+            <button class="btn-card btn-del" onclick="deleteProduct('${p.id}', ${hasOrders})" ${hasOrders ? 'title="Product has existing orders"' : ''}>
+              <i class="fas fa-${hasOrders ? 'lock' : 'trash'}"></i> ${hasOrders ? 'Locked' : 'Delete'}
             </button>
           </div>
         </div>`;
@@ -189,54 +343,152 @@
     });
   }
 
-  function openAddModal(){document.getElementById('productForm').reset();document.getElementById('editProductId').value='';document.getElementById('modalTitle').innerHTML='<i class="fas fa-plus" style="color:#f97316;"></i> Add Product';document.getElementById('fieldActive').checked=true;openModal();}
-
-  function editProduct(id){
-    const p=APP.getProductById(id);if(!p)return;
-    document.getElementById('editProductId').value=p.id;
-    document.getElementById('fieldName').value=p.name||'';
-    document.getElementById('fieldPrice').value=p.price||'';
-    document.getElementById('fieldBV').value=p.bv||'';
-    document.getElementById('fieldRP').value=p.rp||'';
-    document.getElementById('fieldReferral').value=p.referralIncome || (p.price >= 10000 ? 1200 : 600);
-    document.getElementById('fieldDesc').value=p.description||'';
-    document.getElementById('fieldItems').value=Array.isArray(p.items)?p.items.join('\n'):'';
-    document.getElementById('fieldActive').checked=p.active!==false;
-    document.getElementById('modalTitle').innerHTML='<i class="fas fa-edit" style="color:#f97316;"></i> Edit Product';
+  function openAddModal(){
+    document.getElementById('productForm').reset();
+    document.getElementById('editProductId').value = '';
+    document.getElementById('fieldImageData').value = '';
+    document.getElementById('imgPreview').style.display = 'none';
+    document.getElementById('imgPreview').src = '';
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle" style="color:#f97316;"></i> Add New Product';
+    document.getElementById('fieldActive').checked = true;
+    document.getElementById('fieldStock').value = '100';
+    document.getElementById('fieldCategory').value = 'Package';
+    document.getElementById('activeStatusLabel').textContent = 'Active (Available for purchase)';
+    document.getElementById('activeStatusLabel').style.color = '#166534';
     openModal();
   }
 
-  function toggleProduct(id){const p=APP.getProductById(id);if(!p)return;p.active=p.active===false?true:false;APP.updateProduct(p);showToast(`Product ${p.active?'activated':'deactivated'}`);renderProducts();}
+  function editProduct(id){
+    const p = APP.getProductById(id);
+    if (!p) return;
+    document.getElementById('editProductId').value = p.id;
+    document.getElementById('fieldName').value = p.name || '';
+    document.getElementById('fieldCategory').value = p.category || 'Package';
+    document.getElementById('fieldStock').value = typeof p.stock === 'number' ? p.stock : 100;
+    document.getElementById('fieldPrice').value = p.price || '';
+    document.getElementById('fieldBV').value = p.bv || '';
+    document.getElementById('fieldRP').value = p.rp || '';
+    document.getElementById('fieldReferral').value = p.referralIncome || (p.price >= 10000 ? 1020 : 510);
+    document.getElementById('fieldDesc').value = p.description || '';
+    document.getElementById('fieldItems').value = Array.isArray(p.items) ? p.items.join('\n') : '';
+    document.getElementById('fieldActive').checked = p.active !== false;
 
-  function deleteProduct(id,hasOrders){
-    if(hasOrders){showToast('Cannot delete: product has existing orders!','error');return;}
-    const p=APP.getProductById(id);
-    if(!confirm(`Delete "${p?p.name:'this product'}"?`))return;
-    APP.deleteProduct(id);showToast('Product deleted');renderProducts();
+    const label = document.getElementById('activeStatusLabel');
+    if (p.active !== false) {
+      label.textContent = 'Active (Available for purchase)';
+      label.style.color = '#166534';
+    } else {
+      label.textContent = 'Inactive (Hidden / Disabled)';
+      label.style.color = '#991b1b';
+    }
+
+    const prev = document.getElementById('imgPreview');
+    if (p.image) {
+      document.getElementById('fieldImageData').value = p.image;
+      prev.src = p.image.startsWith('data:') || p.image.startsWith('http') ? p.image : ('../' + p.image);
+      prev.style.display = 'block';
+    } else {
+      document.getElementById('fieldImageData').value = '';
+      prev.style.display = 'none';
+      prev.src = '';
+    }
+
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit" style="color:#f97316;"></i> Edit Product';
+    openModal();
+  }
+
+  function toggleProduct(id){
+    const p = APP.getProductById(id);
+    if (!p) return;
+    p.active = p.active === false ? true : false;
+    APP.updateProduct(p);
+    showToast(`Product "${p.name}" ${p.active ? 'activated' : 'deactivated'} successfully!`);
+    renderProducts();
+  }
+
+  function deleteProduct(id, hasOrders){
+    if (hasOrders) {
+      showToast('Cannot delete product: Existing orders are linked to this package!', 'error');
+      return;
+    }
+    const p = APP.getProductById(id);
+    if (!confirm(`Are you sure you want to delete "${p ? p.name : 'this product'}"?`)) return;
+    APP.deleteProduct(id);
+    showToast('Product deleted successfully');
+    renderProducts();
   }
 
   function submitProduct(e){
     e.preventDefault();
-    const editId=document.getElementById('editProductId').value;
-    const itemsRaw=document.getElementById('fieldItems').value;
-    const pd={
-      name:document.getElementById('fieldName').value.trim(),
-      price:parseFloat(document.getElementById('fieldPrice').value),
-      bv:parseFloat(document.getElementById('fieldBV').value),
-      rp:parseFloat(document.getElementById('fieldRP').value),
-      referralIncome:parseFloat(document.getElementById('fieldReferral').value) || 0,
-      description:document.getElementById('fieldDesc').value.trim(),
-      items:itemsRaw.split('\n').map(s=>s.trim()).filter(Boolean),
-      active:document.getElementById('fieldActive').checked,
+    const editId = document.getElementById('editProductId').value;
+    const name = document.getElementById('fieldName').value.trim();
+    const price = parseFloat(document.getElementById('fieldPrice').value);
+    const category = document.getElementById('fieldCategory').value;
+    const stock = parseInt(document.getElementById('fieldStock').value, 10);
+    const bv = parseFloat(document.getElementById('fieldBV').value);
+    const rp = parseFloat(document.getElementById('fieldRP').value);
+    const referralIncome = parseFloat(document.getElementById('fieldReferral').value);
+    const desc = document.getElementById('fieldDesc').value.trim();
+    const itemsRaw = document.getElementById('fieldItems').value;
+    const active = document.getElementById('fieldActive').checked;
+    const imageData = document.getElementById('fieldImageData').value;
+
+    if (!name) {
+      showToast('Product name is required', 'error');
+      return;
+    }
+    if (isNaN(price) || price < 0) {
+      showToast('Please enter a valid price', 'error');
+      return;
+    }
+    if (isNaN(stock) || stock < 0) {
+      showToast('Please enter valid stock quantity', 'error');
+      return;
+    }
+
+    const items = itemsRaw.split('\n').map(s => s.trim()).filter(Boolean);
+
+    const pd = {
+      name,
+      category,
+      stock,
+      price,
+      bv: isNaN(bv) ? (price >= 10000 ? 600 : 300) : bv,
+      rp: isNaN(rp) ? (price >= 10000 ? 1 : 0.5) : rp,
+      referralIncome: isNaN(referralIncome) ? (price >= 10000 ? 1020 : 510) : referralIncome,
+      description: desc,
+      items,
+      active
     };
-    if(editId){pd.id=editId;APP.updateProduct(pd);showToast('Product updated!');}
-    else{pd.id=generateId();APP.addProduct(pd);showToast('Product added!');}
-    closeModal();renderProducts();
+
+    if (imageData) {
+      pd.image = imageData;
+    }
+
+    if (editId) {
+      pd.id = editId;
+      const existing = APP.getProductById(editId);
+      if (existing && !imageData && existing.image) {
+        pd.image = existing.image;
+      }
+      APP.updateProduct(pd);
+      showToast(`Product "${name}" updated successfully!`);
+    } else {
+      pd.id = generateId();
+      APP.addProduct(pd);
+      showToast(`New product "${name}" added successfully!`);
+    }
+
+    closeModal();
+    renderProducts();
   }
 
-  function openModal(){document.getElementById('productModal').classList.add('open');}
-  function closeModal(){document.getElementById('productModal').classList.remove('open');}
-  document.getElementById('productModal').addEventListener('click',e=>{if(e.target===document.getElementById('productModal'))closeModal();});
+  function openModal(){ document.getElementById('productModal').classList.add('open'); }
+  function closeModal(){ document.getElementById('productModal').classList.remove('open'); }
+  document.getElementById('productModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('productModal')) closeModal();
+  });
+
   renderProducts();
 </script>
 </body>

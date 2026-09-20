@@ -68,7 +68,7 @@
     <nav class="sidebar-nav">
       <div class="sidebar-nav-label">Management</div>
       <a href="admin-dashboard.html" class="sidebar-nav-item active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-      <a href="admin-members.html" class="sidebar-nav-item"><i class="fas fa-users"></i> Members</a>
+      <a href="admin-members.html" class="sidebar-nav-item"><i class="fas fa-users"></i> Customers</a>
       <a href="admin-products.html" class="sidebar-nav-item"><i class="fas fa-box"></i> Products</a>
       <a href="admin-orders.html" class="sidebar-nav-item"><i class="fas fa-shopping-bag"></i> Orders</a>
       <a href="admin-withdrawals.html" class="sidebar-nav-item"><i class="fas fa-money-bill-wave"></i> Withdrawals</a>
@@ -102,12 +102,29 @@
     <div class="dash-content">
       <div class="stat-cards" id="statCards"></div>
 
+      <!-- ADMIN NOTIFICATIONS & APPROVAL ALERTS -->
+      <div id="adminNotifsSection">
+        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <i class="fas fa-bell" style="color:#f97316;"></i>
+            <span>Action Required: Registrations & KYC Notifications</span>
+            <span id="unreadNotifCounter" style="background:#ef4444;color:#fff;font-size:0.75rem;padding:2px 8px;border-radius:50px;font-weight:700;display:none;">0</span>
+          </div>
+          <div>
+            <button class="btn-xs" style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;padding:4px 10px;cursor:pointer;" onclick="markAllNotifsRead()">
+              <i class="fas fa-check-double"></i> Mark All as Read
+            </button>
+          </div>
+        </div>
+        <div id="notificationsContainer" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:1rem;margin-bottom:1.75rem;"></div>
+      </div>
+
       <div class="section-title"><i class="fas fa-bolt" style="color:#f97316;"></i> Quick Navigation</div>
       <div class="quick-links">
         <a href="admin-members.html" class="quick-link-card">
           <div class="ql-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);"><i class="fas fa-users"></i></div>
-          <div class="ql-label">Members</div>
-          <div style="font-size:.75rem;color:#64748b;margin-top:.25rem;">Manage all members</div>
+          <div class="ql-label">Customers</div>
+          <div style="font-size:.75rem;color:#64748b;margin-top:.25rem;">Manage & verify accounts</div>
         </a>
         <a href="admin-products.html" class="quick-link-card">
           <div class="ql-icon" style="background:linear-gradient(135deg,#a855f7,#7e22ce);"><i class="fas fa-box"></i></div>
@@ -128,7 +145,7 @@
 
       <!-- NEW: PENDING PRODUCT ORDERS TO APPROVE -->
       <div class="section-title">
-        <i class="fas fa-bell" style="color:#f59e0b;"></i>
+        <i class="fas fa-shopping-cart" style="color:#f59e0b;"></i>
         <span>Product Orders Awaiting Verification & Approval</span>
         <span id="pendingOrdersCounter" style="background:#ef4444;color:#fff;font-size:0.75rem;padding:2px 8px;border-radius:50px;font-weight:700;display:none;">0</span>
       </div>
@@ -211,12 +228,12 @@
   const now=new Date();document.getElementById('topbarDate').textContent=now.toLocaleDateString('en-IN',{weekday:'short',year:'numeric',month:'short',day:'numeric'});
   const stats=APP.getAdminStats();
   const cardDefs=[
-    {label:'Total Members',val:stats.totalMembers,icon:'fa-users',cls:'bg-blue',fmt:n=>n},
+    {label:'Total Customers',val:stats.totalMembers,icon:'fa-users',cls:'bg-blue',fmt:n=>n},
+    {label:'Pending Activations',val:stats.pendingMembers||0,icon:'fa-user-clock',cls:'bg-yellow',fmt:n=>n,urgent:(stats.pendingMembers||0)>0},
+    {label:'KYC Under Review',val:stats.kycPending||0,icon:'fa-shield-alt',cls:'bg-purple',fmt:n=>n,urgent:(stats.kycPending||0)>0},
     {label:'Pending Orders',val:stats.pendingOrders,icon:'fa-clock',cls:'bg-red',fmt:n=>n,urgent:stats.pendingOrders>0},
-    {label:'Completed Orders',val:stats.completedOrders,icon:'fa-cart-circle-check',cls:'bg-green',fmt:n=>n},
-    {label:'Total Verified Revenue',val:stats.totalRevenue,icon:'fa-indian-rupee-sign',cls:'bg-orange',fmt:n=>APP.fmtINR(n)},
-    {label:'Pending Withdrawals',val:stats.pendingWD,icon:'fa-hourglass-half',cls:'bg-yellow',fmt:n=>n,urgent:stats.pendingWD>0},
-    {label:'Total Withdrawn',val:stats.totalWDAmount,icon:'fa-money-bill-wave',cls:'bg-teal',fmt:n=>APP.fmtINR(n)},
+    {label:'Total Verified Revenue',val:stats.totalRevenue,icon:'fa-indian-rupee-sign',cls:'bg-green',fmt:n=>APP.fmtINR(n)},
+    {label:'Pending Withdrawals',val:stats.pendingWD,icon:'fa-hourglass-half',cls:'bg-orange',fmt:n=>n,urgent:stats.pendingWD>0},
   ];
   const statCardsEl=document.getElementById('statCards');
   cardDefs.forEach(def=>{
@@ -226,6 +243,103 @@
   });
   function countUp(el,target,fmtFn,dur=1200){let s=0;const isF=target%1!==0;const step=target/(dur/16);const tm=setInterval(()=>{s=Math.min(s+step,target);el.textContent=fmtFn(isF?parseFloat(s.toFixed(2)):Math.floor(s));if(s>=target)clearInterval(tm);},16);}
   document.querySelectorAll('.stat-num').forEach((el,i)=>{const target=parseFloat(el.dataset.target);setTimeout(()=>countUp(el,target,cardDefs[i].fmt,1000),i*100);});
+
+  // Admin Notifications
+  function renderAdminNotifications(){
+    const notifs = APP.getNotifications().filter(n => !n.read);
+    const container = document.getElementById('notificationsContainer');
+    const counter = document.getElementById('unreadNotifCounter');
+    
+    if (notifs.length > 0) {
+      counter.textContent = notifs.length + ' New';
+      counter.style.display = 'inline-block';
+    } else {
+      counter.style.display = 'none';
+    }
+
+    if (!notifs.length) {
+      container.innerHTML = `
+        <div style="grid-column:1/-1;background:#fff;padding:1.25rem;border-radius:12px;border:1px dashed #cbd5e1;text-align:center;color:#64748b;font-size:0.88rem;">
+          <i class="fas fa-check-circle" style="color:#22c55e;font-size:1.3rem;margin-right:0.4rem;"></i> All registrations, KYC submissions, and alerts are caught up!
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = notifs.map(n => {
+      let icon = 'fa-bell';
+      let borderCol = '#f59e0b';
+      let actionBtn = '';
+
+      if (n.type === 'customer_registration') {
+        icon = 'fa-user-plus';
+        borderCol = '#3b82f6';
+        actionBtn = `
+          <button class="btn-xs btn-approve" onclick="quickActivate('${n.referenceId}', '${n.id}')">
+            <i class="fas fa-user-check"></i> Activate
+          </button>
+          <a href="admin-members.html" class="btn-xs btn-view">Review</a>
+        `;
+      } else if (n.type === 'kyc_submission') {
+        icon = 'fa-id-card';
+        borderCol = '#8b5cf6';
+        actionBtn = `
+          <a href="admin-members.html" class="btn-xs" style="background:#8b5cf6;color:#fff;" onclick="APP.markNotificationAsRead('${n.id}')">
+            <i class="fas fa-search"></i> Review KYC
+          </a>
+        `;
+      } else {
+        actionBtn = `<a href="admin-orders.html" class="btn-xs btn-view">View</a>`;
+      }
+
+      const timeStr = new Date(n.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+      return `
+        <div style="background:#fff;border-radius:12px;box-shadow:var(--shadow);border-left:4px solid ${borderCol};padding:1rem;display:flex;flex-direction:column;justify-content:space-between;gap:0.75rem;">
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
+              <span style="font-size:0.75rem;font-weight:700;color:${borderCol};text-transform:uppercase;">
+                <i class="fas ${icon}"></i> ${n.type.replace('_',' ')}
+              </span>
+              <span style="font-size:0.7rem;color:#94a3b8;">${timeStr}</span>
+            </div>
+            <p style="margin:0;font-size:0.85rem;color:#1e293b;font-weight:600;line-height:1.4;">${n.message}</p>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:0.5rem;border-top:1px solid #f1f5f9;">
+            <div style="display:flex;gap:0.4rem;">${actionBtn}</div>
+            <button class="btn-xs" style="background:none;color:#94a3b8;cursor:pointer;" onclick="dismissNotif('${n.id}')" title="Dismiss">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function quickActivate(memberId, notifId){
+    if (!confirm(`Activate customer ${memberId}? This will approve their account immediately.`)) return;
+    const res = APP.activateMember(memberId);
+    if (res.success) {
+      APP.markNotificationAsRead(notifId);
+      showToast(`Customer ${memberId} activated!`);
+      setTimeout(()=>location.reload(), 800);
+    } else {
+      showToast(res.msg || 'Activation failed', 'error');
+    }
+  }
+
+  function dismissNotif(id){
+    APP.markNotificationAsRead(id);
+    renderAdminNotifications();
+  }
+
+  function markAllNotifsRead(){
+    APP.markAllNotificationsAsRead();
+    showToast('All notifications marked as read');
+    renderAdminNotifications();
+  }
+
+  renderAdminNotifications();
 
   const products=APP.getProducts();const prodMap={};products.forEach(p=>prodMap[p.id]=p);
   const allNonAdmin=APP.getMembers().filter(m=>!m.isAdmin);

@@ -26,12 +26,19 @@
     .badge{display:inline-block;font-size:.68rem;font-weight:700;border-radius:50px;padding:.18rem .55rem;}
     .badge-active{background:#dcfce7;color:#166534;}
     .badge-inactive{background:#fee2e2;color:#991b1b;}
+    .badge-pending{background:#fef3c7;color:#92400e;border:1px solid #f59e0b;}
+    .badge-kyc-review{background:#fef3c7;color:#b45309;font-weight:700;border:1px solid #fde047;}
+    .badge-kyc-verified{background:#dcfce7;color:#15803d;font-weight:700;border:1px solid #86efac;}
+    .badge-kyc-rejected{background:#fee2e2;color:#dc2626;font-weight:700;border:1px solid #fca5a5;}
+    .badge-kyc-none{background:#f1f5f9;color:#64748b;}
     .action-btns{display:flex;gap:.35rem;flex-wrap:wrap;}
-    .btn-xs{font-size:.7rem;padding:.25rem .6rem;border-radius:6px;border:none;cursor:pointer;font-weight:600;transition:all .18s;}
+    .btn-xs{font-size:.72rem;padding:.3rem .65rem;border-radius:6px;border:none;cursor:pointer;font-weight:600;transition:all .18s;display:inline-flex;align-items:center;gap:3px;}
     .btn-view{background:#dbeafe;color:#1d4ed8;}
     .btn-view:hover{background:#bfdbfe;}
-    .btn-toggle-active{background:#dcfce7;color:#166534;}
-    .btn-toggle-inactive{background:#fee2e2;color:#991b1b;}
+    .btn-activate{background:#16a34a;color:#fff;font-weight:700;}
+    .btn-activate:hover{background:#15803d;}
+    .btn-deactivate{background:#fef3c7;color:#92400e;}
+    .btn-deactivate:hover{background:#fde68a;}
     .btn-del{background:#fee2e2;color:#991b1b;}
     .btn-del:hover{background:#fecaca;}
     .pagination{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:1rem;flex-wrap:wrap;}
@@ -40,25 +47,26 @@
     .page-btn:hover:not(.active){background:#f8fafc;}
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;}
     .modal-overlay.open{display:flex;}
-    .modal-box{background:#fff;border-radius:20px;padding:2rem;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+    .modal-box{background:#fff;border-radius:20px;padding:2rem;width:100%;max-width:680px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.2);}
     .modal-box h2{font-size:1.15rem;font-weight:800;color:#1e293b;margin-bottom:1.25rem;}
     .modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#94a3b8;}
     .modal-close:hover{color:#1e293b;}
     .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;}
     .form-group{display:flex;flex-direction:column;gap:.35rem;}
     .form-group label{font-size:.78rem;font-weight:700;color:#475569;}
-    .form-group input,.form-group select{padding:.6rem .85rem;border:1.5px solid #e2e8f0;border-radius:10px;font-size:.88rem;outline:none;transition:border-color .18s;width:100%;box-sizing:border-box;}
-    .form-group input:focus,.form-group select:focus{border-color:#0b2ac9;}
+    .form-group input,.form-group select,.form-group textarea{padding:.6rem .85rem;border:1.5px solid #e2e8f0;border-radius:10px;font-size:.88rem;outline:none;transition:border-color .18s;width:100%;box-sizing:border-box;}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#0b2ac9;}
     .form-full{grid-column:1/-1;}
     .btn-submit{background:linear-gradient(135deg,#071a82,#0b2ac9);border:1px solid var(--gold);color:#fff;padding:.7rem 2rem;border-radius:10px;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .2s;width:100%;}
     .btn-submit:hover{background:linear-gradient(135deg,#f5b800,#d97706);color:#071a82;}
     .mobile-toggle{display:none;background:none;border:none;font-size:1.4rem;color:#1e293b;cursor:pointer;}
     .info-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.85rem;}
-    .info-item{flex:1;min-width:140px;}
+    .info-item{flex:1;min-width:130px;}
     .info-item label{font-size:.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;display:block;margin-bottom:.15rem;}
     .info-item .val{font-size:.9rem;font-weight:600;color:#1e293b;}
     .alert{padding:.75rem 1rem;border-radius:10px;font-size:.85rem;font-weight:600;margin-bottom:.75rem;}
     .alert-error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;}
+    .kyc-doc-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:0.75rem 1rem;margin-bottom:0.6rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;}
     @media(max-width:768px){.mobile-toggle{display:block;}.toolbar{flex-direction:column;align-items:stretch;}.form-grid{grid-template-columns:1fr;}th,td{padding:.6rem .65rem;font-size:.75rem;}}
   </style>
 </head>
@@ -77,7 +85,7 @@
     <nav class="sidebar-nav">
       <div class="sidebar-nav-label">Management</div>
       <a href="admin-dashboard.html" class="sidebar-nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-      <a href="admin-members.html" class="sidebar-nav-item active"><i class="fas fa-users"></i> Members</a>
+      <a href="admin-members.html" class="sidebar-nav-item active"><i class="fas fa-users"></i> Customers</a>
       <a href="admin-products.html" class="sidebar-nav-item"><i class="fas fa-box"></i> Products</a>
       <a href="admin-orders.html" class="sidebar-nav-item"><i class="fas fa-shopping-bag"></i> Orders</a>
       <a href="admin-withdrawals.html" class="sidebar-nav-item"><i class="fas fa-money-bill-wave"></i> Withdrawals</a>
@@ -93,59 +101,73 @@
       <div style="display:flex;align-items:center;gap:.75rem;">
         <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></button>
         <div>
-          <h1><i class="fas fa-users" style="color:#f97316;margin-right:.4rem;"></i>Members <span class="count-badge" id="memberCountBadge">0</span></h1>
-          <div style="font-size:.78rem;color:#94a3b8;margin-top:.1rem;">Manage all registered members</div>
+          <h1><i class="fas fa-users" style="color:#f97316;margin-right:.4rem;"></i>Customer Management <span class="count-badge" id="memberCountBadge">0</span></h1>
+          <div style="font-size:.78rem;color:#94a3b8;margin-top:.1rem;">Review registrations, activate accounts, and verify KYC documents</div>
         </div>
       </div>
-      <button class="btn-add" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Member</button>
+      <button class="btn-add" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Customer</button>
     </div>
 
     <div class="dash-content">
       <!-- KPI SUMMARY -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem;">
-        <div style="background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:4px solid #3b82f6;">
-          <div style="font-size:0.75rem;color:#64748b;text-transform:uppercase;font-weight:700;">Total Members</div>
+        <div style="background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:4px solid #3b82f6;cursor:pointer;" onclick="setAccountFilter('')">
+          <div style="font-size:0.75rem;color:#64748b;text-transform:uppercase;font-weight:700;">Total Customers</div>
           <div style="font-size:1.6rem;font-weight:800;color:#1e293b;" id="kpiTotal">0</div>
         </div>
-        <div style="background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:4px solid #16a34a;">
-          <div style="font-size:0.75rem;color:#64748b;text-transform:uppercase;font-weight:700;">🟢 Ordered / Active</div>
-          <div style="font-size:1.6rem;font-weight:800;color:#16a34a;" id="kpiOrdered">0</div>
+        <div style="background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:4px solid #f59e0b;cursor:pointer;" onclick="setAccountFilter('pending')">
+          <div style="font-size:0.75rem;color:#d97706;text-transform:uppercase;font-weight:700;">⏳ Pending Approval</div>
+          <div style="font-size:1.6rem;font-weight:800;color:#d97706;" id="kpiPending">0</div>
         </div>
-        <div style="background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:4px solid #ef4444;">
-          <div style="font-size:0.75rem;color:#64748b;text-transform:uppercase;font-weight:700;">🔴 Not Ordered (Pending)</div>
-          <div style="font-size:1.6rem;font-weight:800;color:#ef4444;" id="kpiNotOrdered">0</div>
+        <div style="background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:4px solid #16a34a;cursor:pointer;" onclick="setAccountFilter('active')">
+          <div style="font-size:0.75rem;color:#16a34a;text-transform:uppercase;font-weight:700;">🟢 Active Accounts</div>
+          <div style="font-size:1.6rem;font-weight:800;color:#16a34a;" id="kpiActive">0</div>
         </div>
-        <div style="background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:4px solid #f97316;">
-          <div style="font-size:0.75rem;color:#64748b;text-transform:uppercase;font-weight:700;">Total Order Revenue</div>
-          <div style="font-size:1.6rem;font-weight:800;color:#f97316;" id="kpiRevenue">₹0</div>
+        <div style="background:#fff;border-radius:12px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:4px solid #8b5cf6;cursor:pointer;" onclick="setKycFilter('UNDER_REVIEW')">
+          <div style="font-size:0.75rem;color:#7c3aed;text-transform:uppercase;font-weight:700;">📑 KYC Under Review</div>
+          <div style="font-size:1.6rem;font-weight:800;color:#7c3aed;" id="kpiKycReview">0</div>
         </div>
       </div>
 
       <div class="toolbar">
         <div class="search-box">
           <i class="fas fa-search"></i>
-          <input type="text" id="searchInput" placeholder="Search by ID, name, or phone…" oninput="filterMembers()" />
+          <input type="text" id="searchInput" placeholder="Search by ID, name, email, or phone…" oninput="filterMembers()" />
         </div>
-        <select class="filter-sel" id="orderFilter" onchange="filterMembers()">
-          <option value="">All Purchase Status</option>
-          <option value="ordered">🟢 Ordered (Package Active)</option>
-          <option value="not_ordered">🔴 Not Ordered (Pending)</option>
-        </select>
         <select class="filter-sel" id="statusFilter" onchange="filterMembers()">
-          <option value="">All Account Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
+          <option value="">All Account Statuses</option>
+          <option value="pending">⏳ Pending Approval</option>
+          <option value="active">🟢 Active</option>
+          <option value="inactive">🔴 Inactive</option>
+        </select>
+        <select class="filter-sel" id="kycFilter" onchange="filterMembers()">
+          <option value="">All KYC Statuses</option>
+          <option value="UNDER_REVIEW">📑 Under Review</option>
+          <option value="VERIFIED">✅ Verified</option>
+          <option value="REJECTED">❌ Rejected</option>
+          <option value="NOT_SUBMITTED">⚪ Not Submitted</option>
+        </select>
+        <select class="filter-sel" id="orderFilter" onchange="filterMembers()">
+          <option value="">All Package Statuses</option>
+          <option value="ordered">🟢 Package Ordered</option>
+          <option value="not_ordered">⚪ No Package</option>
         </select>
       </div>
+
       <div class="table-card">
         <div style="overflow-x:auto;">
           <table>
             <thead>
               <tr>
-                <th>ID</th><th>Name</th><th>Phone</th><th>Sponsor</th><th>Pos.</th>
-                <th>Order Status</th>
-                <th>Package</th><th>L-BV</th><th>R-BV</th>
-                <th>Wallet</th><th>Rank</th><th>Account</th><th>Joined</th><th>Actions</th>
+                <th>Customer</th>
+                <th>Contact Info</th>
+                <th>Sponsor & Pos</th>
+                <th>Account Status</th>
+                <th>KYC Status</th>
+                <th>Package</th>
+                <th>Wallet / BV</th>
+                <th>Registered</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="membersTbody"></tbody>
@@ -157,11 +179,11 @@
   </div>
 </div>
 
-<!-- VIEW MODAL -->
+<!-- CUSTOMER DETAILS & KYC REVIEW MODAL -->
 <div class="modal-overlay" id="viewModal">
-  <div class="modal-box" style="max-width:700px;">
+  <div class="modal-box" style="max-width:760px;">
     <button class="modal-close" onclick="closeModal('viewModal')"><i class="fas fa-times"></i></button>
-    <h2><i class="fas fa-user" style="color:#f97316;"></i> Member Details</h2>
+    <h2><i class="fas fa-user-circle" style="color:#f97316;"></i> Customer Profile & KYC Details</h2>
     <div id="viewModalContent"></div>
   </div>
 </div>
@@ -208,135 +230,174 @@
 <script src="../assets/js/app.js"></script>
 <script>
   APP.requireAdmin('../login.html');
-  function showToast(msg,type='success'){const tc=document.getElementById('toast-container');const t=document.createElement('div');t.className=`toast ${type}`;t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;tc.appendChild(t);setTimeout(()=>t.remove(),3500);}
 
-  const PAGE_SIZE=10;
-  let currentPage=1;
-  let filteredMembers=[];
-  const products=APP.getProducts();
-  const prodMap={};
-  products.forEach(p=>prodMap[p.id]=p);
+  function showToast(msg, type='success'){
+    const tc = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;
+    tc.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+
+  const PAGE_SIZE = 10;
+  let currentPage = 1;
+  let filteredMembers = [];
+  const products = APP.getProducts();
+  const prodMap = {};
+  products.forEach(p => prodMap[p.id] = p);
 
   // Populate package selects
-  const pkgSel=document.getElementById('addPackage');
-  const orderPkgSel=document.getElementById('orderPackageSelect');
-  products.filter(p=>p.active!==false).forEach(p=>{
-    const opt=document.createElement('option');
-    opt.value=p.id;
-    opt.textContent=`${p.name} – ₹${p.price.toLocaleString('en-IN')}`;
+  const pkgSel = document.getElementById('addPackage');
+  const orderPkgSel = document.getElementById('orderPackageSelect');
+  products.filter(p => p.active !== false).forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = `${p.name} – ₹${p.price.toLocaleString('en-IN')}`;
     pkgSel.appendChild(opt);
-    const opt2=opt.cloneNode(true);
+    const opt2 = opt.cloneNode(true);
     orderPkgSel.appendChild(opt2);
   });
 
-  let allMembers=APP.getMembers().filter(m=>!m.isAdmin);
-  document.getElementById('memberCountBadge').textContent=allMembers.length;
+  let allMembers = APP.getMembers().filter(m => !m.isAdmin);
+  document.getElementById('memberCountBadge').textContent = allMembers.length;
+
+  function setAccountFilter(val) {
+    document.getElementById('statusFilter').value = val;
+    filterMembers();
+  }
+
+  function setKycFilter(val) {
+    document.getElementById('kycFilter').value = val;
+    filterMembers();
+  }
 
   function updateKPIs(){
-    const orders=APP.getOrders();
-    const orderedMemberIds=new Set(orders.map(o=>(o.memberId||'').toUpperCase()));
-    const orderedCount=allMembers.filter(m=>orderedMemberIds.has(m.id.toUpperCase())||!!m.packageId).length;
-    const notOrderedCount=allMembers.length - orderedCount;
-    const totalRev=orders.reduce((s,o)=>s+(o.price||0),0);
+    const pendingCount = allMembers.filter(m => m.status === 'pending').length;
+    const activeCount = allMembers.filter(m => m.status === 'active').length;
+    const kycReviewCount = allMembers.filter(m => m.kycStatus === 'UNDER_REVIEW').length;
 
-    document.getElementById('kpiTotal').textContent=allMembers.length;
-    document.getElementById('kpiOrdered').textContent=orderedCount;
-    document.getElementById('kpiNotOrdered').textContent=notOrderedCount;
-    document.getElementById('kpiRevenue').textContent=APP.fmtINR(totalRev);
+    document.getElementById('kpiTotal').textContent = allMembers.length;
+    document.getElementById('kpiPending').textContent = pendingCount;
+    document.getElementById('kpiActive').textContent = activeCount;
+    document.getElementById('kpiKycReview').textContent = kycReviewCount;
   }
   updateKPIs();
 
   function filterMembers(){
-    const q=document.getElementById('searchInput').value.toLowerCase();
-    const st=document.getElementById('statusFilter').value;
-    const ordSt=document.getElementById('orderFilter').value;
-    const orders=APP.getOrders();
-    const orderedMemberIds=new Set(orders.map(o=>(o.memberId||'').toUpperCase()));
+    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    const st = document.getElementById('statusFilter').value;
+    const kycSt = document.getElementById('kycFilter').value;
+    const ordSt = document.getElementById('orderFilter').value;
+    const orders = APP.getOrders();
+    const orderedMemberIds = new Set(orders.map(o => (o.memberId || '').toUpperCase()));
 
-    filteredMembers=allMembers.filter(m=>{
-      const matchQ=!q||m.id.toLowerCase().includes(q)||m.name.toLowerCase().includes(q)||(m.phone||'').includes(q);
-      const matchS=!st||m.status===st;
-      const isOrd=orderedMemberIds.has(m.id.toUpperCase())||!!m.packageId;
-      const matchOrd=!ordSt||(ordSt==='ordered'?isOrd:!isOrd);
-      return matchQ&&matchS&&matchOrd;
+    filteredMembers = allMembers.filter(m => {
+      const matchQ = !q ||
+        m.id.toLowerCase().includes(q) ||
+        (m.name || '').toLowerCase().includes(q) ||
+        (m.email || '').toLowerCase().includes(q) ||
+        (m.phone || '').includes(q);
+      const matchS = !st || m.status === st;
+      const matchKyc = !kycSt || (m.kycStatus || 'NOT_SUBMITTED') === kycSt;
+      const isOrd = orderedMemberIds.has(m.id.toUpperCase()) || !!m.packageId;
+      const matchOrd = !ordSt || (ordSt === 'ordered' ? isOrd : !isOrd);
+      return matchQ && matchS && matchKyc && matchOrd;
     });
-    currentPage=1;renderTable();renderPagination();
+
+    currentPage = 1;
+    renderTable();
+    renderPagination();
   }
 
   function renderTable(){
-    const tbody=document.getElementById('membersTbody');tbody.innerHTML='';
-    const start=(currentPage-1)*PAGE_SIZE;
-    const pageItems=filteredMembers.slice(start,start+PAGE_SIZE);
-    if(!pageItems.length){tbody.innerHTML='<tr><td colspan="15" style="text-align:center;padding:2.5rem;color:#94a3b8;"><i class="fas fa-users" style="font-size:2rem;display:block;margin-bottom:.5rem;"></i>No members found matching filter</td></tr>';return;}
-    
-    pageItems.forEach(m=>{
-      const pkg=prodMap[m.packageId];
-      const isActive=m.status==='active';
-      const mOrders=APP.getMemberOrders(m.id);
-      const completedOrders=mOrders.filter(o=>o.status==='completed');
-      const pendingOrders=mOrders.filter(o=>o.status==='pending');
-      const isOrdered=completedOrders.length>0||!!m.packageId;
-      const latestOrder=mOrders.length?mOrders[mOrders.length-1]:null;
+    const tbody = document.getElementById('membersTbody');
+    tbody.innerHTML = '';
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const pageItems = filteredMembers.slice(start, start + PAGE_SIZE);
 
-      let orderStatusHtml='';
-      if(pendingOrders.length>0){
-        orderStatusHtml=`
-          <span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #fde047;font-weight:700;">
-            <i class="fas fa-clock"></i> Pending Approval (${pendingOrders.length})
-          </span>
-          <div style="margin-top:3px;">
-            <a href="admin-orders.html" class="btn-xs btn-approve" style="text-decoration:none;padding:2px 7px;font-size:0.68rem;">
-              <i class="fas fa-check"></i> Verify in Orders
-            </a>
-          </div>
-        `;
-      } else if(isOrdered){
-        orderStatusHtml=`
-          <span class="badge" style="background:#dcfce7;color:#15803d;border:1px solid #86efac;font-weight:700;">
-            <i class="fas fa-check-circle"></i> Ordered (${completedOrders.length||1})
-          </span>
-          <div style="font-size:.72rem;color:#64748b;margin-top:2px;">
-            ${latestOrder?`${latestOrder.id} • ${new Date(latestOrder.createdAt).toLocaleDateString('en-IN')}`: 'Package Active'}
-          </div>
-        `;
+    if (!pageItems.length) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:#94a3b8;"><i class="fas fa-users" style="font-size:2rem;display:block;margin-bottom:.5rem;"></i>No customers found matching filter</td></tr>';
+      return;
+    }
+
+    pageItems.forEach(m => {
+      const pkg = prodMap[m.packageId];
+      const mOrders = APP.getMemberOrders(m.id);
+      const isOrdered = mOrders.some(o => o.status === 'completed') || !!m.packageId;
+
+      // Status Badges
+      let statusBadge = '';
+      if (m.status === 'pending') {
+        statusBadge = `<span class="badge badge-pending"><i class="fas fa-clock"></i> PENDING APPROVAL</span>`;
+      } else if (m.status === 'active') {
+        statusBadge = `<span class="badge badge-active"><i class="fas fa-check-circle"></i> ACTIVE</span>`;
       } else {
-        orderStatusHtml=`
-          <span class="badge" style="background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;font-weight:700;">
-            <i class="fas fa-times-circle"></i> Not Ordered
-          </span>
-          <div>
-            <button class="btn-xs" style="background:#f97316;color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:0.7rem;cursor:pointer;margin-top:3px;" onclick="openOrderModal('${m.id}')">
-              <i class="fas fa-cart-plus"></i> Order Now
-            </button>
-          </div>
-        `;
+        statusBadge = `<span class="badge badge-inactive"><i class="fas fa-ban"></i> INACTIVE</span>`;
       }
 
-      const tr=document.createElement('tr');
-      tr.innerHTML=`
-        <td><span style="font-family:monospace;font-size:.78rem;font-weight:700;color:#f97316;">${m.id}</span></td>
-        <td><strong>${m.name}</strong></td>
-        <td>${m.phone||'—'}</td>
-        <td><span style="font-family:monospace;font-size:.78rem;">${m.sponsorId||'—'}</span></td>
-        <td style="text-transform:capitalize;">${m.position||'—'}</td>
-        <td>${orderStatusHtml}</td>
-        <td>${pkg?pkg.name:'<span style="color:#ef4444;font-size:0.78rem;">No Package</span>'}</td>
-        <td>${APP.fmt(m.leftBV||0)}</td>
-        <td>${APP.fmt(m.rightBV||0)}</td>
-        <td><strong style="color:#16a34a;">${APP.fmtINR(m.incomeWallet||0)}</strong></td>
-        <td>${m.rank||'Starter'}</td>
+      // KYC Badges
+      let kycBadge = '';
+      const kyc = m.kycStatus || 'NOT_SUBMITTED';
+      if (kyc === 'UNDER_REVIEW') {
+        kycBadge = `<span class="badge badge-kyc-review" title="Documents submitted for review"><i class="fas fa-hourglass-half"></i> Under Review</span>`;
+      } else if (kyc === 'VERIFIED') {
+        kycBadge = `<span class="badge badge-kyc-verified" title="KYC Verified"><i class="fas fa-shield-alt"></i> Verified</span>`;
+      } else if (kyc === 'REJECTED') {
+        kycBadge = `<span class="badge badge-kyc-rejected" title="${m.kycRejectionReason || 'Rejected'}"><i class="fas fa-times-circle"></i> Rejected</span>`;
+      } else {
+        kycBadge = `<span class="badge badge-kyc-none">Not Submitted</span>`;
+      }
+
+      // Avatar
+      const userPhoto = (m.profile && m.profile.photo) ? m.profile.photo : '';
+      const avatarHtml = userPhoto
+        ? `<img src="${userPhoto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1.5px solid var(--gold);" />`
+        : `<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#071a82,#0b2ac9);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;">${(m.name||'U').charAt(0).toUpperCase()}</div>`;
+
+      // Actions
+      let activateBtn = '';
+      if (m.status === 'pending') {
+        activateBtn = `<button class="btn-xs btn-activate" onclick="activateCustomer('${m.id}')" title="Approve & Activate Customer"><i class="fas fa-user-check"></i> Activate</button>`;
+      } else if (m.status === 'active') {
+        activateBtn = `<button class="btn-xs btn-deactivate" onclick="deactivateCustomer('${m.id}')" title="Deactivate Customer Account"><i class="fas fa-user-slash"></i> Deactivate</button>`;
+      } else {
+        activateBtn = `<button class="btn-xs btn-activate" onclick="activateCustomer('${m.id}')" title="Reactivate Account"><i class="fas fa-user-check"></i> Reactivate</button>`;
+      }
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
         <td>
-          <span class="badge ${isActive?'badge-active':'badge-inactive'}" style="cursor:pointer;" onclick="toggleStatus('${m.id}')" title="Click to toggle status">
-            <i class="fas ${isActive?'fa-check-circle':'fa-ban'}"></i> ${m.status||'inactive'}
-          </span>
+          <div style="display:flex;align-items:center;gap:0.6rem;">
+            ${avatarHtml}
+            <div>
+              <div style="font-weight:700;color:#1e293b;">${m.name}</div>
+              <span style="font-family:monospace;font-size:.78rem;font-weight:700;color:#f97316;">${m.id}</span>
+            </div>
+          </div>
         </td>
-        <td>${m.joinedAt?new Date(m.joinedAt).toLocaleDateString('en-IN'):'—'}</td>
+        <td>
+          <div><i class="fas fa-envelope" style="font-size:0.75rem;color:#94a3b8;margin-right:3px;"></i>${m.email || '<span style="color:#94a3b8;">No email</span>'}</div>
+          <div style="margin-top:2px;"><i class="fas fa-phone" style="font-size:0.75rem;color:#94a3b8;margin-right:3px;"></i>${m.phone || '—'}</div>
+        </td>
+        <td>
+          <div><span style="font-family:monospace;font-weight:600;">${m.sponsorId || 'Root'}</span></div>
+          <div style="font-size:0.75rem;color:#64748b;text-transform:capitalize;">${m.position || '—'}</div>
+        </td>
+        <td>${statusBadge}</td>
+        <td>
+          ${kycBadge}
+          ${kyc === 'UNDER_REVIEW' ? `<div style="margin-top:2px;"><button class="btn-xs btn-view" onclick="viewMember('${m.id}')" style="font-size:0.68rem;padding:1px 5px;"><i class="fas fa-search"></i> Review</button></div>` : ''}
+        </td>
+        <td>${pkg ? pkg.name : '<span style="color:#ef4444;font-size:0.78rem;">No Package</span>'}</td>
+        <td>
+          <div style="color:#16a34a;font-weight:700;">${APP.fmtINR(m.incomeWallet||0)}</div>
+          <div style="font-size:0.72rem;color:#64748b;">L: ${APP.fmt(m.leftBV||0)} | R: ${APP.fmt(m.rightBV||0)}</div>
+        </td>
+        <td>${m.joinedAt ? new Date(m.joinedAt).toLocaleDateString('en-IN') : '—'}</td>
         <td class="action-btns">
-          <button class="btn-xs btn-view" onclick="viewMember('${m.id}')" title="View Details"><i class="fas fa-eye"></i></button>
-          <button class="btn-xs" style="background:#f97316;color:#fff;" onclick="openOrderModal('${m.id}')" title="Place Order"><i class="fas fa-shopping-cart"></i></button>
-          <button class="btn-xs ${isActive?'btn-toggle-active':'btn-toggle-inactive'}" onclick="toggleStatus('${m.id}')" title="${isActive?'Deactivate (Block login & access)':'Activate (Grant login & access)'}">
-            <i class="fas ${isActive?'fa-user-slash':'fa-user-check'}"></i> ${isActive?'Deactivate':'Activate'}
-          </button>
+          <button class="btn-xs btn-view" onclick="viewMember('${m.id}')" title="View Full Details & KYC"><i class="fas fa-eye"></i> View</button>
+          ${activateBtn}
           <button class="btn-xs btn-del" onclick="deleteMember('${m.id}')" title="Delete Member"><i class="fas fa-trash"></i></button>
         </td>
       `;
@@ -345,189 +406,292 @@
   }
 
   function renderPagination(){
-    const totalPages=Math.ceil(filteredMembers.length/PAGE_SIZE);
-    const pg=document.getElementById('pagination');pg.innerHTML='';
-    if(totalPages<=1)return;
-    const mkBtn=(label,page,isActive)=>{const btn=document.createElement('button');btn.className=`page-btn${isActive?' active':''}`;btn.innerHTML=label;btn.onclick=()=>{currentPage=page;renderTable();renderPagination();};pg.appendChild(btn);};
-    if(currentPage>1)mkBtn('<i class="fas fa-chevron-left"></i>',currentPage-1,false);
-    for(let i=1;i<=totalPages;i++){if(i===1||i===totalPages||Math.abs(i-currentPage)<=1)mkBtn(i,i,i===currentPage);else if(Math.abs(i-currentPage)===2){const sp=document.createElement('span');sp.textContent='…';sp.style.cssText='padding:.4rem .2rem;color:#94a3b8;font-size:.85rem;';pg.appendChild(sp);}}
-    if(currentPage<totalPages)mkBtn('<i class="fas fa-chevron-right"></i>',currentPage+1,false);
+    const totalPages = Math.ceil(filteredMembers.length / PAGE_SIZE);
+    const pg = document.getElementById('pagination');
+    pg.innerHTML = '';
+    if (totalPages <= 1) return;
+
+    const mkBtn = (label, page, isActive) => {
+      const btn = document.createElement('button');
+      btn.className = `page-btn${isActive ? ' active' : ''}`;
+      btn.innerHTML = label;
+      btn.onclick = () => { currentPage = page; renderTable(); renderPagination(); };
+      pg.appendChild(btn);
+    };
+
+    if (currentPage > 1) mkBtn('<i class="fas fa-chevron-left"></i>', currentPage - 1, false);
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 1) {
+        mkBtn(i, i, i === currentPage);
+      } else if (Math.abs(i - currentPage) === 2) {
+        const sp = document.createElement('span');
+        sp.textContent = '…';
+        sp.style.cssText = 'padding:.4rem .2rem;color:#94a3b8;font-size:.85rem;';
+        pg.appendChild(sp);
+      }
+    }
+    if (currentPage < totalPages) mkBtn('<i class="fas fa-chevron-right"></i>', currentPage + 1, false);
+  }
+
+  function activateCustomer(id){
+    const m = APP.getMemberById(id);
+    if (!m) return;
+    if (!confirm(`Activate customer "${m.name}" (${m.id})?\n\nThis will approve their account and allow them to log into the customer dashboard.`)) return;
+    
+    const res = APP.activateMember(id);
+    if (res.success) {
+      showToast(`Customer "${m.name}" activated successfully!`);
+      allMembers = APP.getMembers().filter(x => !x.isAdmin);
+      updateKPIs();
+      filterMembers();
+    } else {
+      showToast(res.msg || 'Activation failed', 'error');
+    }
+  }
+
+  function deactivateCustomer(id){
+    const m = APP.getMemberById(id);
+    if (!m) return;
+    if (!confirm(`Deactivate customer "${m.name}" (${m.id})?\n\nThis will block their access and prevent login until reactivated.`)) return;
+
+    const res = APP.deactivateMember(id);
+    if (res.success) {
+      showToast(`Customer "${m.name}" has been deactivated.`, 'warning');
+      allMembers = APP.getMembers().filter(x => !x.isAdmin);
+      updateKPIs();
+      filterMembers();
+    } else {
+      showToast(res.msg || 'Deactivation failed', 'error');
+    }
+  }
+
+  function reviewKYC(memberId, status){
+    let reason = '';
+    if (status === 'REJECTED') {
+      const reasonInput = document.getElementById('kycRejectReason');
+      reason = reasonInput ? reasonInput.value.trim() : '';
+      if (!reason) {
+        showToast('Please provide a reason for rejecting the KYC submission', 'error');
+        return;
+      }
+    }
+
+    const res = APP.reviewCustomerKYC(memberId, status, reason);
+    if (res.success) {
+      showToast(`KYC status updated to ${status}!`);
+      allMembers = APP.getMembers().filter(x => !x.isAdmin);
+      updateKPIs();
+      filterMembers();
+      viewMember(memberId);
+    } else {
+      showToast(res.msg || 'Failed to review KYC', 'error');
+    }
+  }
+
+  function toggleRejectBox(){
+    const box = document.getElementById('rejectBox');
+    if (box) {
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
   }
 
   function viewMember(id){
-    const m=APP.getMemberById(id);if(!m)return;
-    const pkg=prodMap[m.packageId];
-    const mOrders=APP.getMemberOrders(m.id);
-    const isOrdered=mOrders.length>0||!!m.packageId;
+    const m = APP.getMemberById(id);
+    if (!m) return;
+    const pkg = prodMap[m.packageId];
+    const mOrders = APP.getMemberOrders(m.id);
+    const profile = m.profile || {};
+    const kycDocs = m.kycDocuments || [];
+    const kycStatus = m.kycStatus || 'NOT_SUBMITTED';
 
-    let ordersTableHtml='';
-    if(mOrders.length>0){
-      ordersTableHtml=`
-        <table style="margin-top:0.5rem;width:100%;font-size:0.8rem;">
-          <thead><tr><th>Order ID</th><th>Product</th><th>Price</th><th>BV</th><th>RP</th><th>Date</th></tr></thead>
-          <tbody>
-            ${mOrders.map(o=>`
-              <tr>
-                <td style="font-family:monospace;font-weight:700;color:#f97316;">${o.id}</td>
-                <td><strong>${o.productName}</strong></td>
-                <td>${APP.fmtINR(o.price)}</td>
-                <td>${o.bv}</td>
-                <td>${o.rp}</td>
-                <td>${new Date(o.createdAt).toLocaleDateString('en-IN')}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
+    const photoHtml = profile.photo
+      ? `<img src="${profile.photo}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--gold);" />`
+      : `<div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#071a82,#0b2ac9);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.8rem;border:2px solid var(--gold);">${(m.name||'U').charAt(0).toUpperCase()}</div>`;
+
+    // KYC Review HTML
+    let kycHtml = '';
+    if (kycDocs.length > 0) {
+      kycHtml = `
+        <div style="margin-top:0.5rem;">
+          ${kycDocs.map((doc, idx) => `
+            <div class="kyc-doc-card">
+              <div>
+                <strong>${doc.docType || 'Document'}</strong>: <span style="font-family:monospace;color:#1e293b;">${doc.docNumber || '—'}</span>
+                <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">
+                  File: <strong>${doc.fileName || 'Attached document'}</strong> &bull; Uploaded: ${doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString('en-IN') : '—'}
+                </div>
+              </div>
+              <div>
+                ${doc.fileData ? `<a href="${doc.fileData}" target="_blank" class="btn-xs btn-view"><i class="fas fa-external-link-alt"></i> View Document</a>` : '<span style="font-size:0.75rem;color:#94a3b8;">No preview</span>'}
+              </div>
+            </div>
+          `).join('')}
+        </div>
       `;
     } else {
-      ordersTableHtml=`
-        <div style="background:#fee2e2;color:#991b1b;padding:0.75rem 1rem;border-radius:8px;font-size:0.85rem;display:flex;align-items:center;justify-content:space-between;margin-top:0.5rem;">
-          <span><i class="fas fa-exclamation-triangle"></i> This member has <strong>NOT ordered</strong> any package yet.</span>
-          <button class="btn-xs" style="background:#f97316;color:#fff;" onclick="closeModal('viewModal');openOrderModal('${m.id}')"><i class="fas fa-cart-plus"></i> Order Now</button>
+      kycHtml = `<p style="font-size:0.85rem;color:#94a3b8;margin:0.5rem 0;">No KYC documents have been uploaded yet.</p>`;
+    }
+
+    // KYC Actions
+    let kycActions = '';
+    if (kycStatus === 'UNDER_REVIEW') {
+      kycActions = `
+        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:1rem;flex-wrap:wrap;">
+          <button class="btn-xs btn-activate" style="padding:0.5rem 1rem;font-size:0.85rem;" onclick="reviewKYC('${m.id}', 'VERIFIED')">
+            <i class="fas fa-check-circle"></i> Verify & Approve KYC
+          </button>
+          <button class="btn-xs btn-del" style="padding:0.5rem 1rem;font-size:0.85rem;" onclick="toggleRejectBox()">
+            <i class="fas fa-times-circle"></i> Reject KYC...
+          </button>
+        </div>
+        <div id="rejectBox" style="display:none;margin-top:0.75rem;background:#fee2e2;padding:0.75rem;border-radius:8px;border:1px solid #fca5a5;">
+          <label style="font-size:0.78rem;font-weight:700;color:#991b1b;display:block;margin-bottom:0.3rem;">Reason for Rejection *</label>
+          <textarea id="kycRejectReason" rows="2" style="width:100%;border:1px solid #f87171;border-radius:6px;padding:0.5rem;font-size:0.85rem;" placeholder="e.g. Document photo is blurred / PAN mismatch"></textarea>
+          <button class="btn-xs btn-del" style="margin-top:0.5rem;" onclick="reviewKYC('${m.id}', 'REJECTED')">
+            Confirm Rejection
+          </button>
+        </div>
+      `;
+    } else if (kycStatus === 'VERIFIED') {
+      kycActions = `<div style="margin-top:0.5rem;color:#16a34a;font-weight:700;font-size:0.85rem;"><i class="fas fa-check-double"></i> Verified on ${m.kycReviewedAt ? new Date(m.kycReviewedAt).toLocaleDateString('en-IN') : '—'}</div>`;
+    } else if (kycStatus === 'REJECTED') {
+      kycActions = `
+        <div style="margin-top:0.5rem;background:#fee2e2;padding:0.6rem 0.8rem;border-radius:6px;color:#991b1b;font-size:0.82rem;">
+          <strong>Rejection Reason:</strong> ${m.kycRejectionReason || 'No reason specified'}
         </div>
       `;
     }
 
-    document.getElementById('viewModalContent').innerHTML=`
-      <div style="background:linear-gradient(135deg,#071a82,#0b2ac9);border:1px solid var(--gold);border-radius:14px;padding:1.25rem;color:#fff;margin-bottom:1.25rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;box-shadow:0 4px 15px rgba(11,42,201,0.3);">
-        <div>
-          <div style="font-size:1.4rem;font-weight:800;">${m.name}</div>
-          <div style="font-size:.85rem;opacity:.9;">${m.id} &bull; ${m.phone||'No phone'}</div>
+    document.getElementById('viewModalContent').innerHTML = `
+      <div style="background:linear-gradient(135deg,#071a82,#0b2ac9);border:1px solid var(--gold);border-radius:14px;padding:1.25rem;color:#fff;margin-bottom:1.25rem;display:flex;align-items:center;gap:1.25rem;box-shadow:0 4px 15px rgba(11,42,201,0.3);flex-wrap:wrap;">
+        ${photoHtml}
+        <div style="flex:1;">
+          <div style="font-size:1.35rem;font-weight:800;">${m.name}</div>
+          <div style="font-size:.85rem;opacity:.9;">Member ID: <strong>${m.id}</strong> &bull; Registered: ${m.joinedAt ? new Date(m.joinedAt).toLocaleDateString('en-IN') : '—'}</div>
+          <div style="font-size:.82rem;opacity:.9;margin-top:2px;">Email: <strong>${m.email || 'None'}</strong> &bull; Phone: <strong>${m.phone || 'None'}</strong></div>
         </div>
-        <div>
-          <span style="background:rgba(255,255,255,.2);border-radius:50px;padding:.25rem .75rem;font-size:.75rem;font-weight:700;">${m.status||'inactive'}</span>
-          <span style="background:${isOrdered?'#22c55e':'#ef4444'};color:#fff;border-radius:50px;padding:.25rem .75rem;font-size:.75rem;font-weight:700;margin-left:0.3rem;">${isOrdered?'ORDERED':'NOT ORDERED'}</span>
+        <div style="text-align:right;">
+          <div>
+            <span style="background:rgba(255,255,255,.2);border-radius:50px;padding:.25rem .75rem;font-size:.75rem;font-weight:700;text-transform:uppercase;">
+              ${m.status || 'pending'}
+            </span>
+          </div>
+          <div style="margin-top:0.5rem;">
+            ${m.status === 'pending'
+              ? `<button class="btn-xs btn-activate" onclick="activateCustomer('${m.id}')"><i class="fas fa-user-check"></i> Activate Now</button>`
+              : (m.status === 'active'
+                  ? `<button class="btn-xs btn-deactivate" onclick="deactivateCustomer('${m.id}')"><i class="fas fa-user-slash"></i> Deactivate</button>`
+                  : `<button class="btn-xs btn-activate" onclick="activateCustomer('${m.id}')"><i class="fas fa-user-check"></i> Reactivate</button>`)}
+          </div>
         </div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-item"><label>Sponsor ID</label><div class="val">${m.sponsorId||'—'}</div></div>
-        <div class="info-item"><label>Position</label><div class="val" style="text-transform:capitalize;">${m.position||'—'}</div></div>
-        <div class="info-item"><label>Package</label><div class="val">${pkg?pkg.name:'<span style="color:#ef4444">None</span>'}</div></div>
-        <div class="info-item"><label>Rank</label><div class="val">${m.rank||'Starter'}</div></div>
-      </div>
-      <div class="info-row">
-        <div class="info-item"><label>Left BV</label><div class="val">${APP.fmt(m.leftBV||0)}</div></div>
-        <div class="info-item"><label>Right BV</label><div class="val">${APP.fmt(m.rightBV||0)}</div></div>
-        <div class="info-item"><label>Left RP</label><div class="val">${APP.fmt(m.leftRP||0)}</div></div>
-        <div class="info-item"><label>Right RP</label><div class="val">${APP.fmt(m.rightRP||0)}</div></div>
-      </div>
-      <div class="info-row">
-        <div class="info-item"><label>Left Members</label><div class="val">${m.leftMemberCount||0}</div></div>
-        <div class="info-item"><label>Right Members</label><div class="val">${m.rightMemberCount||0}</div></div>
-        <div class="info-item"><label>Income Wallet</label><div class="val" style="color:#16a34a;font-weight:700;">${APP.fmtINR(m.incomeWallet||0)}</div></div>
-        <div class="info-item"><label>Joined</label><div class="val">${m.joinedAt?new Date(m.joinedAt).toLocaleDateString('en-IN'):'—'}</div></div>
       </div>
 
+      <!-- PERSONAL DETAILS -->
+      <h3 style="font-size:0.95rem;font-weight:700;color:#1e293b;border-bottom:2px solid #f1f5f9;padding-bottom:0.4rem;margin-bottom:0.75rem;">
+        <i class="fas fa-id-card text-primary"></i> Personal Profile Information
+      </h3>
+      <div class="info-row">
+        <div class="info-item"><label>Date of Birth</label><div class="val">${profile.dob || '—'}</div></div>
+        <div class="info-item"><label>Gender</label><div class="val" style="text-transform:capitalize;">${profile.gender || '—'}</div></div>
+        <div class="info-item"><label>Country</label><div class="val">${profile.country || 'India'}</div></div>
+        <div class="info-item"><label>State</label><div class="val">${profile.state || '—'}</div></div>
+      </div>
+      <div class="info-row">
+        <div class="info-item"><label>City</label><div class="val">${profile.city || '—'}</div></div>
+        <div class="info-item"><label>Pincode</label><div class="val">${profile.pincode || '—'}</div></div>
+        <div class="info-item" style="flex:2;"><label>Full Address</label><div class="val">${profile.address || '—'}</div></div>
+      </div>
+
+      <!-- KYC VERIFICATION -->
       <div style="margin-top:1.25rem;">
-        <h3 style="font-size:0.95rem;font-weight:700;color:#1e293b;border-bottom:2px solid #f1f5f9;padding-bottom:0.4rem;display:flex;align-items:center;gap:0.4rem;">
-          <i class="fas fa-shopping-bag text-primary"></i> Order & Purchase History (${mOrders.length})
+        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #f1f5f9;padding-bottom:0.4rem;margin-bottom:0.75rem;">
+          <h3 style="font-size:0.95rem;font-weight:700;color:#1e293b;margin:0;">
+            <i class="fas fa-shield-alt text-primary"></i> KYC Verification Documents
+          </h3>
+          <span class="badge ${kycStatus==='VERIFIED'?'badge-kyc-verified':(kycStatus==='UNDER_REVIEW'?'badge-kyc-review':(kycStatus==='REJECTED'?'badge-kyc-rejected':'badge-kyc-none'))}">
+            ${kycStatus}
+          </span>
+        </div>
+        ${kycHtml}
+        ${kycActions}
+      </div>
+
+      <!-- BUSINESS & BINARY -->
+      <div style="margin-top:1.25rem;">
+        <h3 style="font-size:0.95rem;font-weight:700;color:#1e293b;border-bottom:2px solid #f1f5f9;padding-bottom:0.4rem;margin-bottom:0.75rem;">
+          <i class="fas fa-sitemap text-primary"></i> Business & Tree Summary
         </h3>
-        ${ordersTableHtml}
+        <div class="info-row">
+          <div class="info-item"><label>Sponsor ID</label><div class="val">${m.sponsorId || '—'}</div></div>
+          <div class="info-item"><label>Position</label><div class="val" style="text-transform:capitalize;">${m.position || '—'}</div></div>
+          <div class="info-item"><label>Package</label><div class="val">${pkg ? pkg.name : '<span style="color:#ef4444">None</span>'}</div></div>
+          <div class="info-item"><label>Rank</label><div class="val">${m.rank || 'Starter'}</div></div>
+        </div>
+        <div class="info-row">
+          <div class="info-item"><label>Left BV</label><div class="val">${APP.fmt(m.leftBV||0)}</div></div>
+          <div class="info-item"><label>Right BV</label><div class="val">${APP.fmt(m.rightBV||0)}</div></div>
+          <div class="info-item"><label>Left RP</label><div class="val">${APP.fmt(m.leftRP||0)}</div></div>
+          <div class="info-item"><label>Right RP</label><div class="val">${APP.fmt(m.rightRP||0)}</div></div>
+        </div>
       </div>
     `;
+
     openModal('viewModal');
   }
 
-  // Place Order Modal Logic
-  function openOrderModal(memberId){
-    const m=APP.getMemberById(memberId);if(!m)return;
-    document.getElementById('orderMemberId').value=m.id;
-    document.getElementById('orderModalInfo').innerHTML=`
-      <strong>Member:</strong> ${m.name} (${m.id})<br>
-      <strong>Sponsor:</strong> ${m.sponsorId||'Root'} &bull; <strong>Position:</strong> ${m.position||'—'}<br>
-      <strong>Current Package:</strong> ${prodMap[m.packageId]?prodMap[m.packageId].name:'<span style="color:#ef4444;">Not Ordered Yet</span>'}
-    `;
-    updateOrderPreview();
-    openModal('orderModal');
-  }
-
-  function updateOrderPreview(){
-    const pkgId=document.getElementById('orderPackageSelect').value;
-    const p=prodMap[pkgId];
-    const prevEl=document.getElementById('orderPackagePreview');
-    if(!p){prevEl.innerHTML='Select a package above';return;}
-    const netRef = p.referralIncome || (p.price>=10000?1020:510);
-    prevEl.innerHTML=`
-      <div style="display:flex;justify-content:space-between;font-weight:700;margin-bottom:4px;">
-        <span>${p.name}</span>
-        <span style="color:#ea580c;font-size:1.05rem;">₹${p.price.toLocaleString('en-IN')}</span>
-      </div>
-      <div>BV: <strong>${p.bv}</strong> | RP: <strong>${p.rp}</strong></div>
-      <div>Sponsor Net Referral Bonus: <strong>₹${netRef}</strong></div>
-      <div style="font-size:0.75rem;color:#78350f;margin-top:4px;">Placing this order will immediately activate the member and propagate BV/RP up the tree.</div>
-    `;
-  }
-
-  function submitAdminOrder(e){
-    e.preventDefault();
-    const memberId=document.getElementById('orderMemberId').value;
-    const productId=document.getElementById('orderPackageSelect').value;
-    // Admin direct placement auto-activates immediately (autoApprove=true)
-    const res=APP.placeOrder(memberId,productId,true);
-    if(res&&res.success){
-      showToast('Order placed & completed successfully! Member package activated.');
-      closeModal('orderModal');
-      allMembers=APP.getMembers().filter(m=>!m.isAdmin);
-      updateKPIs();
-      filterMembers();
-    } else {
-      showToast((res&&res.msg)?res.msg:'Failed to place order','error');
-    }
-  }
-
-  function toggleStatus(id){
-    const m=APP.getMemberById(id);if(!m)return;
-    const ns=m.status==='active'?'inactive':'active';
-    const warningText = ns==='inactive'
-      ? `Are you sure you want to DEACTIVATE "${m.name}" (${m.id})?\n\n⚠️ Deactivating will lock this member out and prevent login or withdrawals.`
-      : `Activate "${m.name}" (${m.id})?\n\nThis will restore login and dashboard access.`;
-    
-    if(!confirm(warningText)) return;
-    m.status=ns;
-    APP.updateMember(m);
-    showToast(`Member "${m.name}" marked as ${ns.toUpperCase()}`, ns==='active'?'success':'warning');
-    allMembers=APP.getMembers().filter(m=>!m.isAdmin);
-    document.getElementById('memberCountBadge').textContent=allMembers.length;
-    updateKPIs();
-    filterMembers();
-  }
-
   function deleteMember(id){
-    const m=APP.getMemberById(id);if(!m)return;
-    if(!confirm(`⚠️ Permanently DELETE "${m.name}" (${id})? This cannot be undone.`))return;
-    APP.deleteMember(id);showToast('Member deleted');
-    allMembers=APP.getMembers().filter(m=>!m.isAdmin);
-    document.getElementById('memberCountBadge').textContent=allMembers.length;
+    const m = APP.getMemberById(id);
+    if (!m) return;
+    if (!confirm(`⚠️ Permanently DELETE "${m.name}" (${id})? This cannot be undone.`)) return;
+    APP.deleteMember(id);
+    showToast('Customer record deleted');
+    allMembers = APP.getMembers().filter(m => !m.isAdmin);
+    document.getElementById('memberCountBadge').textContent = allMembers.length;
     updateKPIs();
     filterMembers();
   }
 
-  function openAddModal(){document.getElementById('addMemberForm').reset();document.getElementById('addFormError').style.display='none';openModal('addModal');}
+  function openAddModal(){
+    document.getElementById('addMemberForm').reset();
+    document.getElementById('addFormError').style.display = 'none';
+    openModal('addModal');
+  }
 
   function submitAddMember(e){
-    e.preventDefault();const errEl=document.getElementById('addFormError');
-    const data={sponsorId:document.getElementById('addSponsorId').value.trim(),position:document.getElementById('addPosition').value,name:document.getElementById('addName').value.trim(),phone:document.getElementById('addPhone').value.trim(),password:document.getElementById('addPassword').value,productId:document.getElementById('addPackage').value||null};
-    const result=APP.registerMember(data);
-    if(result&&result.success){
-      showToast(`Member registered! ID: ${result.memberId}`);
+    e.preventDefault();
+    const errEl = document.getElementById('addFormError');
+    const data = {
+      sponsorId: document.getElementById('addSponsorId').value.trim(),
+      position: document.getElementById('addPosition').value,
+      name: document.getElementById('addName').value.trim(),
+      phone: document.getElementById('addPhone').value.trim(),
+      password: document.getElementById('addPassword').value,
+      productId: document.getElementById('addPackage').value || null
+    };
+
+    const result = APP.registerMember(data);
+    if (result && result.success) {
+      showToast(`Customer registered! ID: ${result.memberId}`);
       closeModal('addModal');
-      allMembers=APP.getMembers().filter(m=>!m.isAdmin);
-      document.getElementById('memberCountBadge').textContent=allMembers.length;
+      allMembers = APP.getMembers().filter(m => !m.isAdmin);
+      document.getElementById('memberCountBadge').textContent = allMembers.length;
       updateKPIs();
       filterMembers();
     } else {
-      errEl.textContent=(result&&result.msg)?result.msg:'Registration failed. Check sponsor ID and try again.';
-      errEl.style.display='block';
+      errEl.textContent = (result && result.msg) ? result.msg : 'Registration failed. Check sponsor ID and try again.';
+      errEl.style.display = 'block';
     }
   }
 
-  function openModal(id){document.getElementById(id).classList.add('open');}
-  function closeModal(id){document.getElementById(id).classList.remove('open');}
-  document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+  function openModal(id){ document.getElementById(id).classList.add('open'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+  document.querySelectorAll('.modal-overlay').forEach(o => {
+    o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+  });
 
-  filteredMembers=[...allMembers];
-  renderTable();renderPagination();
+  filteredMembers = [...allMembers];
+  renderTable();
+  renderPagination();
 </script>
 </body>
 </html>
