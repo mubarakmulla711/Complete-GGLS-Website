@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Details – Admin | Great Goals Lifestyle</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    .dash-topbar{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.75rem;background:#fff;border-bottom:1px solid #f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+    .dash-topbar h1{font-size:1.3rem;font-weight:800;color:#1e293b;margin:0;}
+    .dash-content{padding:1.75rem;overflow-y:auto;}
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+    @media(max-width:992px){.detail-grid{grid-template-columns:1fr;}}
+    .card{background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.07);padding:1.5rem;margin-bottom:1.5rem;}
+    .card-title{font-size:1.1rem;font-weight:800;color:#071a82;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid #f1f5f9;padding-bottom:0.85rem;margin-bottom:1.25rem;}
+    .info-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;}
+    .info-item label{font-size:0.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.03em;display:block;margin-bottom:0.25rem;}
+    .info-item .val{font-size:0.95rem;font-weight:700;color:#1e293b;word-break:break-all;}
+    .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem;}
+    .kpi-box{background:#fff;border-radius:14px;padding:1.15rem 1.25rem;box-shadow:0 2px 10px rgba(0,0,0,.06);border-left:4px solid #f97316;}
+    .kpi-box .kpi-label{font-size:0.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:0.35rem;}
+    .kpi-box .kpi-val{font-size:1.4rem;font-weight:800;color:#1e293b;}
+    .btn-action{padding:0.55rem 1.1rem;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:0.4rem;transition:all .18s;text-decoration:none;}
+    .btn-activate{background:#16a34a;color:#fff;}
+    .btn-activate:hover{background:#15803d;}
+    .btn-deactivate{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;}
+    .btn-deactivate:hover{background:#fecaca;}
+    .btn-verify{background:#0b2ac9;color:#fff;}
+    .btn-verify:hover{background:#071a82;}
+    .btn-reject{background:#ef4444;color:#fff;}
+    .btn-reject:hover{background:#dc2626;}
+    .btn-back{background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;}
+    .btn-back:hover{background:#e2e8f0;}
+    .doc-card{border:1.5px solid #e2e8f0;border-radius:12px;padding:1rem;background:#f8fafc;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.85rem;}
+    .doc-info{display:flex;align-items:center;gap:1rem;}
+    .doc-icon{width:46px;height:46px;border-radius:10px;background:#eff6ff;color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:1.35rem;}
+    .doc-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:2000;align-items:center;justify-content:center;padding:1.5rem;}
+    .doc-modal.open{display:flex;}
+    .doc-modal-content{background:#fff;border-radius:16px;width:100%;max-width:850px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;}
+    .doc-modal-header{padding:1rem 1.5rem;background:#071a82;color:#fff;display:flex;align-items:center;justify-content:space-between;}
+    .doc-modal-body{padding:1.5rem;overflow-y:auto;flex:1;text-align:center;}
+    table{width:100%;border-collapse:collapse;}
+    th{background:#f8fafc;color:#64748b;font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:.85rem 1rem;text-align:left;}
+    td{padding:.8rem 1rem;font-size:.85rem;color:#1e293b;border-top:1px solid #f1f5f9;}
+    .table-responsive{overflow-x:auto;}
+  </style>
+</head>
+<body>
+<div class="dash-layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar admin-sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="../assets/images/logo.png" alt="Great Goals Lifestyle" style="width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);box-shadow:0 0 10px rgba(245,184,0,0.4);object-fit:cover;">
+      <div class="sidebar-logo-text">Admin Panel<br><span>Great Goals</span></div>
+    </div>
+    <div style="padding:.75rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.1);">
+      <div style="font-size:.7rem;color:#94a3b8;">Logged in as</div>
+      <div style="font-size:.95rem;font-weight:700;color:#fff;">Administrator</div>
+      <span style="font-size:.7rem;background:var(--gold);color:#071a82;font-weight:800;padding:.1rem .5rem;border-radius:50px;">Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-label">Management</div>
+      <a href="admin-dashboard.html" class="sidebar-nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="admin-members.html" class="sidebar-nav-item active"><i class="fas fa-users"></i> Customers</a>
+      <a href="admin-kyc.html" class="sidebar-nav-item"><i class="fas fa-id-card"></i> KYC Verification</a>
+      <a href="admin-products.html" class="sidebar-nav-item"><i class="fas fa-box"></i> Products</a>
+      <a href="admin-orders.html" class="sidebar-nav-item"><i class="fas fa-shopping-bag"></i> Orders</a>
+      <a href="admin-withdrawals.html" class="sidebar-nav-item"><i class="fas fa-money-bill-wave"></i> Withdrawals</a>
+      <a href="../customer-tree.html" class="sidebar-nav-item"><i class="fas fa-sitemap"></i> Genealogy Tree</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="APP.logout();window.location.href='../login.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <a href="admin-members.html" class="btn-action btn-back"><i class="fas fa-arrow-left"></i> Back to Customers</a>
+        <div>
+          <h1 id="topbarTitle">Customer Details</h1>
+          <div style="font-size:.78rem;color:#94a3b8;margin-top:.1rem;">Full profile, BV/RP metrics, KYC verification, and order records</div>
+        </div>
+      </div>
+      <div id="topbarActions" style="display:flex;gap:0.5rem;"></div>
+    </div>
+
+    <div class="dash-content">
+      <!-- TOP KPIS -->
+      <div class="kpi-row">
+        <div class="kpi-box" style="border-left-color:#3b82f6;">
+          <div class="kpi-label">Account Status</div>
+          <div id="kpiAccountStatus" style="margin-top:0.35rem;">—</div>
+        </div>
+        <div class="kpi-box" style="border-left-color:#8b5cf6;">
+          <div class="kpi-label">KYC Status</div>
+          <div id="kpiKycStatus" style="margin-top:0.35rem;">—</div>
+        </div>
+        <div class="kpi-box" style="border-left-color:#16a34a;">
+          <div class="kpi-label">Total BV / Total RP</div>
+          <div class="kpi-val" id="kpiTotalBVRP" style="font-size:1.2rem;color:#15803d;">0 BV / 0 RP</div>
+        </div>
+        <div class="kpi-box" style="border-left-color:#f59e0b;">
+          <div class="kpi-label">Income Wallet</div>
+          <div class="kpi-val" id="kpiWallet" style="color:#b45309;">₹0</div>
+        </div>
+      </div>
+
+      <!-- DETAILS GRID -->
+      <div class="detail-grid">
+        <!-- PERSONAL DETAILS -->
+        <div class="card">
+          <div class="card-title">
+            <span><i class="fas fa-id-badge text-primary" style="margin-right:.5rem;"></i>Personal & Profile Information</span>
+            <div id="customerAvatarContainer"></div>
+          </div>
+          <div class="info-list">
+            <div class="info-item"><label>Customer ID</label><div class="val text-primary" id="detId" style="font-family:monospace;font-size:1.05rem;">—</div></div>
+            <div class="info-item"><label>Full Name</label><div class="val" id="detName">—</div></div>
+            <div class="info-item"><label>Phone Number</label><div class="val" id="detPhone">—</div></div>
+            <div class="info-item"><label>Email Address</label><div class="val" id="detEmail">—</div></div>
+            <div class="info-item"><label>Sponsor ID</label><div class="val" id="detSponsor">—</div></div>
+            <div class="info-item"><label>Binary Placement</label><div class="val" id="detPosition" style="text-transform:capitalize;">—</div></div>
+            <div class="info-item"><label>Joined Date</label><div class="val" id="detJoined">—</div></div>
+            <div class="info-item"><label>Activation Date</label><div class="val" id="detActivated">—</div></div>
+            <div class="info-item"><label>Package Assigned</label><div class="val" id="detPackage">—</div></div>
+            <div class="info-item"><label>Gender</label><div class="val" id="detGender">—</div></div>
+            <div class="info-item"><label>Date of Birth</label><div class="val" id="detDob">—</div></div>
+            <div class="info-item" style="grid-column:1/-1;"><label>Residential Address</label><div class="val" id="detAddress">—</div></div>
+          </div>
+        </div>
+
+        <!-- BV & RP NETWORK BREAKDOWN -->
+        <div class="card">
+          <div class="card-title">
+            <span><i class="fas fa-chart-line text-primary" style="margin-right:.5rem;"></i>BV & RP Network Breakdown</span>
+            <span id="rankBadge" class="status-badge badge-status-active" style="display:none;"></span>
+          </div>
+          <div class="info-list">
+            <div class="info-item"><label>Personal BV</label><div class="val text-primary" id="detPersonalBV">0 BV</div></div>
+            <div class="info-item"><label>Personal RP</label><div class="val text-primary" id="detPersonalRP">0 RP</div></div>
+            <div class="info-item"><label>Left Leg Total BV</label><div class="val" id="detLeftBV">0 BV</div></div>
+            <div class="info-item"><label>Right Leg Total BV</label><div class="val" id="detRightBV">0 BV</div></div>
+            <div class="info-item"><label>Left Leg RP</label><div class="val" id="detLeftRP">0 RP</div></div>
+            <div class="info-item"><label>Right Leg RP</label><div class="val" id="detRightRP">0 RP</div></div>
+            <div class="info-item"><label>Total Combined BV</label><div class="val" style="color:#16a34a;font-size:1.1rem;" id="detTotalBV">0 BV</div></div>
+            <div class="info-item"><label>Total Combined RP</label><div class="val" style="color:#16a34a;font-size:1.1rem;" id="detTotalRP">0 RP</div></div>
+            <div class="info-item"><label>Matched RP Pairs</label><div class="val" id="detMatchedPairs">0</div></div>
+            <div class="info-item"><label>Carry Forward (L / R)</label><div class="val" id="detCarryForward">0 / 0</div></div>
+            <div class="info-item"><label>Direct Referral Income</label><div class="val" id="detReferralIncome">₹0</div></div>
+            <div class="info-item"><label>Binary Matching Income</label><div class="val" id="detBinaryIncome">₹0</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KYC DOCUMENTS SECTION -->
+      <div class="card">
+        <div class="card-title">
+          <span><i class="fas fa-file-invoice text-primary" style="margin-right:.5rem;"></i>KYC Verification Documents</span>
+          <div id="kycActionButtons" style="display:flex;gap:0.5rem;"></div>
+        </div>
+        <div id="kycRejectionNotice" style="display:none;margin-bottom:1rem;" class="alert alert-error"></div>
+        <div id="kycDocsList">
+          <div style="color:#94a3b8;font-size:0.9rem;padding:1rem;text-align:center;">Loading customer KYC records...</div>
+        </div>
+      </div>
+
+      <!-- CUSTOMER ORDERS SECTION -->
+      <div class="card">
+        <div class="card-title">
+          <span><i class="fas fa-shopping-bag text-primary" style="margin-right:.5rem;"></i>Customer Order History</span>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Product Package</th>
+                <th>Price</th>
+                <th>BV</th>
+                <th>RP</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="customerOrdersTbody">
+              <tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:1.5rem;">Loading customer orders...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DOCUMENT VIEWER MODAL -->
+<div class="doc-modal" id="docViewerModal">
+  <div class="doc-modal-content">
+    <div class="doc-modal-header">
+      <h3 style="margin:0;font-size:1.1rem;" id="docModalTitle">Document Preview</h3>
+      <button onclick="closeDocModal()" style="background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="doc-modal-body" id="docModalBody">
+      <!-- Rendered iframe or img -->
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container" class="toast-container"></div>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script>
+APP.requireAdmin('../login.html');
+
+function showToast(msg, type='success'){
+  const tc = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;
+  tc.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+const urlParams = new URLSearchParams(window.location.search);
+const customerId = urlParams.get('id');
+
+if(!customerId){
+  alert('Customer ID is required');
+  window.location.href = 'admin-members.html';
+}
+
+let customer = null;
+let kycData = null;
+let ordersList = [];
+
+async function loadCustomerData(){
+  try {
+    // 1. Fetch Customer Info
+    let res = await API.get('/api/customers/' + encodeURIComponent(customerId));
+    if(res && res.id){
+      customer = res;
+    } else {
+      customer = APP.getMemberById(customerId);
+    }
+
+    if(!customer){
+      alert('Customer not found in database');
+      window.location.href = 'admin-members.html';
+      return;
+    }
+
+    renderCustomerDetails();
+
+    // 2. Fetch KYC
+    try {
+      kycData = await API.get('/api/customers/' + encodeURIComponent(customerId) + '/kyc');
+      renderKYCSection();
+    } catch(e){
+      console.warn('KYC load error:', e);
+      kycData = { documents: customer.kycDocuments || [], kycStatus: customer.kycStatus };
+      renderKYCSection();
+    }
+
+    // 3. Fetch Orders
+    try {
+      const ordRes = await API.get('/api/orders?memberId=' + encodeURIComponent(customerId));
+      ordersList = Array.isArray(ordRes) ? ordRes : (ordRes && ordRes.data ? ordRes.data : []);
+      renderOrdersSection();
+    } catch(e){
+      console.warn('Orders load error:', e);
+      ordersList = APP.getMemberOrders(customerId);
+      renderOrdersSection();
+    }
+
+  } catch(err){
+    console.error('Error loading customer:', err);
+    customer = APP.getMemberById(customerId);
+    if(customer){
+      renderCustomerDetails();
+      renderKYCSection();
+      renderOrdersSection();
+    }
+  }
+}
+
+function renderCustomerDetails(){
+  document.getElementById('topbarTitle').textContent = `Customer Details: ${customer.name} (${customer.id})`;
+  
+  // Top KPIs
+  document.getElementById('kpiAccountStatus').innerHTML = APP.getStatusBadge(customer.status, 'account');
+  document.getElementById('kpiKycStatus').innerHTML = APP.getStatusBadge(customer.kycStatus, 'kyc');
+  
+  const totalBV = (customer.totalBV !== undefined) ? customer.totalBV : ((customer.leftBV||0) + (customer.rightBV||0) + (customer.personalBV||0));
+  const totalRP = (customer.totalRP !== undefined) ? customer.totalRP : +(totalBV / 600).toFixed(2);
+  document.getElementById('kpiTotalBVRP').textContent = `${APP.fmt(totalBV)} BV / ${totalRP} RP`;
+  document.getElementById('kpiWallet').textContent = APP.fmtINR(customer.incomeWallet || 0);
+
+  // Topbar Action buttons
+  const actionsEl = document.getElementById('topbarActions');
+  actionsEl.innerHTML = '';
+  if(customer.status === 'active'){
+    actionsEl.innerHTML = `<button class="btn-action btn-deactivate" onclick="changeStatus('inactive')"><i class="fas fa-ban"></i> Deactivate Account</button>`;
+  } else {
+    actionsEl.innerHTML = `<button class="btn-action btn-activate" onclick="changeStatus('active')"><i class="fas fa-check-circle"></i> Activate Account</button>`;
+  }
+
+  // Personal Info
+  document.getElementById('detId').textContent = customer.id;
+  document.getElementById('detName').textContent = customer.name;
+  document.getElementById('detPhone').textContent = customer.phone || '—';
+  document.getElementById('detEmail').textContent = customer.email || '—';
+  document.getElementById('detSponsor').textContent = customer.sponsorId || 'Root';
+  document.getElementById('detPosition').textContent = customer.position || '—';
+  document.getElementById('detJoined').textContent = customer.joinedAt ? new Date(customer.joinedAt).toLocaleString('en-IN') : '—';
+  document.getElementById('detActivated').textContent = customer.activatedAt ? new Date(customer.activatedAt).toLocaleString('en-IN') : 'Not yet activated';
+
+  const prod = APP.getProductById(customer.packageId);
+  document.getElementById('detPackage').textContent = prod ? `${prod.name} (${APP.fmtINR(prod.price)})` : (customer.packageId || 'No package assigned');
+
+  const p = customer.profile || {};
+  document.getElementById('detGender').textContent = p.gender ? p.gender.toUpperCase() : '—';
+  document.getElementById('detDob').textContent = p.dob || '—';
+  const addrParts = [p.address, p.city, p.state, p.pincode, p.country].filter(Boolean);
+  document.getElementById('detAddress').textContent = addrParts.length > 0 ? addrParts.join(', ') : 'Not provided';
+
+  // Avatar
+  const avatarEl = document.getElementById('customerAvatarContainer');
+  if(p.photo){
+    avatarEl.innerHTML = `<img src="../${p.photo}" alt="${customer.name}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);" />`;
+  } else {
+    avatarEl.innerHTML = `<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#071a82,#0b2ac9);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;">${customer.name.charAt(0).toUpperCase()}</div>`;
+  }
+
+  // BV & RP Breakdown
+  document.getElementById('detPersonalBV').textContent = `${APP.fmt(customer.personalBV || 0)} BV`;
+  document.getElementById('detPersonalRP').textContent = `${customer.personalRP || 0} RP`;
+  document.getElementById('detLeftBV').textContent = `${APP.fmt(customer.leftBV || 0)} BV`;
+  document.getElementById('detRightBV').textContent = `${APP.fmt(customer.rightBV || 0)} BV`;
+  document.getElementById('detLeftRP').textContent = `${customer.leftRP || 0} RP`;
+  document.getElementById('detRightRP').textContent = `${customer.rightRP || 0} RP`;
+  document.getElementById('detTotalBV').textContent = `${APP.fmt(totalBV)} BV`;
+  document.getElementById('detTotalRP').textContent = `${totalRP} RP`;
+  document.getElementById('detMatchedPairs').textContent = customer.matchedPairs || 0;
+  document.getElementById('detCarryForward').textContent = `${customer.leftCarryForward || 0} L / ${customer.rightCarryForward || 0} R`;
+  document.getElementById('detReferralIncome').textContent = APP.fmtINR(customer.referralIncome || 0);
+  document.getElementById('detBinaryIncome').textContent = APP.fmtINR(customer.binaryIncome || 0);
+
+  if(customer.rank){
+    const rb = document.getElementById('rankBadge');
+    rb.style.display = 'inline-flex';
+    rb.textContent = `Rank: ${customer.rank}`;
+  }
+}
+
+function renderKYCSection(){
+  const docsList = document.getElementById('kycDocsList');
+  const docs = (kycData && kycData.documents) ? kycData.documents : (customer.kycDocuments || []);
+  const kycActionEl = document.getElementById('kycActionButtons');
+  const rejNotice = document.getElementById('kycRejectionNotice');
+
+  if(customer.kycRejectionReason){
+    rejNotice.style.display = 'block';
+    rejNotice.innerHTML = `<strong><i class="fas fa-exclamation-triangle"></i> KYC Rejection Reason:</strong> ${customer.kycRejectionReason}`;
+  } else {
+    rejNotice.style.display = 'none';
+  }
+
+  // Review buttons
+  if(customer.kycStatus === 'UNDER_REVIEW' || customer.kycStatus === 'NOT_SUBMITTED' || customer.kycStatus === 'REJECTED'){
+    kycActionEl.innerHTML = `
+      <button class="btn-action btn-verify" onclick="reviewKYC('VERIFIED')"><i class="fas fa-check-circle"></i> Verify KYC</button>
+      <button class="btn-action btn-reject" onclick="promptRejectKYC()"><i class="fas fa-times-circle"></i> Reject KYC</button>
+    `;
+  } else if(customer.kycStatus === 'VERIFIED'){
+    kycActionEl.innerHTML = `
+      <button class="btn-action btn-reject" onclick="promptRejectKYC()"><i class="fas fa-times-circle"></i> Revoke / Reject</button>
+    `;
+  }
+
+  if(docs.length === 0){
+    docsList.innerHTML = `<div style="text-align:center;padding:1.5rem;color:#94a3b8;"><i class="fas fa-folder-open" style="font-size:2rem;margin-bottom:.5rem;display:block;"></i>No KYC documents have been submitted by this customer yet.</div>`;
+    return;
+  }
+
+  docsList.innerHTML = docs.map(doc => {
+    const docStatus = doc.documentStatus || doc.status || 'UNDER_REVIEW';
+    const isPdf = (doc.documentMime && doc.documentMime.includes('pdf')) || (doc.fileName && doc.fileName.endsWith('.pdf')) || (doc.documentOriginalName && doc.documentOriginalName.endsWith('.pdf'));
+    const docId = doc.id || doc.fileRef;
+    const docName = doc.documentOriginalName || doc.fileName || doc.documentType || 'KYC Document';
+    const docNumber = doc.documentNumber || doc.docNumber || '—';
+    const docType = doc.documentType || doc.docType || 'Identification';
+    const viewUrl = `/api/kyc/document/${encodeURIComponent(docId)}`;
+
+    return `
+      <div class="doc-card">
+        <div class="doc-info">
+          <div class="doc-icon"><i class="fas fa-${isPdf ? 'file-pdf' : 'file-image'}"></i></div>
+          <div>
+            <div style="font-weight:700;color:#1e293b;font-size:0.95rem;">${docType}: ${docNumber}</div>
+            <div style="font-size:0.8rem;color:#64748b;">Filename: <strong>${docName}</strong></div>
+            <div style="font-size:0.75rem;color:#94a3b8;margin-top:2px;">Uploaded: ${doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleString('en-IN') : '—'}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          ${APP.getStatusBadge(docStatus, 'kyc')}
+          <button class="btn-action btn-back" onclick="openDocModal('${docName}', '${viewUrl}', ${isPdf})" style="padding:0.4rem 0.8rem;font-size:0.8rem;">
+            <i class="fas fa-eye"></i> View Document
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openDocModal(title, url, isPdf){
+  document.getElementById('docModalTitle').textContent = title;
+  const body = document.getElementById('docModalBody');
+  if(isPdf){
+    body.innerHTML = `<iframe src="${url}" style="width:100%;height:550px;border:none;border-radius:8px;"></iframe>`;
+  } else {
+    body.innerHTML = `<img src="${url}" alt="${title}" style="max-width:100%;max-height:550px;border-radius:8px;object-fit:contain;box-shadow:0 4px 15px rgba(0,0,0,.1);" />`;
+  }
+  document.getElementById('docViewerModal').classList.add('open');
+}
+
+function closeDocModal(){
+  document.getElementById('docViewerModal').classList.remove('open');
+  document.getElementById('docModalBody').innerHTML = '';
+}
+
+function renderOrdersSection(){
+  const tbody = document.getElementById('customerOrdersTbody');
+  if(ordersList.length === 0){
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:#94a3b8;">No orders found for this customer.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = ordersList.map(o => {
+    const isPending = o.status === 'pending';
+    return `
+      <tr>
+        <td style="font-family:monospace;font-weight:700;color:#071a82;">${o.id}</td>
+        <td style="font-weight:700;">${o.productName}</td>
+        <td style="font-weight:700;color:#16a34a;">${APP.fmtINR(o.price)}</td>
+        <td>${APP.fmt(o.bv)}</td>
+        <td>${o.rp}</td>
+        <td>${o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-IN') : '—'}</td>
+        <td>${APP.getStatusBadge(o.status, 'order')}</td>
+        <td>
+          ${isPending ? `<button class="btn-action btn-activate" onclick="approveOrder('${o.id}')" style="padding:0.3rem 0.65rem;font-size:0.75rem;"><i class="fas fa-check"></i> Approve & Distribute BV</button>` : `<span style="color:#64748b;font-size:0.75rem;">Processed</span>`}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function changeStatus(newStatus){
+  const confirmMsg = newStatus === 'active'
+    ? 'Are you sure you want to ACTIVATE this customer account? (Any pending package orders will be completed and BV/RP will be distributed)'
+    : 'Are you sure you want to DEACTIVATE this customer account?';
+
+  if(!confirm(confirmMsg)) return;
+
+  try {
+    const res = await API.patch('/api/customers/' + encodeURIComponent(customerId) + '/status', { status: newStatus });
+    if(res && res.success){
+      showToast(res.message || 'Status updated successfully', 'success');
+      loadCustomerData();
+    } else {
+      showToast(res.error || 'Failed to update status', 'error');
+    }
+  } catch(err){
+    showToast('Failed to update status: ' + err.message, 'error');
+  }
+}
+
+async function reviewKYC(status, reason = ''){
+  try {
+    const res = await API.put('/api/customers/' + encodeURIComponent(customerId) + '/kyc/review', { status, reason });
+    if(res && res.success){
+      showToast(`KYC status updated to ${status}`, 'success');
+      loadCustomerData();
+    } else {
+      showToast(res.error || 'Failed to update KYC status', 'error');
+    }
+  } catch(err){
+    showToast('KYC update failed: ' + err.message, 'error');
+  }
+}
+
+function promptRejectKYC(){
+  const reason = prompt('Please enter the reason for rejecting this customer\'s KYC documents:');
+  if(reason === null) return;
+  if(!reason.trim()){
+    alert('A rejection reason is required');
+    return;
+  }
+  reviewKYC('REJECTED', reason.trim());
+}
+
+async function approveOrder(orderId){
+  if(!confirm('Approve this order and distribute BV and RP up the binary genealogy tree?')) return;
+  try {
+    const res = await API.patch('/api/orders/' + encodeURIComponent(orderId) + '/complete');
+    if(res && res.success){
+      showToast('Order completed! BV & RP distributed successfully.', 'success');
+      loadCustomerData();
+    } else {
+      showToast(res.error || 'Failed to complete order', 'error');
+    }
+  } catch(err){
+    showToast('Order approval failed: ' + err.message, 'error');
+  }
+}
+
+// Initial load
+loadCustomerData();
+</script>
+</body>
+</html>

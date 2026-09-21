@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Product – Admin | Great Goals Lifestyle</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    .dash-topbar{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.75rem;background:#fff;border-bottom:1px solid #f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+    .dash-topbar h1{font-size:1.3rem;font-weight:800;color:#1e293b;margin:0;}
+    .dash-content{padding:1.75rem;overflow-y:auto;}
+    .page-container{max-width:1100px;margin:0 auto;}
+    .form-layout{display:grid;grid-template-columns:1.6fr 1fr;gap:1.5rem;}
+    @media(max-width:850px){.form-layout{grid-template-columns:1fr;}}
+    .card{background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.07);padding:1.5rem;margin-bottom:1.5rem;}
+    .card-title{font-size:1.05rem;font-weight:800;color:#071a82;border-bottom:1.5px solid #f1f5f9;padding-bottom:0.75rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:0.5rem;}
+    .form-group{margin-bottom:1.15rem;}
+    .form-group label{display:block;font-size:0.8rem;font-weight:700;color:#475569;margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.03em;}
+    .form-control{width:100%;padding:0.65rem 0.9rem;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;outline:none;transition:border-color .18s;box-sizing:border-box;}
+    .form-control:focus{border-color:#0b2ac9;}
+    textarea.form-control{resize:vertical;min-height:90px;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    .upload-box{border:2px dashed #cbd5e1;border-radius:12px;padding:1.5rem 1rem;text-align:center;background:#f8fafc;cursor:pointer;transition:all .2s;position:relative;}
+    .upload-box:hover{border-color:#f97316;background:#fff7ed;}
+    .preview-container{margin-top:1rem;text-align:center;}
+    .preview-container img{max-width:100%;max-height:220px;border-radius:10px;border:1.5px solid #e2e8f0;object-fit:cover;}
+    .btn-action{padding:0.65rem 1.3rem;border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:0.4rem;transition:all .18s;text-decoration:none;}
+    .btn-save{background:linear-gradient(135deg,#071a82,#0b2ac9);color:#fff;border:1px solid var(--gold);}
+    .btn-save:hover{background:linear-gradient(135deg,#f5b800,#d97706);color:#071a82;}
+    .btn-cancel{background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;}
+    .btn-cancel:hover{background:#e2e8f0;}
+    .help-hint{font-size:0.75rem;color:#94a3b8;margin-top:0.25rem;display:block;}
+    .alert{padding:0.85rem 1rem;border-radius:10px;font-size:0.88rem;margin-bottom:1.25rem;}
+    .alert-error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
+    .switch-wrap{display:flex;align-items:center;gap:0.75rem;margin-top:0.5rem;}
+    .switch{position:relative;display:inline-block;width:48px;height:26px;}
+    .switch input{opacity:0;width:0;height:0;}
+    .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#cbd5e1;transition:.3s;border-radius:34px;}
+    .slider:before{position:absolute;content:"";height:20px;width:20px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%;}
+    input:checked + .slider{background-color:#16a34a;}
+    input:checked + .slider:before{transform:translateX(22px);}
+  </style>
+</head>
+<body>
+<div class="dash-layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar admin-sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="../assets/images/logo.png" alt="Great Goals Lifestyle" style="width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);box-shadow:0 0 10px rgba(245,184,0,0.4);object-fit:cover;">
+      <div class="sidebar-logo-text">Admin Panel<br><span>Great Goals</span></div>
+    </div>
+    <div style="padding:.75rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.1);">
+      <div style="font-size:.7rem;color:#94a3b8;">Logged in as</div>
+      <div style="font-size:.95rem;font-weight:700;color:#fff;">Administrator</div>
+      <span style="font-size:.7rem;background:var(--gold);color:#071a82;font-weight:800;padding:.1rem .5rem;border-radius:50px;">Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-label">Management</div>
+      <a href="admin-dashboard.html" class="sidebar-nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="admin-members.html" class="sidebar-nav-item"><i class="fas fa-users"></i> Customers</a>
+      <a href="admin-kyc.html" class="sidebar-nav-item"><i class="fas fa-id-card"></i> KYC Verification</a>
+      <a href="admin-products.html" class="sidebar-nav-item active"><i class="fas fa-box"></i> Products</a>
+      <a href="admin-orders.html" class="sidebar-nav-item"><i class="fas fa-shopping-bag"></i> Orders</a>
+      <a href="admin-withdrawals.html" class="sidebar-nav-item"><i class="fas fa-money-bill-wave"></i> Withdrawals</a>
+      <a href="../customer-tree.html" class="sidebar-nav-item"><i class="fas fa-sitemap"></i> Genealogy Tree</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="APP.logout();window.location.href='../login.html'"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <a href="admin-products.html" class="btn-action btn-cancel"><i class="fas fa-arrow-left"></i> Back to Products</a>
+        <div>
+          <h1 id="pageHeading">Edit Product</h1>
+          <div style="font-size:.78rem;color:#94a3b8;margin-top:.1rem;">Update product specifications, price, BV/RP metrics, inventory and image</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.6rem;">
+        <a href="admin-products.html" class="btn-action btn-cancel">Cancel</a>
+        <button type="button" onclick="submitEditProduct()" class="btn-action btn-save" id="btnTopSave"><i class="fas fa-save"></i> Save Changes</button>
+      </div>
+    </div>
+
+    <div class="dash-content">
+      <div class="page-container">
+        <div id="errorAlert" class="alert alert-error" style="display:none;"></div>
+
+        <form id="editProductForm" onsubmit="event.preventDefault(); submitEditProduct();">
+          <input type="hidden" id="productId" />
+          <div class="form-layout">
+            <!-- LEFT COLUMN: MAIN INFORMATION -->
+            <div>
+              <div class="card">
+                <div class="card-title"><i class="fas fa-info-circle"></i> Basic Product Information</div>
+                
+                <div class="form-group">
+                  <label for="productName">Product Package Name <span style="color:#ef4444">*</span></label>
+                  <input type="text" id="productName" class="form-control" placeholder="Product name" required />
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="productCategory">Category</label>
+                    <select id="productCategory" class="form-control">
+                      <option value="Package">Package (MLM Starter)</option>
+                      <option value="Textiles & Sarees">Textiles & Sarees</option>
+                      <option value="Apparel & Clothing">Apparel & Clothing</option>
+                      <option value="Travel Vouchers">Travel Vouchers</option>
+                      <option value="General">General</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="productStock">Available Stock (Units) <span style="color:#ef4444">*</span></label>
+                    <input type="number" id="productStock" class="form-control" min="0" required />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="productDesc">Product Description</label>
+                  <textarea id="productDesc" class="form-control" rows="3" placeholder="Describe the package benefits, quality, and opportunity details..."></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="productItems">Package Inclusions (One per line)</label>
+                  <textarea id="productItems" class="form-control" rows="4" placeholder="Enter items on separate lines..."></textarea>
+                  <span class="help-hint">Each line will be rendered as an included item on the storefront card.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN: PRICING, BV/RP & IMAGE -->
+            <div>
+              <div class="card">
+                <div class="card-title"><i class="fas fa-tags"></i> Pricing & BV / RP Metrics</div>
+
+                <div class="form-group">
+                  <label for="productPrice">Price in INR (₹) <span style="color:#ef4444">*</span></label>
+                  <input type="number" id="productPrice" class="form-control" min="1" step="any" required />
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="productBV">Business Value (BV) <span style="color:#ef4444">*</span></label>
+                    <input type="number" id="productBV" class="form-control" oninput="syncRPFromBV()" required />
+                    <span class="help-hint">1 RP = 600 BV</span>
+                  </div>
+                  <div class="form-group">
+                    <label for="productRP">Reward Points (RP) <span style="color:#ef4444">*</span></label>
+                    <input type="number" id="productRP" class="form-control" step="0.1" required />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="productRef">Sponsor Referral Income (₹)</label>
+                  <input type="number" id="productRef" class="form-control" />
+                  <span class="help-hint">Net direct referral commission credited to sponsor's income wallet.</span>
+                </div>
+
+                <div class="form-group">
+                  <label>Product Status</label>
+                  <div class="switch-wrap">
+                    <label class="switch">
+                      <input type="checkbox" id="productActive" onchange="updateStatusLabel()" />
+                      <span class="slider"></span>
+                    </label>
+                    <span id="statusLabel" style="font-size:0.88rem;font-weight:700;">Active</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PRODUCT IMAGE -->
+              <div class="card">
+                <div class="card-title"><i class="fas fa-image"></i> Product Image</div>
+                <div class="upload-box" onclick="document.getElementById('productImageFile').click()">
+                  <i class="fas fa-cloud-upload-alt" style="font-size:2.2rem;color:#94a3b8;margin-bottom:0.4rem;display:block;"></i>
+                  <span style="font-size:0.88rem;font-weight:700;color:#1e293b;display:block;">Click to Change Image</span>
+                  <span style="font-size:0.75rem;color:#94a3b8;">Leave empty to keep existing image</span>
+                  <input type="file" id="productImageFile" accept="image/*" style="display:none;" onchange="previewSelectedImage(event)" />
+                </div>
+                <div class="preview-container" id="previewContainer">
+                  <img id="imagePreview" src="" alt="Product Image" />
+                  <div id="imageNameNotice" style="font-size:0.75rem;color:#64748b;margin-top:0.35rem;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1rem;margin-bottom:2rem;">
+            <a href="admin-products.html" class="btn-action btn-cancel">Cancel</a>
+            <button type="submit" class="btn-action btn-save" id="btnBottomSave"><i class="fas fa-save"></i> Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app.js"></script>
+<script>
+APP.requireAdmin('../login.html');
+
+function showToast(msg, type='success'){
+  const tc = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} toast-icon"></i><span class="toast-msg">${msg}</span>`;
+  tc.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+const urlParams = new URLSearchParams(window.location.search);
+const editId = urlParams.get('id');
+
+if(!editId){
+  alert('Product ID is required');
+  window.location.href = 'admin-products.html';
+}
+
+let currentProduct = null;
+let selectedImageFile = null;
+
+async function loadProduct(){
+  try {
+    const res = await API.get('/api/products/' + encodeURIComponent(editId));
+    if(res && res.id){
+      currentProduct = res;
+    } else {
+      currentProduct = APP.getProductById(editId);
+    }
+
+    if(!currentProduct){
+      alert('Product not found');
+      window.location.href = 'admin-products.html';
+      return;
+    }
+
+    populateForm(currentProduct);
+  } catch(err){
+    console.error('Error loading product:', err);
+    currentProduct = APP.getProductById(editId);
+    if(currentProduct){
+      populateForm(currentProduct);
+    } else {
+      alert('Could not load product');
+      window.location.href = 'admin-products.html';
+    }
+  }
+}
+
+function populateForm(p){
+  document.getElementById('productId').value = p.id;
+  document.getElementById('pageHeading').textContent = `Edit Product: ${p.name}`;
+  document.getElementById('productName').value = p.name;
+  document.getElementById('productCategory').value = p.category || 'Package';
+  document.getElementById('productStock').value = typeof p.stock === 'number' ? p.stock : 100;
+  document.getElementById('productDesc').value = p.description || '';
+
+  const items = Array.isArray(p.items) ? p.items : (typeof p.items === 'string' ? JSON.parse(p.items || '[]') : []);
+  document.getElementById('productItems').value = items.join('\n');
+
+  document.getElementById('productPrice').value = p.price;
+  document.getElementById('productBV').value = p.bv;
+  document.getElementById('productRP').value = p.rp;
+  document.getElementById('productRef').value = p.referralIncome || (p.price >= 10000 ? 1020 : 510);
+
+  document.getElementById('productActive').checked = p.active !== false;
+  updateStatusLabel();
+
+  // Existing image preview
+  let imgSrc = '../assets/images/p2_5000.jpg';
+  if (p.image) {
+    if (p.image.startsWith('http') || p.image.startsWith('data:') || p.image.startsWith('/')) {
+      imgSrc = p.image;
+    } else {
+      imgSrc = '../' + p.image;
+    }
+  }
+  document.getElementById('imagePreview').src = imgSrc;
+  document.getElementById('imageNameNotice').textContent = `Current image: ${p.image || 'default'}`;
+  document.getElementById('previewContainer').style.display = 'block';
+}
+
+function syncRPFromBV(){
+  const bv = parseFloat(document.getElementById('productBV').value) || 0;
+  document.getElementById('productRP').value = +(bv / 600).toFixed(2);
+}
+
+function updateStatusLabel(){
+  const active = document.getElementById('productActive').checked;
+  const label = document.getElementById('statusLabel');
+  if(active){
+    label.textContent = 'Active (Available for purchase)';
+    label.style.color = '#16a34a';
+  } else {
+    label.textContent = 'Inactive (Hidden from Customers)';
+    label.style.color = '#dc2626';
+  }
+}
+
+function previewSelectedImage(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  selectedImageFile = file;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('imagePreview').src = e.target.result;
+    document.getElementById('imageNameNotice').textContent = `New upload: ${file.name}`;
+    document.getElementById('previewContainer').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function submitEditProduct(){
+  const name = document.getElementById('productName').value.trim();
+  const price = parseFloat(document.getElementById('productPrice').value);
+  const category = document.getElementById('productCategory').value;
+  const stock = parseInt(document.getElementById('productStock').value, 10);
+  const bv = parseFloat(document.getElementById('productBV').value);
+  const rp = parseFloat(document.getElementById('productRP').value);
+  const referralIncome = parseFloat(document.getElementById('productRef').value);
+  const description = document.getElementById('productDesc').value.trim();
+  const itemsText = document.getElementById('productItems').value.trim();
+  const active = document.getElementById('productActive').checked;
+  const errEl = document.getElementById('errorAlert');
+
+  errEl.style.display = 'none';
+  errEl.textContent = '';
+
+  if(!name){
+    errEl.textContent = 'Please enter a product name.';
+    errEl.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  if(isNaN(price) || price <= 0){
+    errEl.textContent = 'Please enter a valid price.';
+    errEl.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  const itemsArr = itemsText ? itemsText.split('\n').map(s => s.trim()).filter(Boolean) : [];
+
+  const btnTop = document.getElementById('btnTopSave');
+  const btnBottom = document.getElementById('btnBottomSave');
+  btnTop.disabled = true;
+  btnBottom.disabled = true;
+  btnTop.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+  btnBottom.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('price', price);
+  formData.append('category', category);
+  formData.append('stock', isNaN(stock) ? 100 : stock);
+  formData.append('bv', isNaN(bv) ? 600 : bv);
+  formData.append('rp', isNaN(rp) ? 1 : rp);
+  formData.append('referralIncome', isNaN(referralIncome) ? 510 : referralIncome);
+  formData.append('description', description);
+  formData.append('items', JSON.stringify(itemsArr));
+  formData.append('active', active);
+
+  if(selectedImageFile){
+    formData.append('productImage', selectedImageFile);
+  }
+
+  try {
+    const token = API.getToken();
+    const headers = {};
+    if(token) headers['Authorization'] = 'Bearer ' + token;
+
+    const res = await fetch('/api/products/' + encodeURIComponent(editId), {
+      method: 'PUT',
+      headers,
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if(res.ok && data.success){
+      showToast('Product updated successfully!', 'success');
+      if(data.product){
+        APP.updateProduct(data.product);
+      }
+      setTimeout(() => {
+        window.location.href = 'admin-products.html';
+      }, 1000);
+    } else {
+      btnTop.disabled = false;
+      btnBottom.disabled = false;
+      btnTop.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+      btnBottom.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+      errEl.textContent = data.error || data.message || 'Failed to update product.';
+      errEl.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  } catch(err){
+    btnTop.disabled = false;
+    btnBottom.disabled = false;
+    btnTop.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+    btnBottom.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+    errEl.textContent = 'Server connection error: ' + err.message;
+    errEl.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+// Initial load
+loadProduct();
+</script>
+</body>
+</html>

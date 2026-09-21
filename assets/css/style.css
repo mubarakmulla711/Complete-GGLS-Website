@@ -748,3 +748,100 @@ footer {
   animation: shine 2.5s linear infinite;
 }
 @keyframes shine { to { background-position: 200%; } }
+
+/* ── Unified Status Badge System ───────────────────────────── */
+.status-badge, .badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.status-badge::before, .badge-status::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+/* Account Status Badges */
+.badge-status-active, .badge-active {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  border: 1px solid #86efac !important;
+}
+.badge-status-active::before, .badge-active::before {
+  background: #16a34a !important;
+}
+
+.badge-status-pending, .badge-pending {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+  border: 1px solid #fcd34d !important;
+}
+.badge-status-pending::before, .badge-pending::before {
+  background: #f59e0b !important;
+}
+
+.badge-status-inactive, .badge-inactive {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+  border: 1px solid #fca5a5 !important;
+}
+.badge-status-inactive::before, .badge-inactive::before {
+  background: #ef4444 !important;
+}
+
+/* KYC Status Badges */
+.badge-status-verified, .badge-verified {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  border: 1px solid #86efac !important;
+}
+.badge-status-verified::before, .badge-verified::before {
+  background: #16a34a !important;
+}
+
+.badge-status-review, .badge-status-under_review, .badge-review {
+  background: #fef9c3 !important;
+  color: #a16207 !important;
+  border: 1px solid #fde047 !important;
+}
+.badge-status-review::before, .badge-status-under_review::before, .badge-review::before {
+  background: #eab308 !important;
+}
+
+.badge-status-rejected, .badge-rejected {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  border: 1px solid #fca5a5 !important;
+}
+.badge-status-rejected::before, .badge-rejected::before {
+  background: #dc2626 !important;
+}
+
+.badge-status-unsubmitted, .badge-unsubmitted {
+  background: #f1f5f9 !important;
+  color: #64748b !important;
+  border: 1px solid #cbd5e1 !important;
+}
+.badge-status-unsubmitted::before, .badge-unsubmitted::before {
+  background: #94a3b8 !important;
+}
+
+/* Order Status Badges */
+.badge-status-completed, .badge-completed {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  border: 1px solid #86efac !important;
+}
+.badge-status-completed::before, .badge-completed::before {
+  background: #16a34a !important;
+}

@@ -89,34 +89,54 @@ function showToast(msg,type){
 if(!APP.requireMember('login.html')){throw new Error('redirect');}
 var session=APP.getCurrentSession();
 if (!session) { window.location.href='login.html'; }
-var user=APP.getMemberById(session.id) || { id: session.id, name: 'Member', status: 'active' };
+var user=APP.getCurrentUser() || APP.getMemberById(session.id) || { id: session.id, name: 'Member', status: 'active' };
 var initials=(user.name||'GG').split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
 document.getElementById('topAvatar').textContent=initials;
 document.getElementById('topName').textContent=user.name;
-document.getElementById('sidebarUser').innerHTML='<div class="sidebar-user-id">'+user.id+'</div><div class="sidebar-user-name">'+user.name+'</div><span class="sidebar-status">'+user.status+'</span>';
+document.getElementById('sidebarUser').innerHTML='<div class="sidebar-user-id">'+user.id+'</div><div class="sidebar-user-name">'+user.name+'</div><div style="margin-top:4px;">'+APP.getStatusBadge(user.status)+'</div>';
 
-var cards=[
-  {label:'User ID',value:user.id,sub:'<span style="background:#16a34a;color:#fff;padding:.1rem .5rem;border-radius:50px;font-size:.65rem;">'+user.status+'</span>',icon:'fas fa-id-card',bg:'bg-purple'},
-  {label:'Sponsor ID',value:user.sponsorId||'Root',sub:'Your upline',icon:'fas fa-user-tie',bg:'bg-darkpurple'},
-  {label:'Referral Income',value:'Rs.'+Number(user.referralIncome||0).toFixed(2),sub:'Total earned',icon:'fas fa-hand-holding-usd',bg:'bg-blue'},
-  {label:'Binary Matching',value:'Rs.'+Number(user.binaryIncome||0).toFixed(2),sub:'Total matched',icon:'fas fa-exchange-alt',bg:'bg-green'},
-  {label:'Success Withdrawals',value:'Rs.'+Number(user.successWithdrawals||0).toFixed(2),sub:'Total withdrawn',icon:'fas fa-check-circle',bg:'bg-yellow'},
-  {label:'Income Wallet',value:'Rs.'+Number(user.incomeWallet||0).toFixed(2),sub:'Available balance',icon:'fas fa-wallet',bg:'bg-orange'},
-  {label:'Activation Wallet',value:'Rs.'+Number(user.activationWallet||0).toFixed(2),sub:'Activation balance',icon:'fas fa-coins',bg:'bg-red'},
-  {label:'Left Member',value:user.leftMemberCount||0,sub:'Total left team',icon:'fas fa-user-friends',bg:'bg-purple'},
-  {label:'Right Member',value:user.rightMemberCount||0,sub:'Total right team',icon:'fas fa-users',bg:'bg-darkpurple'},
-  {label:'Rank',value:user.rank||'Nill',sub:'Current achievement',icon:'fas fa-award',bg:'bg-blue'},
-  {label:'Left RP',value:Number(user.leftRP||0).toFixed(2),sub:'Left reward points',icon:'fas fa-arrow-left',bg:'bg-green'},
-  {label:'Right RP',value:Number(user.rightRP||0).toFixed(2),sub:'Right reward points',icon:'fas fa-arrow-right',bg:'bg-yellow'},
-  {label:'Left Carry Forward',value:Number(user.leftCarryForward||0).toFixed(2)+' RP',sub:'Left carry balance',icon:'fas fa-redo',bg:'bg-orange'},
-  {label:'Right Carry Forward',value:Number(user.rightCarryForward||0).toFixed(2)+' RP',sub:'Right carry balance',icon:'fas fa-undo',bg:'bg-red'},
-  {label:'Left BV',value:Number(user.leftBV||0).toLocaleString('en-IN')+' BV',sub:'Left business value',icon:'fas fa-chart-bar',bg:'bg-cyan'},
-  {label:'Right BV',value:Number(user.rightBV||0).toLocaleString('en-IN')+' BV',sub:'Right business value',icon:'fas fa-chart-pie',bg:'bg-teal'},
-];
-var sc=document.getElementById('statCards');
-cards.forEach(function(c,i){
-  sc.innerHTML+='<div class="stat-card '+c.bg+'" style="animation-delay:'+(i*0.05)+'s"><div class="stat-card-icon"><i class="'+c.icon+'"></i></div><div class="stat-card-info"><div class="stat-card-label">'+c.label+'</div><div class="stat-card-value">'+c.value+'</div><div class="stat-card-sub">'+c.sub+'</div></div></div>';
-});
+function renderCards(){
+  var totBV = (user.totalBV !== undefined) ? user.totalBV : ((user.leftBV||0)+(user.rightBV||0)+(user.personalBV||0));
+  var totRP = (user.totalRP !== undefined) ? user.totalRP : +(totBV / 600).toFixed(2);
+
+  var cards=[
+    {label:'User ID',value:user.id,sub:APP.getStatusBadge(user.status),icon:'fas fa-id-card',bg:'bg-purple'},
+    {label:'Sponsor ID',value:user.sponsorId||'Root',sub:'Your upline placement',icon:'fas fa-user-tie',bg:'bg-darkpurple'},
+    {label:'Total BV',value:Number(totBV||0).toLocaleString('en-IN')+' BV',sub:'Combined team & personal BV',icon:'fas fa-chart-line',bg:'bg-blue'},
+    {label:'Total RP',value:Number(totRP||0).toFixed(2)+' RP',sub:'1 RP = 600 BV',icon:'fas fa-star',bg:'bg-green'},
+    {label:'Personal BV / RP',value:Number(user.personalBV||0).toLocaleString('en-IN')+' BV / '+(user.personalRP||0)+' RP',sub:'Own package activation',icon:'fas fa-box-open',bg:'bg-yellow'},
+    {label:'Income Wallet',value:'Rs.'+Number(user.incomeWallet||0).toFixed(2),sub:'Available balance',icon:'fas fa-wallet',bg:'bg-orange'},
+    {label:'Referral Income',value:'Rs.'+Number(user.referralIncome||0).toFixed(2),sub:'Direct referral bonus',icon:'fas fa-hand-holding-usd',bg:'bg-blue'},
+    {label:'Binary Matching',value:'Rs.'+Number(user.binaryIncome||0).toFixed(2),sub:'₹600 per matched RP pair',icon:'fas fa-exchange-alt',bg:'bg-green'},
+    {label:'Success Withdrawals',value:'Rs.'+Number(user.successWithdrawals||0).toFixed(2),sub:'Total paid out',icon:'fas fa-check-circle',bg:'bg-yellow'},
+    {label:'Left Member',value:user.leftMemberCount||0,sub:'Total left team members',icon:'fas fa-user-friends',bg:'bg-purple'},
+    {label:'Right Member',value:user.rightMemberCount||0,sub:'Total right team members',icon:'fas fa-users',bg:'bg-darkpurple'},
+    {label:'Rank',value:user.rank||'New Member',sub:'Achievement milestone',icon:'fas fa-award',bg:'bg-blue'},
+    {label:'Left RP',value:Number(user.leftRP||0).toFixed(2),sub:'Left reward points',icon:'fas fa-arrow-left',bg:'bg-green'},
+    {label:'Right RP',value:Number(user.rightRP||0).toFixed(2),sub:'Right reward points',icon:'fas fa-arrow-right',bg:'bg-yellow'},
+    {label:'Left Carry Forward',value:Number(user.leftCarryForward||0).toFixed(2)+' RP',sub:'Left carry balance',icon:'fas fa-redo',bg:'bg-orange'},
+    {label:'Right Carry Forward',value:Number(user.rightCarryForward||0).toFixed(2)+' RP',sub:'Right carry balance',icon:'fas fa-undo',bg:'bg-red'},
+    {label:'Left BV',value:Number(user.leftBV||0).toLocaleString('en-IN')+' BV',sub:'Left leg business value',icon:'fas fa-chart-bar',bg:'bg-cyan'},
+    {label:'Right BV',value:Number(user.rightBV||0).toLocaleString('en-IN')+' BV',sub:'Right leg business value',icon:'fas fa-chart-pie',bg:'bg-teal'}
+  ];
+  var sc=document.getElementById('statCards');
+  sc.innerHTML='';
+  cards.forEach(function(c,i){
+    sc.innerHTML+='<div class="stat-card '+c.bg+'" style="animation-delay:'+(i*0.04)+'s"><div class="stat-card-icon"><i class="'+c.icon+'"></i></div><div class="stat-card-info"><div class="stat-card-label">'+c.label+'</div><div class="stat-card-value">'+c.value+'</div><div class="stat-card-sub">'+c.sub+'</div></div></div>';
+  });
+}
+renderCards();
+
+// Sync fresh data from backend
+if(typeof API !== 'undefined'){
+  API.get('/api/customers/' + encodeURIComponent(session.id)).then(function(res){
+    if(res && res.id){
+      user = res;
+      APP.updateMember(user);
+      renderCards();
+    }
+  }).catch(function(){});
+}
 
 var weakBV=Math.min(user.leftBV||0,user.rightBV||0);
 var nextIdx=APP.ACHIEVEMENTS.findIndex(function(a){return a.bv>weakBV;});

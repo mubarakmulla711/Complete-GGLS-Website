@@ -117,13 +117,16 @@ async function doLogin(){
     if(res && res.success){
       if(res.token) API.setToken(res.token);
 
+      const isAdmin = !!res.isAdmin || res.role === 'ADMIN';
       const sessionObj = {
-        id: res.user ? res.user.id : (res.isAdmin ? 'admin' : id),
-        isAdmin: !!res.isAdmin
+        id: res.user ? res.user.id : (isAdmin ? 'admin' : id),
+        name: res.user ? res.user.name : (isAdmin ? 'Administrator' : id),
+        isAdmin: isAdmin,
+        role: isAdmin ? 'ADMIN' : 'CUSTOMER'
       };
       localStorage.setItem('gg_current_user', JSON.stringify(sessionObj));
 
-      if(res.user && !res.isAdmin){
+      if(res.user && !isAdmin){
         const mems = APP.getMembers();
         const idx = mems.findIndex(m => m.id.toUpperCase() === res.user.id.toUpperCase());
         if(idx !== -1){
@@ -136,7 +139,7 @@ async function doLogin(){
 
       showToast('Login successful! Redirecting...', 'success');
       setTimeout(()=>{
-        if(res.isAdmin) window.location.href='admin/admin-dashboard.html';
+        if(isAdmin) window.location.href='admin/admin-dashboard.html';
         else window.location.href='dashboard.html';
       }, 700);
     } else {
@@ -144,8 +147,8 @@ async function doLogin(){
         btn.disabled = false;
         btn.innerHTML = origBtnHtml;
       }
-      const isPending = res.pending || (res.message && res.message.toLowerCase().includes('pending')) || (res.error && res.error.toLowerCase().includes('pending'));
-      const isInactive = res.inactive || (res.message && res.message.toLowerCase().includes('inactive')) || (res.error && res.error.toLowerCase().includes('inactive'));
+      const isPending = res.pending || (res.message && res.message.toLowerCase().includes('pending')) || (res.error && res.error.toLowerCase().includes('pending')) || (res.msg && res.msg.toLowerCase().includes('pending'));
+      const isInactive = res.inactive || (res.message && res.message.toLowerCase().includes('inactive')) || (res.error && res.error.toLowerCase().includes('inactive')) || (res.msg && res.msg.toLowerCase().includes('inactive'));
 
       if(isPending){
         errEl.innerHTML=`<div class="alert alert-warning" style="background:#fef3c7;color:#92400e;border:1.5px solid #f59e0b;padding:0.9rem 1rem;line-height:1.5;border-radius:8px;">
@@ -167,21 +170,65 @@ async function doLogin(){
       }
     }
   } catch(err){
+    // Fallback to local authentication
+    const localRes = APP.login(id, pass);
+    if(localRes && localRes.success){
+      const isAdmin = !!localRes.isAdmin || localRes.role === 'ADMIN';
+      showToast('Login successful! Redirecting...', 'success');
+      setTimeout(()=>{
+        if(isAdmin) window.location.href='admin/admin-dashboard.html';
+        else window.location.href='dashboard.html';
+      }, 700);
+      return;
+    }
+
     if(btn){
       btn.disabled = false;
       btn.innerHTML = origBtnHtml;
     }
-    errEl.innerHTML=`<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Login failed: ${err.message}</div>`;
+    if(localRes && localRes.pending){
+      errEl.innerHTML=`<div class="alert alert-warning" style="background:#fef3c7;color:#92400e;border:1.5px solid #f59e0b;padding:0.9rem 1rem;line-height:1.5;border-radius:8px;">
+        <div style="display:flex;align-items:flex-start;gap:0.6rem;">
+          <i class="fas fa-user-clock" style="font-size:1.25rem;color:#d97706;margin-top:2px;"></i>
+          <div>
+            <strong style="display:block;font-size:0.95rem;margin-bottom:3px;color:#78350f;">Account Pending Approval</strong>
+            <span style="font-size:0.86rem;">${localRes.msg}</span>
+          </div>
+        </div>
+      </div>`;
+    } else if(localRes && localRes.inactive){
+      errEl.innerHTML=`<div class="alert alert-error" style="background:#fee2e2;color:#991b1b;border:1.5px solid #f87171;padding:0.9rem 1rem;line-height:1.45;border-radius:8px;">
+        <i class="fas fa-ban" style="font-size:1.1rem;margin-right:0.4rem;color:#dc2626;"></i>
+        <strong>Account Deactivated:</strong> ${localRes.msg}
+      </div>`;
+    } else {
+      errEl.innerHTML=`<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${localRes ? localRes.msg : err.message}</div>`;
+    }
   }
 }
 
 // Enter key
 document.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
 
-// If already logged in, redirect
-if(APP.isLoggedIn()){
-  const s=APP.getCurrentSession();
-  window.location.href=s.isAdmin?'admin/admin-dashboard.html':'dashboard.html';
+// Inform user if an active session exists without abrupt redirect
+const activeSession = APP.getCurrentSession();
+if(activeSession){
+  const isAdm = activeSession.isAdmin || activeSession.role === 'ADMIN';
+  const dashUrl = isAdm ? 'admin/admin-dashboard.html' : 'dashboard.html';
+  const roleLabel = isAdm ? 'Administrator' : `Customer (${activeSession.id || ''})`;
+  const container = document.querySelector('.auth-box') || document.querySelector('.card') || document.querySelector('.auth-card') || document.getElementById('loginForm');
+  if(container){
+    const sessionBanner = document.createElement('div');
+    sessionBanner.style.cssText = 'margin-bottom:1.2rem;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:8px;padding:0.75rem 1rem;font-size:0.85rem;display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;';
+    sessionBanner.innerHTML = `
+      <span><i class="fas fa-user-check text-primary"></i> Currently signed in as <strong>${roleLabel}</strong></span>
+      <div style="display:flex;gap:0.4rem;">
+        <a href="${dashUrl}" class="btn btn-primary btn-sm" style="padding:4px 10px;font-size:0.75rem;text-decoration:none;">Go to Dashboard &rarr;</a>
+        <button onclick="APP.logout();location.reload();" class="btn btn-sm" style="padding:4px 8px;font-size:0.75rem;background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;cursor:pointer;border-radius:4px;">Logout</button>
+      </div>
+    `;
+    container.parentNode.insertBefore(sessionBanner, container);
+  }
 }
 </script>
 </body>

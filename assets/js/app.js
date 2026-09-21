@@ -93,6 +93,12 @@ const APP = {
       if (notifs) {
         this.saveNotifications(notifs);
       }
+      // 4. Sync Orders from Database
+      const ordersRes = await API.get('/api/orders');
+      const ords = (ordersRes && ordersRes.success && Array.isArray(ordersRes.data)) ? ordersRes.data : (Array.isArray(ordersRes) ? ordersRes : null);
+      if (ords) {
+        this.saveOrders(ords);
+      }
     } catch (e) {
       console.warn('Backend sync:', e.message);
     }
@@ -749,11 +755,31 @@ const APP = {
     return { success:true };
   },
 
+  // ─── Status Badge Helper ───────────────────────────────────────────────────
+  getStatusBadge(status, type = 'account') {
+    const s = (status || '').toLowerCase().trim();
+    if (type === 'kyc') {
+      if (s === 'verified') return '<span class="status-badge badge-status-verified"><i class="fas fa-check-circle"></i> Verified</span>';
+      if (s === 'under_review' || s === 'under review' || s === 'submitted') return '<span class="status-badge badge-status-review"><i class="fas fa-clock"></i> Under Review</span>';
+      if (s === 'rejected') return '<span class="status-badge badge-status-rejected"><i class="fas fa-times-circle"></i> Rejected</span>';
+      return '<span class="status-badge badge-status-unsubmitted"><i class="fas fa-file"></i> Not Submitted</span>';
+    }
+    if (type === 'order') {
+      if (s === 'completed') return '<span class="status-badge badge-status-completed"><i class="fas fa-check-circle"></i> Completed</span>';
+      if (s === 'rejected') return '<span class="status-badge badge-status-rejected"><i class="fas fa-times-circle"></i> Rejected</span>';
+      return '<span class="status-badge badge-status-pending"><i class="fas fa-clock"></i> Pending</span>';
+    }
+    // Default: account status
+    if (s === 'active') return '<span class="status-badge badge-status-active"><i class="fas fa-check-circle"></i> Active</span>';
+    if (s === 'inactive' || s === 'deactivated') return '<span class="status-badge badge-status-inactive"><i class="fas fa-ban"></i> Inactive</span>';
+    return '<span class="status-badge badge-status-pending"><i class="fas fa-clock"></i> Pending</span>';
+  },
+
   // ─── Auth ──────────────────────────────────────────────────────────────────
   login(id, password) {
     if (id.toLowerCase() === 'admin' && password === 'Admin@1234') {
-      localStorage.setItem(this.KEYS.CURRENT_USER, JSON.stringify({ id:'admin', isAdmin:true }));
-      return { success:true, isAdmin:true };
+      localStorage.setItem(this.KEYS.CURRENT_USER, JSON.stringify({ id:'admin', name:'Administrator', isAdmin:true, role:'ADMIN' }));
+      return { success:true, isAdmin:true, role:'ADMIN' };
     }
     const member = this.getMemberById(id.toUpperCase());
     if (!member)                           return { success:false, msg:'Member ID not found' };
@@ -774,8 +800,9 @@ const APP = {
       };
     }
     const isAdmin = !!member.isAdmin;
-    localStorage.setItem(this.KEYS.CURRENT_USER, JSON.stringify({ id:member.id, isAdmin }));
-    return { success:true, isAdmin, member };
+    const role = isAdmin ? 'ADMIN' : 'CUSTOMER';
+    localStorage.setItem(this.KEYS.CURRENT_USER, JSON.stringify({ id:member.id, name:member.name, isAdmin, role }));
+    return { success:true, isAdmin, role, member };
   },
 
   setMemberStatus(memberId, status) {
@@ -796,23 +823,35 @@ const APP = {
   getCurrentUser() {
     const s = this.getCurrentSession();
     if (!s) return null;
-    if (s.isAdmin) return { id:'admin', name:'Administrator', isAdmin:true };
+    if (s.isAdmin) return { id:'admin', name:'Administrator', isAdmin:true, role:'ADMIN' };
     const m = this.getMemberById(s.id);
-    if (m) return m;
+    if (m) {
+      m.role = m.isAdmin ? 'ADMIN' : 'CUSTOMER';
+      m.personalBV = m.personalBV || 0;
+      m.personalRP = m.personalRP || 0;
+      m.totalBV = (m.leftBV || 0) + (m.rightBV || 0) + (m.personalBV || 0);
+      m.totalRP = +(m.totalBV / this.RP_TO_BV).toFixed(2);
+      return m;
+    }
     return {
       id: s.id,
       name: s.name || s.id,
+      role: 'CUSTOMER',
       status: 'active',
       kycStatus: 'NOT_SUBMITTED',
       profile: { photo: '' },
-      kycDocuments: []
+      kycDocuments: [],
+      personalBV: 0,
+      personalRP: 0,
+      totalBV: 0,
+      totalRP: 0
     };
   },
 
   isLoggedIn()   { return !!this.getCurrentSession(); },
   isAdminLoggedIn() {
     const s = this.getCurrentSession();
-    return s && s.isAdmin;
+    return s && (s.isAdmin || s.role === 'ADMIN');
   },
 
   requireAuth(redirectTo = '../login.html') {
@@ -821,14 +860,23 @@ const APP = {
   },
 
   requireAdmin(redirectTo = '../login.html') {
-    if (!this.isAdminLoggedIn()) { window.location.href = redirectTo; return false; }
+    const s = this.getCurrentSession();
+    if (!s) {
+      window.location.href = redirectTo;
+      return false;
+    }
+    if (!s.isAdmin && s.role !== 'ADMIN') {
+      alert('Access Denied: You do not have permission to access the administrator portal.');
+      window.location.href = '../dashboard.html';
+      return false;
+    }
     return true;
   },
 
   requireMember(redirectTo = 'login.html') {
     const s = this.getCurrentSession();
     if (!s) { window.location.href = redirectTo; return false; }
-    if (s.isAdmin) return true;
+    if (s.isAdmin || s.role === 'ADMIN') return true;
     const m = this.getMemberById(s.id);
     if (m && m.status === 'inactive') {
       this.logout();

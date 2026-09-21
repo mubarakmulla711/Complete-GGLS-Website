@@ -100,8 +100,8 @@ function getDefaultDB() {
         price: 10000,
         category: 'Package',
         stock: 100,
-        bv: 600,
-        rp: 1.0,
+        bv: 1200,
+        rp: 2.0,
         referralIncome: 1020,
         grossReferral: 1200,
         serviceTax: 180,
@@ -123,8 +123,8 @@ function getDefaultDB() {
         price: 5000,
         category: 'Package',
         stock: 100,
-        bv: 300,
-        rp: 0.5,
+        bv: 600,
+        rp: 1.0,
         referralIncome: 510,
         grossReferral: 600,
         serviceTax: 90,
@@ -234,10 +234,138 @@ function saveDB() {
 // Initial DB load
 loadDB();
 
+// ─── BINARY MLM & BV/RP CALCULATION ENGINE ─────────────────────────────────
+const RP_TO_BV = 600;
+const BINARY_MATCH_PER_RP = 600;
+
+const ACHIEVEMENTS = [
+  { id: 1,  name: 'Silver',        bv: 6000,     rewardValue: 0 },
+  { id: 2,  name: 'Gold',          bv: 12000,    rewardValue: 0 },
+  { id: 3,  name: 'Platinum',      bv: 36000,    rewardValue: 0 },
+  { id: 4,  name: 'Ruby',          bv: 72000,    rewardValue: 13000 },
+  { id: 5,  name: 'Emerald',       bv: 300000,   rewardValue: 50000 },
+  { id: 6,  name: 'Diamond',       bv: 600000,   rewardValue: 0 },
+  { id: 7,  name: 'Blue Diamond',  bv: 1800000,  rewardValue: 300000 },
+  { id: 8,  name: 'Royal Diamond', bv: 3600000,  rewardValue: 690000 },
+  { id: 9,  name: 'Ambassador',    bv: 6000000,  rewardValue: 5000 },
+  { id: 10, name: 'Chairman',      bv: 12000000, rewardValue: 1500000 }
+];
+
+function propagateBVBackend(fromMemberId, bv, rp) {
+  let member = db.members.find(m => m.id.toUpperCase() === fromMemberId.toUpperCase());
+  while (member && member.parentId) {
+    const parent = db.members.find(m => m.id.toUpperCase() === member.parentId.toUpperCase());
+    if (!parent) break;
+
+    const pos = (member.position || '').toLowerCase();
+    if (pos === 'left') {
+      parent.leftBV = (parent.leftBV || 0) + bv;
+      parent.leftRP = +(parent.leftBV / RP_TO_BV).toFixed(2);
+      parent.leftMemberCount = (parent.leftMemberCount || 0) + 1;
+    } else {
+      parent.rightBV = (parent.rightBV || 0) + bv;
+      parent.rightRP = +(parent.rightBV / RP_TO_BV).toFixed(2);
+      parent.rightMemberCount = (parent.rightMemberCount || 0) + 1;
+    }
+
+    // Binary matching calculation
+    const leftRP = (parent.leftBV || 0) / RP_TO_BV;
+    const rightRP = (parent.rightBV || 0) / RP_TO_BV;
+    const matched = Math.floor(Math.min(leftRP, rightRP));
+    const prev = parent.matchedPairs || 0;
+    const newMatch = matched - prev;
+
+    if (newMatch > 0) {
+      const income = newMatch * BINARY_MATCH_PER_RP;
+      parent.binaryIncome = (parent.binaryIncome || 0) + income;
+      parent.incomeWallet = (parent.incomeWallet || 0) + income;
+      parent.matchedPairs = matched;
+    }
+
+    if (leftRP > rightRP) {
+      parent.leftCarryForward = +(leftRP - matched).toFixed(2);
+      parent.rightCarryForward = 0;
+    } else {
+      parent.rightCarryForward = +(rightRP - matched).toFixed(2);
+      parent.leftCarryForward = 0;
+    }
+
+    // Check rank milestones
+    const weakBV = Math.min(parent.leftBV || 0, parent.rightBV || 0);
+    for (const ach of [...ACHIEVEMENTS].reverse()) {
+      if (weakBV >= ach.bv) {
+        parent.achievementIds = parent.achievementIds || [];
+        if (!parent.achievementIds.includes(ach.id)) {
+          parent.achievementIds.push(ach.id);
+          if (ach.rewardValue > 0) {
+            parent.incomeWallet = (parent.incomeWallet || 0) + ach.rewardValue;
+          }
+        }
+        parent.rank = ach.name;
+        break;
+      }
+    }
+
+    parent.totalBV = (parent.leftBV || 0) + (parent.rightBV || 0) + (parent.personalBV || 0);
+    parent.totalRP = +(parent.totalBV / RP_TO_BV).toFixed(2);
+    parent.updatedAt = new Date().toISOString();
+
+    member = parent;
+  }
+}
+
+function completeOrderBackend(orderId) {
+  db.orders = db.orders || [];
+  const order = db.orders.find(o => o.id === orderId);
+  if (!order) return { success: false, error: 'Order not found' };
+  if (order.status === 'completed') {
+    return { success: false, error: 'Order is already completed' };
+  }
+
+  order.status = 'completed';
+  order.completedAt = new Date().toISOString();
+
+  const member = db.members.find(m => m.id.toUpperCase() === order.memberId.toUpperCase());
+  if (member) {
+    member.packageId = order.productId;
+    member.personalBV = (member.personalBV || 0) + (order.bv || 0);
+    member.personalRP = (member.personalRP || 0) + (order.rp || 0);
+    member.totalBV = (member.leftBV || 0) + (member.rightBV || 0) + (member.personalBV || 0);
+    member.totalRP = +(member.totalBV / RP_TO_BV).toFixed(2);
+
+    // Sponsor referral income
+    if (member.sponsorId) {
+      const sponsor = db.members.find(m => m.id.toUpperCase() === member.sponsorId.toUpperCase());
+      const prod = (db.products || []).find(p => p.id === order.productId);
+      if (sponsor && prod) {
+        const ref = prod.referralIncome || (prod.price >= 10000 ? 1020 : (prod.price >= 5000 ? 510 : Math.round(prod.price * 0.102)));
+        sponsor.referralIncome = (sponsor.referralIncome || 0) + ref;
+        sponsor.incomeWallet = (sponsor.incomeWallet || 0) + ref;
+        sponsor.updatedAt = new Date().toISOString();
+      }
+    }
+
+    // Propagate BV and RP up the binary tree
+    propagateBVBackend(member.id, order.bv || 0, order.rp || 0);
+    member.updatedAt = new Date().toISOString();
+  }
+
+  // Mark pending notifications as read
+  db.notifications = db.notifications || [];
+  db.notifications.forEach(n => {
+    if (n.orderId === orderId) n.read = true;
+  });
+
+  saveDB();
+  return { success: true, order };
+}
+
 // ─── AUTHENTICATION & ROLE MIDDLEWARE ─────────────────────────────────────────
 function getSession(req) {
-  const authHeader = req.headers['authorization'] || '';
-  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+  let token = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '').trim();
+  if (!token && req.query && req.query.token) {
+    token = req.query.token;
+  }
   if (!token) return null;
   db.sessions = db.sessions || {};
   return db.sessions[token] || null;
@@ -254,30 +382,27 @@ function requireAuth(req, res, next) {
 
 function requireAdmin(req, res, next) {
   const session = getSession(req);
-  if (session && session.isAdmin) {
+  if (session && (session.isAdmin || session.role === 'ADMIN')) {
     req.user = session;
     return next();
   }
-  if (session && !session.isAdmin) {
-    return res.status(403).json({ success: false, error: 'Admin authorization required.' });
+  if (session && !session.isAdmin && session.role !== 'ADMIN') {
+    return res.status(403).json({ success: false, error: 'Admin authorization required. Access denied.' });
   }
-  // Fallback for automated test runners / local scripts without header
-  req.user = { id: 'admin', isAdmin: true };
-  next();
+  return res.status(401).json({ success: false, error: 'Authentication required. Please login as admin.' });
 }
 
 function requireSelfOrAdmin(req, res, next) {
   const session = getSession(req);
   const targetId = (req.params.id || '').toUpperCase();
   if (session) {
-    if (!session.isAdmin && session.id.toUpperCase() !== targetId) {
+    if (!session.isAdmin && session.role !== 'ADMIN' && session.id.toUpperCase() !== targetId) {
       return res.status(403).json({ success: false, error: 'Access denied. You can only manage your own account.' });
     }
     req.user = session;
     return next();
   }
-  req.user = { id: targetId, isAdmin: false };
-  next();
+  return res.status(401).json({ success: false, error: 'Authentication required. Please login.' });
 }
 
 // ─── API ROUTES ──────────────────────────────────────────────────────────────
@@ -331,8 +456,8 @@ app.post('/api/products', requireAdmin, uploadProduct.single('productImage'), (r
       price: priceNum,
       category: category || 'Package',
       stock: parseInt(stock, 10) >= 0 ? parseInt(stock, 10) : 100,
-      bv: parseFloat(bv) || (priceNum >= 10000 ? 600 : 300),
-      rp: parseFloat(rp) || (priceNum >= 10000 ? 1 : 0.5),
+      bv: parseFloat(bv) || (priceNum >= 10000 ? 1200 : 600),
+      rp: parseFloat(rp) || (priceNum >= 10000 ? 2 : 1),
       referralIncome: parseFloat(referralIncome) || (priceNum >= 10000 ? 1020 : 510),
       description: (description || '').trim(),
       items: itemsArr,
@@ -418,22 +543,32 @@ app.delete('/api/products/:id', requireAdmin, (req, res) => {
   res.json({ success: true, message: 'Product deleted successfully', product: deleted });
 });
 
+function formatCustomerResponse(m) {
+  if (!m) return null;
+  const copy = Object.assign({}, m);
+  delete copy.password;
+  copy.role = m.isAdmin ? 'ADMIN' : 'CUSTOMER';
+  copy.personalBV = m.personalBV || 0;
+  copy.personalRP = m.personalRP || 0;
+  copy.leftBV = m.leftBV || 0;
+  copy.rightBV = m.rightBV || 0;
+  copy.leftRP = m.leftRP || 0;
+  copy.rightRP = m.rightRP || 0;
+  copy.totalBV = (m.leftBV || 0) + (m.rightBV || 0) + (m.personalBV || 0);
+  copy.totalRP = +(copy.totalBV / RP_TO_BV).toFixed(2);
+  return copy;
+}
+
 // 2. CUSTOMERS API
 app.get('/api/customers', (req, res) => {
-  const safeMembers = db.members.map(m => {
-    const copy = Object.assign({}, m);
-    delete copy.password;
-    return copy;
-  });
+  const safeMembers = db.members.map(formatCustomerResponse);
   res.json(safeMembers);
 });
 
 app.get('/api/customers/:id', (req, res) => {
   const m = db.members.find(x => x.id.toUpperCase() === req.params.id.toUpperCase());
   if (!m) return res.status(404).json({ error: 'Customer not found' });
-  const copy = Object.assign({}, m);
-  delete copy.password;
-  res.json(copy);
+  res.json(formatCustomerResponse(m));
 });
 
 app.post('/api/customers/register', (req, res) => {
@@ -458,6 +593,14 @@ app.post('/api/customers/register', (req, res) => {
     const count = db.members.length + 1;
     const newId = 'GG' + String(count).padStart(5, '0');
 
+    // Link sponsor binary tree slot if empty
+    if (pos === 'left' && !sponsor.leftMemberId) {
+      sponsor.leftMemberId = newId;
+    } else if (pos === 'right' && !sponsor.rightMemberId) {
+      sponsor.rightMemberId = newId;
+    }
+    sponsor.updatedAt = new Date().toISOString();
+
     const newMember = {
       id: newId,
       name: name.trim(),
@@ -473,6 +616,10 @@ app.post('/api/customers/register', (req, res) => {
       rightBV: 0,
       leftRP: 0,
       rightRP: 0,
+      personalBV: 0,
+      personalRP: 0,
+      totalBV: 0,
+      totalRP: 0,
       leftCarryForward: 0,
       rightCarryForward: 0,
       leftMemberCount: 0,
@@ -486,6 +633,7 @@ app.post('/api/customers/register', (req, res) => {
       rank: null,
       achievementIds: [],
       status: 'pending', // DEFAULT STATUS IS PENDING
+      role: 'CUSTOMER',
       kycStatus: 'NOT_SUBMITTED',
       kycRejectionReason: '',
       kycSubmittedAt: null,
@@ -509,6 +657,28 @@ app.post('/api/customers/register', (req, res) => {
     };
 
     db.members.push(newMember);
+
+    // If package selected, create initial pending order
+    if (productId) {
+      const prod = (db.products || []).find(p => p.id === productId);
+      if (prod) {
+        db.orders = db.orders || [];
+        const orderId = 'ORD_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6).toUpperCase();
+        db.orders.push({
+          id: orderId,
+          memberId: newId,
+          memberName: name.trim(),
+          productId: prod.id,
+          productName: prod.name,
+          price: prod.price,
+          bv: prod.bv || (prod.price >= 10000 ? 1200 : 600),
+          rp: prod.rp || (prod.price >= 10000 ? 2 : 1),
+          paymentMethod: 'Registration Package',
+          status: 'pending',
+          createdAt: new Date().toISOString()
+        });
+      }
+    }
 
     // Notify admin
     db.notifications.unshift({
@@ -547,13 +717,14 @@ app.post('/api/auth/login', (req, res) => {
   if (id.toLowerCase() === 'admin' && password === 'Admin@1234') {
     const token = 'tok_adm_' + crypto.randomBytes(24).toString('hex');
     db.sessions = db.sessions || {};
-    db.sessions[token] = { id: 'admin', name: 'Administrator', isAdmin: true, createdAt: new Date().toISOString() };
+    db.sessions[token] = { id: 'admin', name: 'Administrator', isAdmin: true, role: 'ADMIN', createdAt: new Date().toISOString() };
     saveDB();
     return res.json({
       success: true,
       token,
       isAdmin: true,
-      user: { id: 'admin', name: 'Administrator', isAdmin: true }
+      role: 'ADMIN',
+      user: { id: 'admin', name: 'Administrator', isAdmin: true, role: 'ADMIN' }
     });
   }
 
@@ -582,19 +753,18 @@ app.post('/api/auth/login', (req, res) => {
     });
   }
 
+  const formattedUser = formatCustomerResponse(member);
   const token = 'tok_mbr_' + crypto.randomBytes(24).toString('hex');
   db.sessions = db.sessions || {};
-  db.sessions[token] = { id: member.id, name: member.name, isAdmin: false, createdAt: new Date().toISOString() };
+  db.sessions[token] = { id: member.id, name: member.name, isAdmin: !!member.isAdmin, role: member.isAdmin ? 'ADMIN' : 'CUSTOMER', createdAt: new Date().toISOString() };
   saveDB();
-
-  const userCopy = Object.assign({}, member);
-  delete userCopy.password;
 
   res.json({
     success: true,
     token,
     isAdmin: !!member.isAdmin,
-    user: userCopy
+    role: member.isAdmin ? 'ADMIN' : 'CUSTOMER',
+    user: formattedUser
   });
 });
 
@@ -609,8 +779,16 @@ app.patch('/api/customers/:id/status', requireAdmin, (req, res) => {
   }
 
   member.status = status;
-  if (status === 'active' && !member.activatedAt) {
-    member.activatedAt = new Date().toISOString();
+  if (status === 'active') {
+    if (!member.activatedAt) {
+      member.activatedAt = new Date().toISOString();
+    }
+    // Auto-complete pending registration orders for this member
+    db.orders = db.orders || [];
+    const pendingOrders = db.orders.filter(o => o.memberId.toUpperCase() === member.id.toUpperCase() && o.status === 'pending');
+    for (const ord of pendingOrders) {
+      completeOrderBackend(ord.id);
+    }
   }
   member.updatedAt = new Date().toISOString();
 
@@ -624,7 +802,7 @@ app.patch('/api/customers/:id/status', requireAdmin, (req, res) => {
   res.json({
     success: true,
     message: `Customer status updated to ${status.toUpperCase()}`,
-    member: { id: member.id, name: member.name, status: member.status }
+    member: formatCustomerResponse(member)
   });
 });
 
@@ -943,6 +1121,116 @@ app.get('/api/stats/admin', (req, res) => {
     totalWDAmount: withdrawals.filter(w => w.status === 'approved').reduce((s, w) => s + (w.amount || 0), 0),
     unreadNotifs: db.notifications.filter(n => !n.read).length
   });
+});
+
+// 6. ORDERS API
+app.get('/api/orders', requireAuth, (req, res) => {
+  db.orders = db.orders || [];
+  const { memberId } = req.query;
+  if (memberId) {
+    if (!req.user.isAdmin && req.user.role !== 'ADMIN' && req.user.id.toUpperCase() !== memberId.toUpperCase()) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    const filtered = db.orders.filter(o => o.memberId.toUpperCase() === memberId.toUpperCase());
+    return res.json(filtered);
+  }
+  if (!req.user.isAdmin && req.user.role !== 'ADMIN') {
+    const filtered = db.orders.filter(o => o.memberId.toUpperCase() === req.user.id.toUpperCase());
+    return res.json(filtered);
+  }
+  res.json(db.orders);
+});
+
+app.post('/api/orders', requireAuth, (req, res) => {
+  try {
+    const { memberId, productId, paymentMethod } = req.body;
+    const targetMemberId = memberId || req.user.id;
+    if (!req.user.isAdmin && req.user.role !== 'ADMIN' && req.user.id.toUpperCase() !== targetMemberId.toUpperCase()) {
+      return res.status(403).json({ error: 'Cannot place order for another customer' });
+    }
+    const member = db.members.find(m => m.id.toUpperCase() === targetMemberId.toUpperCase());
+    if (!member) return res.status(404).json({ error: 'Member not found' });
+
+    const prod = (db.products || []).find(p => p.id === productId);
+    if (!prod) return res.status(404).json({ error: 'Product not found' });
+
+    const orderId = 'ORD_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const newOrder = {
+      id: orderId,
+      memberId: member.id,
+      memberName: member.name,
+      productId: prod.id,
+      productName: prod.name,
+      price: prod.price,
+      bv: prod.bv || (prod.price >= 10000 ? 1200 : 600),
+      rp: prod.rp || (prod.price >= 10000 ? 2 : 1),
+      paymentMethod: paymentMethod || 'Online Transfer',
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+
+    db.orders = db.orders || [];
+    db.orders.unshift(newOrder);
+
+    // Notification for admin
+    db.notifications = db.notifications || [];
+    db.notifications.unshift({
+      id: 'NOTIF_' + Date.now(),
+      type: 'order_placement',
+      title: 'New Product Order Placed',
+      message: `${member.name} (${member.id}) placed order for ${prod.name} (₹${prod.price.toLocaleString('en-IN')}). Requires approval.`,
+      referenceId: newOrder.id,
+      orderId: newOrder.id,
+      customerName: member.name,
+      createdAt: new Date().toISOString(),
+      read: false
+    });
+
+    saveDB();
+    res.status(201).json({ success: true, message: 'Order placed successfully', order: newOrder });
+  } catch (err) {
+    console.error('Order creation error:', err);
+    res.status(500).json({ error: 'Failed to place order: ' + err.message });
+  }
+});
+
+app.patch('/api/orders/:id/complete', requireAdmin, (req, res) => {
+  const result = completeOrderBackend(req.params.id);
+  if (!result.success) {
+    return res.status(400).json({ success: false, error: result.error });
+  }
+  res.json({ success: true, message: 'Order approved and BV/RP distributed.', order: result.order });
+});
+
+app.patch('/api/orders/:id/reject', requireAdmin, (req, res) => {
+  db.orders = db.orders || [];
+  const order = db.orders.find(o => o.id === req.params.id);
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  if (order.status === 'completed') {
+    return res.status(400).json({ error: 'Cannot reject an already completed order' });
+  }
+  order.status = 'rejected';
+  order.rejectedAt = new Date().toISOString();
+  saveDB();
+  res.json({ success: true, message: 'Order rejected', order });
+});
+
+// Route security for admin static HTML files
+app.use('/admin', (req, res, next) => {
+  if (req.path.match(/\.(css|js|png|jpg|jpeg|gif|svg|ico)$/i)) {
+    return next();
+  }
+  let token = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '').trim();
+  if (!token && req.query && req.query.token) {
+    token = req.query.token;
+  }
+  if (token) {
+    const session = db.sessions && db.sessions[token];
+    if (session && !session.isAdmin && session.role !== 'ADMIN') {
+      return res.status(403).send('Forbidden: Access Denied. Customers cannot access admin portal.');
+    }
+  }
+  next();
 });
 
 // Serve frontend static files

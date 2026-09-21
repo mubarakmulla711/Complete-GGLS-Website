@@ -120,11 +120,22 @@ function renderProducts() {
   `}).join('');
 }
 
-function buyProduct(pId) {
+async function buyProduct(pId) {
   const p = APP.getProductById(pId);
   if(!confirm(`Confirm order for ${p.name} at ₹${p.price.toLocaleString('en-IN')}?\n\nNOTE: The order will be submitted with "Pending" status and sent to Admin for verification and activation.`)) return;
   
-  // Customer placement sets status 'pending' and adds message to Admin
+  try {
+    const res = await API.post('/api/orders', { memberId: user.id, productId: pId });
+    if(res && res.success) {
+      showToast('Order submitted successfully! Status is "Pending". Admin notified for verification.', 'warning');
+      setTimeout(() => location.reload(), 1500);
+      return;
+    }
+  } catch(e) {
+    console.warn('Backend order placement:', e);
+  }
+
+  // Fallback
   const res = APP.placeOrder(user.id, pId, false);
   if(res.success) {
     showToast('Order submitted successfully! Status is "Pending". Admin notified for verification.', 'warning');
@@ -133,6 +144,18 @@ function buyProduct(pId) {
     showToast(res.msg || 'Failed to place order', 'error');
   }
 }
+
+async function loadOrdersFromBackend() {
+  try {
+    const res = await API.get('/api/orders?memberId=' + encodeURIComponent(user.id));
+    const ords = Array.isArray(res) ? res : (res && res.data ? res.data : null);
+    if(ords && ords.length > 0){
+      APP.saveOrders(ords);
+      renderOrderHistory();
+    }
+  } catch(e){}
+}
+loadOrdersFromBackend();
 
 function renderOrderHistory() {
   const list = APP.getOrders().filter(o => o.memberId === user.id).reverse();

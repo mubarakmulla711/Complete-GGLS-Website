@@ -116,7 +116,7 @@
           <div style="font-size:.78rem;color:#94a3b8;margin-top:.1rem;">Add, edit and manage products with real-time updates</div>
         </div>
       </div>
-      <button class="btn-add" onclick="openAddModal()"><i class="fas fa-plus"></i> Add New Product</button>
+      <a href="admin-product-add.html" class="btn-add" style="text-decoration:none;"><i class="fas fa-plus"></i> Add New Product</a>
     </div>
     <div class="dash-content">
       <div id="productsGrid" class="products-grid"></div>
@@ -354,7 +354,7 @@
           ${p.description ? `<div class="prod-desc">${p.description}</div>` : ''}
           ${items.length ? `<div class="prod-items"><div class="prod-items-title">Includes</div><ul>${items.slice(0,3).map(it => `<li>${it}</li>`).join('')}${items.length > 3 ? `<li style="color:#94a3b8;">+${items.length - 3} more</li>` : ''}</ul></div>` : ''}
           <div class="card-actions">
-            <button class="btn-card btn-edit" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i> Edit</button>
+            <a href="admin-product-edit.html?id=${encodeURIComponent(p.id)}" class="btn-card btn-edit" style="text-decoration:none;"><i class="fas fa-edit"></i> Edit</a>
             <button class="btn-card ${isActive ? 'btn-tog-on' : 'btn-tog-off'}" onclick="toggleProduct('${p.id}')"><i class="fas fa-${isActive ? 'eye-slash' : 'eye'}"></i> ${isActive ? 'Deactivate' : 'Activate'}</button>
             <button class="btn-card btn-del" onclick="deleteProduct('${p.id}', ${hasOrders})" ${hasOrders ? 'title="Product has existing orders"' : ''}>
               <i class="fas fa-${hasOrders ? 'lock' : 'trash'}"></i> ${hasOrders ? 'Locked' : 'Delete'}
@@ -366,66 +366,13 @@
   }
 
   function openAddModal(){
-    document.getElementById('productForm').reset();
-    document.getElementById('editProductId').value = '';
-    document.getElementById('fieldImageData').value = '';
-    selectedImageFile = null;
-    document.getElementById('fieldImageFile').value = '';
-    document.getElementById('imgPreview').style.display = 'none';
-    document.getElementById('imgPreview').src = '';
-    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle" style="color:#f97316;"></i> Add New Product';
-    document.getElementById('fieldActive').checked = true;
-    document.getElementById('fieldStock').value = '100';
-    document.getElementById('fieldCategory').value = 'Package';
-    document.getElementById('activeStatusLabel').textContent = 'Active (Available for purchase)';
-    document.getElementById('activeStatusLabel').style.color = '#166534';
-    openModal();
+    window.location.href = 'admin-product-add.html';
   }
 
   function editProduct(id){
-    const p = productsCache.find(x => x.id === id) || APP.getProductById(id);
-    if (!p) return;
-    selectedImageFile = null;
-    document.getElementById('fieldImageFile').value = '';
-    document.getElementById('editProductId').value = p.id;
-    document.getElementById('fieldName').value = p.name || '';
-    document.getElementById('fieldCategory').value = p.category || 'Package';
-    document.getElementById('fieldStock').value = typeof p.stock === 'number' ? p.stock : 100;
-    document.getElementById('fieldPrice').value = p.price || '';
-    document.getElementById('fieldBV').value = p.bv !== undefined ? p.bv : '';
-    document.getElementById('fieldRP').value = p.rp !== undefined ? p.rp : '';
-    document.getElementById('fieldReferral').value = p.referralIncome || (p.price >= 10000 ? 1020 : 510);
-    document.getElementById('fieldDesc').value = p.description || '';
-    document.getElementById('fieldItems').value = Array.isArray(p.items) ? p.items.join('\n') : (p.items || '');
-    document.getElementById('fieldActive').checked = p.active !== false;
-
-    const label = document.getElementById('activeStatusLabel');
-    if (p.active !== false) {
-      label.textContent = 'Active (Available for purchase)';
-      label.style.color = '#166534';
-    } else {
-      label.textContent = 'Inactive (Hidden / Disabled)';
-      label.style.color = '#991b1b';
-    }
-
-    const prev = document.getElementById('imgPreview');
-    if (p.image) {
-      document.getElementById('fieldImageData').value = p.image;
-      if (p.image.startsWith('http') || p.image.startsWith('data:') || p.image.startsWith('/')) {
-        prev.src = p.image;
-      } else {
-        prev.src = '../' + p.image;
-      }
-      prev.style.display = 'block';
-    } else {
-      document.getElementById('fieldImageData').value = '';
-      prev.style.display = 'none';
-      prev.src = '';
-    }
-
-    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit" style="color:#f97316;"></i> Edit Product';
-    openModal();
+    window.location.href = 'admin-product-edit.html?id=' + encodeURIComponent(id);
   }
+
 
   async function toggleProduct(id){
     const p = productsCache.find(x => x.id === id) || APP.getProductById(id);
