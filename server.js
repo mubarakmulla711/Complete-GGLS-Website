@@ -1247,4 +1247,9 @@ const server = app.listen(PORT, () => {
   console.log(`====================================================`);
 });
 
-module.exports = { app, server, db };
+app.server = server;
+app.db = db;
+module.exports = app;
+module.exports.app = app;
+module.exports.server = server;
+module.exports.db = db;

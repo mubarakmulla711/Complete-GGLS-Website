@@ -7,15 +7,17 @@
 const API = {
   getBaseUrl() {
     if (window.API_BASE_URL) return window.API_BASE_URL;
-    // If running directly on the Express server port 5000
-    if (window.location && window.location.port === '5000') {
+    // If running in browser via http/https (deployed cloud server or local Express server)
+    if (typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http')) {
+      // If accessed via an external dev server (e.g. Live Server on port 5500, 3000, 5173) connecting to local 5000 backend
+      if (['5500', '3000', '5173', '8080'].includes(window.location.port)) {
+        const host = window.location.hostname || 'localhost';
+        return `http://${host}:5000`;
+      }
+      // Production or directly on Express port (Render, Railway, Heroku, VPS, or localhost:5000)
       return window.location.origin;
     }
-    // If accessed via Live Server (e.g. port 5500, 3000) or file:///
-    const host = (window.location && window.location.hostname && window.location.hostname !== '')
-      ? window.location.hostname
-      : 'localhost';
-    return `http://${host}:5000`;
+    return 'http://localhost:5000';
   },
 
   getToken() {
